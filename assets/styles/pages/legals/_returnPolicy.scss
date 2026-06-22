@@ -1,0 +1,67 @@
+@use '../../utils/' as *;
+
+.returns {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: $nuance-0;
+
+  &_container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    min-height: calc(100vh - 9.7vh);
+    font-family: 'Montserrat';
+    width: 70%;
+
+    @media (max-width: 1300px) {
+      width: 80%;
+    }
+
+    &_title {
+      max-width: 50%;
+
+      @media (max-width: 1300px) {
+        max-width: 100%;
+      }
+
+      @media (max-width: 1000px) {
+        margin-top: 5vh;
+      }
+
+      @media (max-width: 900px) {
+        margin-top: 10vh;
+      }
+
+      h1 {
+        font-size: 3.8vh;
+        font-weight: 700;
+      }
+
+      p {
+        margin-top: 1vh;
+        font-size: 1.7vh;
+        font-weight: 500;
+      }
+    }
+
+    &_description {
+      max-width: 50%;
+      margin-top: 3.2vh;
+
+      @media (max-width: 1300px) {
+        max-width: 100%;
+      }
+
+      &_paraf {
+        p {
+          margin-top: 2vh;
+          font-size: 1.5vh;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+}

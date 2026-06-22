@@ -1,0 +1,155 @@
+@use '../../utils/' as *;
+
+.manual {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 4rem;
+
+  padding-block: clamp(4rem, -0.5714rem + 7.1429vw, 8rem);
+  padding-inline: clamp(2rem, -10.5714rem + 19.6429vw, 13rem);
+
+  // height: calc(100vh + 5.4vh);
+
+  background-color: $nuance-0;
+
+  h2 {
+    // font-family: 'Dancing Script';
+    font-size: clamp(4rem, -0.5714rem + 7.1429vw, 8rem);
+    font-weight: 700;
+    line-height: 100%;
+    letter-spacing: -2px;
+    text-align: center;
+    text-wrap: pretty;
+
+    color: $neutral-700;
+  }
+
+  &_container {
+    // position: relative;
+    // z-index: 9;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+
+    &_item {
+      // position: relative;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+
+      transition: all ease 0.5s;
+
+      &_image {
+        position: relative;
+        width: clamp(9.125rem, 3.5536rem + 8.7054vw, 14rem);
+        height: clamp(9.125rem, 3.5536rem + 8.7054vw, 14rem);
+        // aspect-ratio: 1;
+        border-radius: 1.5rem;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: top;
+          border-radius: 1.5rem;
+          box-shadow: 0 8px 16px 0 hsla(0, 0%, 0%, 0.15);
+          transition: all ease 0.5s;
+        }
+      }
+
+      &_title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        p {
+          text-align: center;
+          font-family: 'Dancing Script';
+          font-size: clamp(1.25rem, 0.3929rem + 1.3393vw, 2rem);
+        }
+      }
+      &_step {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background-color: $principal-500;
+        border-radius: 50%;
+        width: clamp(4rem, 2.2857rem + 2.6786vw, 5.5rem);
+        height: clamp(4rem, 2.2857rem + 2.6786vw, 5.5rem);
+
+        p {
+          text-align: center;
+          font-family: 'Dancing Script';
+          font-size: clamp(2.5rem, 1.3571rem + 1.7857vw, 3.5rem);
+        }
+      }
+
+      &_description {
+        opacity: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        z-index: 15;
+        width: calc(100% - 6.5vh);
+        height: calc(100% - 6.5vh);
+        left: 0;
+        top: 0;
+        padding: 3.2vh;
+        transition: all ease 0.6s;
+        p {
+          color: $black;
+          font-size: 1.5vh;
+          font-weight: 400;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .button--primary {
+    flex-direction: row-reverse;
+    align-self: center;
+    margin-top: 2rem;
+  }
+
+  @media screen and (max-width: 1024px) {
+    & {
+      padding-inline: clamp(1.5rem, 1.2727rem + 1.1364vw, 2rem);
+
+      h2 {
+        font-size: clamp(3rem, 2.5455rem + 2.2727vw, 4rem);
+      }
+
+      &_container {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4rem;
+
+        &_item {
+          &_image {
+            width: 272px;
+            height: 272px;
+          }
+
+          &_text {
+            font-size: 1.75rem;
+          }
+        }
+      }
+    }
+  }
+}

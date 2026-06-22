@@ -1,0 +1,114 @@
+@use '../../utils/' as *;
+
+.welcome_page {
+  background-color: $nuance-0;
+
+  &_content {
+    padding-inline: 4rem;
+    min-height: clamp(31.625rem, -0.2321rem + 49.7768vw, 59.5rem);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    &_avatar {
+      position: relative;
+      z-index: 12;
+      justify-self: center;
+      place-content: end;
+      // height: 100%;
+
+      &_image {
+        position: relative;
+        place-items: end;
+        width: clamp(19.25rem, -26.75rem + 71.875vw, 37.9375rem);
+        height: clamp(26.875rem, -37.5865rem + 100.7212vw, 53.0625rem);
+        z-index: 12;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: top;
+        }
+      }
+      &_bc {
+        position: absolute;
+        z-index: 11;
+        bottom: 0;
+        left: 0;
+        width: clamp(14.25rem, -3.75rem + 37.5vw, 30rem);
+        height: clamp(22.5625rem, -1.9375rem + 51.0417vw, 44rem);
+        background-color: $principal-500;
+        border-radius: clamp(2rem, -0.2857rem + 4.7619vw, 4rem)
+          clamp(2rem, -0.2857rem + 4.7619vw, 4rem) 0 0;
+      }
+      @media screen and (max-width: 1024px) {
+        & {
+          display: none;
+        }
+      }
+    }
+    &_title {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: start;
+      gap: 4rem;
+      height: 100%;
+      padding-block-end: 2rem;
+
+      h1 {
+        font-size: clamp(3rem, -1.9231rem + 7.6923vw, 5rem);
+        line-height: clamp(3.6rem, 0.8571rem + 5.7143vw, 6rem);
+        letter-spacing: -2%;
+        text-transform: uppercase;
+
+        span {
+          font-family: 'Dancing Script', sans-serif;
+          font-size: clamp(2rem, -2.9231rem + 7.6923vw, 4rem);
+          line-height: clamp(2.4rem, -3.5077rem + 9.2308vw, 4.8rem);
+          letter-spacing: 2%;
+          text-transform: none;
+          color: $principal-800;
+        }
+      }
+      p {
+        font-size: clamp(1rem, 0.6923rem + 0.4808vw, 1.125rem);
+        font-weight: 400;
+        line-height: clamp(1.5rem, 1.0385rem + 0.7212vw, 1.6875rem);
+        letter-spacing: 2%;
+      }
+    }
+
+    .button--primary {
+      align-self: start;
+      flex-direction: row-reverse;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    & {
+      &_content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+
+        &_title {
+          h1 {
+            font-size: clamp(1.75rem, 1.1818rem + 2.8409vw, 3rem);
+
+            line-height: clamp(2.1rem, 1.4182rem + 3.4091vw, 3.6rem);
+          }
+          p {
+            font-size: clamp(0.875rem, 0.8182rem + 0.2841vw, 1rem);
+          }
+        }
+        // .button--primary{
+        //     align-self: stretch;
+        //     flex-direction: row-reverse;
+        // }
+      }
+    }
+  }
+}

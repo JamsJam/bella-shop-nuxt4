@@ -1,0 +1,55 @@
+// Colors
+
+$white: #f8f7f7;
+$black: #0d0d0d;
+$grey: #e0e0e0;
+$beige: #d9bcb1;
+$lightbeige: #d3c0b9;
+$lightbrown: #d3c0b9;
+$brown: #8d7f7a;
+
+$red: #c55b5b;
+$green: #5c895c;
+
+// ? ==== principal ======
+
+$principal-50: oklch(96% 0.015 42);
+$principal-100: oklch(94% 0.03 42);
+$principal-200: oklch(91% 0.035 42);
+$principal-300: oklch(88% 0.04 42);
+$principal-400: oklch(85% 0.045 42);
+// $principal-500: navy;
+$principal-500: oklch(82% 0.04 42);
+$principal-600: oklch(68% 0.055 42);
+$principal-700: oklch(51% 0.06 42);
+$principal-800: oklch(34% 0.05 42);
+$principal-900: oklch(18% 0.04 42);
+
+// ? ==== accent ======
+
+$accent-50: oklch(96% 0.015 222);
+$accent-100: oklch(94% 0.03 222);
+$accent-200: oklch(91% 0.035 222);
+$accent-300: oklch(88% 0.04 222);
+$accent-400: oklch(85% 0.045 222);
+$accent-500: oklch(82% 0.04 222);
+$accent-600: oklch(68% 0.055 222);
+$accent-700: oklch(51% 0.06 222);
+$accent-800: oklch(34% 0.05 222);
+$accent-900: oklch(18% 0.04 222);
+
+// ? ==== neutral ======
+
+$neutral-50: oklch(96% 0.01 42);
+$neutral-100: oklch(87% 0.15 42);
+$neutral-200: oklch(78% 0.015 42);
+$neutral-300: oklch(69% 0.015 42);
+$neutral-400: oklch(60% 0.015 42);
+$neutral-500: oklch(42% 0.015 42);
+$neutral-600: oklch(33% 0.015 42);
+$neutral-700: oklch(24% 0.015 42);
+$neutral-800: oklch(19% 0.015 42);
+$neutral-900: oklch(14% 0.015 42);
+
+$nuance-0: oklch(100% 0 193);
+$nuance-100: oklch(0 0 0);

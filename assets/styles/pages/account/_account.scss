@@ -1,0 +1,89 @@
+@use '../../utils/variables' as *;
+
+.account {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: $nuance-0;
+  font-family: 'Montserrat';
+
+  &_container {
+    position: relative;
+    margin-top: 10.8vh;
+    min-height: calc(100vh - 9.7vh - 10.8vh - 13vh);
+    width: calc(40% - 13vh);
+    background-color: $nuance-0;
+    box-shadow: 0 8px 16px 0 hsla(0, 0%, 0%, 0.12);
+    margin-bottom: calc(10.8vh + 21.7vh);
+    border-radius: 1.6vh;
+    padding: 5.9vh 7.6vh;
+    transition: all ease 0.3s;
+
+    @media (max-width: 1500px) {
+      display: flex;
+      flex-direction: column-reverse;
+      width: 60%;
+    }
+
+    @media (max-width: 900px) {
+      margin-bottom: 10vh;
+      width: calc(100% - 15.2vh);
+    }
+
+    @media (max-width: 900px) {
+      padding: 5.9vh 3.2vh;
+      width: calc(100% - 6.5vh);
+    }
+
+    &_menu {
+      position: absolute;
+      top: 0;
+      left: -27.2vh;
+      box-shadow: 0 8px 16px 0 hsla(0, 0%, 0%, 0.12);
+      width: 22.8vh;
+      min-height: 16.3vh;
+      border-radius: 1.6vh;
+      padding: 3.2vh 0;
+
+      @media (max-width: 1500px) {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 5vh;
+        width: 100%;
+        height: fit-content;
+      }
+
+      &_link {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        background-color: transparent;
+        border: none;
+        border-left: 0.5vh solid transparent;
+        padding: 0.7vh 0;
+        transition: all ease 0.2s;
+
+        &:hover {
+          border-left: 0.5vh solid $beige;
+        }
+
+        svg {
+          margin-left: 1.6vh;
+          width: 2.7vh;
+          height: 2.7vh;
+        }
+        p {
+          margin-left: 1vh;
+          font-size: 1.5vh;
+        }
+      }
+
+      .active_account_page {
+        border-left: 0.5vh solid lighten($color: $beige, $amount: 10);
+      }
+    }
+  }
+}

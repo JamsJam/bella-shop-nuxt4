@@ -1,0 +1,82 @@
+@use '../../utils/' as *;
+
+.legals {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: $nuance-0;
+
+  &_container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    min-height: calc(100vh - 9.7vh);
+    font-family: 'Montserrat';
+    width: 70%;
+    margin: 15vh 0;
+
+    @media (max-width: 1300px) {
+      width: 80%;
+    }
+
+    &_title {
+      max-width: 50%;
+      // margin-top: 15vh;
+
+      @media (max-width: 1300px) {
+        max-width: 100%;
+      }
+
+      @media (max-width: 1000px) {
+        margin-top: 5vh;
+      }
+
+      @media (max-width: 900px) {
+        margin-top: 10vh;
+      }
+
+      h2 {
+        font-size: 3.8vh;
+        font-weight: 700;
+      }
+
+      p {
+        margin-top: 1vh;
+        font-size: 1.7vh;
+        font-weight: 500;
+      }
+    }
+
+    &_description {
+      max-width: 50%;
+      margin-top: 3.2vh;
+      padding: 5vh 0;
+      border-bottom: 0.1vh solid $neutral-50;
+
+      @media (max-width: 1300px) {
+        max-width: 100%;
+      }
+
+      &_subtitle {
+        h3 {
+          font-weight: 300;
+          font-size: 2.4vh;
+        }
+      }
+
+      &_paraf {
+        p {
+          margin: 1vh 0;
+          font-size: 1.5vh;
+          font-weight: 300;
+        }
+
+        span {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}

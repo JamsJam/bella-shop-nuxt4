@@ -1,0 +1,240 @@
+@use '../../utils/' as *;
+
+.best_sellers {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+
+  // background-color: $principal-500;
+  background: url('/images/homepage/best-seller-arriere-plan.jpg') center/cover
+    no-repeat;
+
+  padding-block: clamp(4rem, -0.5714rem + 7.1429vw, 8rem);
+  // overflow-x: hidden;
+
+  h2 {
+    font-size: clamp(4rem, 2.1429rem + 2.9018vw, 5.625rem);
+    line-height: 100%;
+    letter-spacing: 2%;
+    text-transform: uppercase;
+  }
+
+  &_content {
+    width: 100%;
+    height: 100%;
+    // background-color: aqua;
+    position: relative;
+    padding-inline: clamp(4rem, -6.2857rem + 16.0714vw, 13rem);
+    // padding-inline: clamp(0rem, -32rem + 50vw, 13rem);;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    &_container {
+      // background-color: rgb(174, 255, 0);
+      position: relative;
+      z-index: 11;
+      left: 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(1rem, -6.3846rem + 11.5385vw, 4rem);
+
+      width: 100%;
+      height: 100%;
+      padding-block: 1rem;
+      transform: translate(0);
+      transition: transform 0.25s ease-in-out;
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+
+        height: clamp(23.5rem, 14rem + 14.8438vw, 31.8125rem);
+        width: clamp(19.3125rem, 16.2411rem + 4.7991vw, 22rem);
+        // background-color: $grey;
+        border-radius: 1.5rem;
+        transition: all ease 0.5s;
+        color: $accent-900;
+        box-shadow: 0 8px 16px 0 hsla(0, 0%, 0%, 0.15);
+
+        &_image {
+          position: relative;
+          z-index: 12;
+          height: clamp(14.3125rem, 7.8125rem + 10.1563vw, 20rem);
+          width: 100%;
+
+          border-radius: 1.5rem 1.5rem 0 0;
+          overflow: hidden;
+
+          transition: all ease 0.2s;
+
+          img {
+            object-fit: cover;
+            object-position: center;
+            width: 100%;
+            height: 100%;
+            transition: all ease 0.2s;
+          }
+        }
+        &_text {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 0.5rem;
+
+          width: 100%;
+          height: clamp(9.375rem, 6.5893rem + 4.3527vw, 11.8125rem);
+
+          background-color: $nuance-0;
+          padding-inline: 1.5rem;
+          border-radius: 0 0 1.5rem 1.5rem;
+          // overflow: hidden;
+          transition: all ease 0.2s;
+          // visibility: hidden;
+
+          &_title h3,
+          &_price p {
+            font-family: 'Dancing Script';
+            font-size: clamp(1.25rem, 0.9643rem + 0.4464vw, 1.5rem);
+            line-height: 150%;
+            letter-spacing: -2%;
+          }
+
+          &_title h3 {
+            font-weight: 600;
+          }
+
+          &_price p {
+            font-weight: 700;
+          }
+        }
+
+        & .button--secondary {
+          align-self: center;
+
+          //20 -> 14
+          font-size: clamp(0.875rem, 0.4464rem + 0.6696vw, 1.25rem);
+          line-height: 100%;
+          letter-spacing: 2%;
+
+          padding: 16px 32px;
+
+          margin-top: 0.5rem;
+
+          svg {
+            //20 -> 16
+            width: clamp(1rem, 0.7143rem + 0.4464vw, 1.25rem);
+            aspect-ratio: 1/1;
+          }
+        }
+      }
+    }
+
+    &_button {
+      position: absolute;
+      z-index: 20;
+      top: 50%;
+      height: clamp(2.5rem, -0.3571rem + 4.4643vw, 5rem);
+      aspect-ratio: 1/1;
+      background-color: $nuance-0;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:hover {
+        background-color: $neutral-50;
+      }
+
+      &:focus {
+        background-color: $neutral-100;
+      }
+
+      svg {
+        height: clamp(1.5rem, -0.3571rem + 2.9018vw, 3.125rem);
+        width: clamp(1.5rem, -0.3571rem + 2.9018vw, 3.125rem);
+        // aspect-ratio: 1/1;
+        stroke: $accent-900;
+      }
+
+      &--next {
+        left: 1rem;
+
+        svg {
+          transform: rotateZ(90deg);
+        }
+      }
+      &--previous {
+        right: 1rem;
+
+        svg {
+          transform: rotateZ(-90deg);
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    & {
+      h2 {
+        text-align: center;
+        font-size: clamp(3rem, 2.5455rem + 2.2727vw, 4rem);
+        line-height: 120%;
+      }
+
+      &_content {
+        justify-content: start;
+        padding-inline: 1rem;
+        // overflow-x: scroll ;
+        &_container {
+          // left:;
+
+          width: max-content;
+          .card {
+            height: clamp(29.1875rem, 31.7727rem + -12.9261vw, 23.5rem);
+            width: clamp(17rem, 15.9489rem + 5.2557vw, 19.3125rem);
+
+            &_image {
+              height: clamp(20rem, 22.5852rem + -12.9261vw, 14.3125rem);
+            }
+          }
+        }
+      }
+      &_navigation {
+        width: 100%;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        gap: 2rem;
+
+        padding-inline: 1rem;
+
+        &_dot {
+          height: 8px;
+          width: 100%;
+
+          border-radius: 8px;
+
+          background-color: $nuance-0;
+
+          &.activ {
+            background-color: $principal-900;
+          }
+        }
+      }
+    }
+  }
+}

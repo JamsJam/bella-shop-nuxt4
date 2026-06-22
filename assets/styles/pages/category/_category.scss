@@ -1,0 +1,212 @@
+@use '../../utils/' as *;
+
+.clothes_selection {
+  width: 100%;
+  background-color: $nuance-0;
+  padding-inline: clamp(6.125rem, 3.9821rem + 3.3482vw, 8rem);
+  padding-block: clamp(6.125rem, 3.9821rem + 3.3482vw, 8rem);
+
+  &_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 4rem;
+
+    &_header {
+      position: relative;
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: start;
+      //   width: 80%;
+      gap: 1rem;
+
+      &_title {
+        color: $neutral-700;
+        line-height: 100%;
+        letter-spacing: 0.02em;
+        font-weight: 600;
+        font-size: clamp(1.5rem, 0.9286rem + 0.8929vw, 2rem);
+
+        span {
+          position: absolute;
+          top: -2.5rem;
+          left: 0;
+
+          a {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: clamp(0.875rem, 0.7614rem + 0.5682vw, 1.125rem);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 150%;
+
+            color: $accent-900;
+
+            svg {
+              width: 32px;
+              height: 32px;
+              stroke: $accent-900;
+            }
+          }
+        }
+      }
+
+      &_subTitle {
+        font-size: clamp(0.875rem, 0.7614rem + 0.5682vw, 1.125rem);
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        line-height: 150%;
+      }
+    }
+
+    &_grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+
+      &_item {
+        height: clamp(12rem, 7.4286rem + 7.1429vw, 16rem);
+        width: clamp(19.3125rem, 7.0982rem + 19.0848vw, 30rem);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px hsla(0, 0%, 0%, 0.12);
+        border-radius: 16px;
+
+        transition: background-color ease 250ms;
+
+        &:hover {
+          background-color: $accent-100;
+        }
+
+        &:focus {
+          background-color: $accent-400;
+        }
+
+        h2 {
+          color: $neutral-700;
+          line-height: 100%;
+          letter-spacing: 0.02em;
+          font-weight: 700;
+          font-size: clamp(1.5rem, 0.9286rem + 0.8929vw, 2rem);
+        }
+        p {
+          display: none;
+        }
+
+        &_image {
+          display: none;
+        }
+      }
+    }
+
+    &_hero {
+      align-self: stretch;
+
+      height: clamp(16rem, 9.8571rem + 9.5982vw, 21.375rem);
+
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+      align-items: flex-end;
+
+      background: url('/images/clothes/category_banniere.jpg') center/cover
+        no-repeat;
+
+      border-radius: 1rem;
+
+      &_container {
+        width: clamp(20.5rem, 8.8571rem + 18.192vw, 30.6875rem);
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: flex-start;
+        gap: 1rem;
+
+        padding-block: clamp(3rem, 2.4286rem + 0.8929vw, 3.5rem);
+        padding-inline: 2rem;
+
+        h2 {
+          font-weight: 500;
+          word-wrap: pretty;
+          font-size: clamp(2rem, 0.8571rem + 1.7857vw, 3rem);
+        }
+      }
+    }
+  }
+  @media screen and (max-width: 1024px) {
+    & {
+      padding-inline: 2rem;
+
+      &_container {
+        // &_header{
+
+        // }
+
+        &_grid {
+          grid-template-columns: 1fr;
+          align-items: stretch;
+          align-self: stretch;
+
+          &_item {
+            width: 100%;
+            flex-direction: row;
+            justify-content: start;
+            gap: 1rem;
+            // width:  clamp(16.9375rem, 15.5739rem + 6.8182vw, 19.9375rem);
+            height: clamp(4rem, 0.3636rem + 18.1818vw, 12rem);
+
+            &_image {
+              display: block;
+              background-color: $principal-600;
+              height: 100%;
+              aspect-ratio: 1/1;
+              border-radius: 1rem 0 0 1rem;
+              padding: 1rem;
+
+              img {
+                height: 100%;
+                width: 100%;
+                object-fit: contain;
+                object-position: center;
+              }
+            }
+
+            &_title {
+              h2 {
+                font-size: clamp(0.875rem, 0.5909rem + 1.4205vw, 1.5rem);
+              }
+            }
+          }
+        }
+
+        &_hero {
+          height: clamp(16rem, 18.6136rem + -13.0682vw, 10.25rem);
+
+          align-items: center;
+
+          &_container {
+            width: 100%;
+            align-items: center;
+            justify-content: space-around;
+
+            padding-block: clamp(1rem, 0.0909rem + 4.5455vw, 3rem);
+            font-size: clamp(1rem, 0.5455rem + 2.2727vw, 2rem);
+
+            h2 {
+              font-size: clamp(1.25rem, 0.9091rem + 1.7045vw, 2rem);
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,167 @@
+@use '../../utils/' as *;
+
+.about {
+  position: relative;
+
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: stretch;
+  gap: 2rem;
+  // min-height: 100dvh;
+  background-color: $nuance-0;
+
+  // overflow: hidden;
+
+  // @media (max-width: 1050px) {
+  //   flex-direction: column;
+  // }
+
+  &_product_slider {
+    //   margin-left: 6.5vh;
+    width: 50%;
+    background-color: $principal-500;
+    overflow: hidden;
+    height: clamp(34.25rem, 18.5357rem + 24.5536vw, 48rem);
+
+    &_item {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      background-color: $nuance-100;
+
+      &:hover {
+        img {
+          transform: scale(1.02);
+        }
+      }
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        transition: all ease 0.4s;
+        opacity: 0.6;
+      }
+      &_title {
+        position: absolute;
+        text-align: center;
+
+        h3 {
+          font-family: 'Playfair Display';
+          font-size: 5.4vh;
+          text-transform: uppercase;
+          color: $nuance-0;
+        }
+
+        p {
+          font-family: 'Dancing Script';
+          font-size: 2.2vh;
+          color: $nuance-0;
+          margin: 2.2vh 0;
+        }
+      }
+    }
+
+    .clothing_animation_fade_in {
+      animation: clothing_fade_in 1000ms ease forwards;
+    }
+    .clothing_animation_fade_out {
+      animation: clothing_fade_out 1000ms ease forwards;
+    }
+  }
+
+  &_text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: 4rem;
+
+    width: 50dvw;
+    height: 100%;
+
+    padding-block: clamp(4rem, -0.5714rem + 7.1429vw, 8rem);
+    padding-inline: 1.5rem;
+
+    h2 {
+      font-family: 'Dancing Script';
+      font-size: clamp(4rem, -0.5714rem + 7.1429vw, 8rem);
+      font-weight: 700;
+      line-height: 100%;
+      letter-spacing: -2px;
+
+      color: $neutral-700;
+    }
+    p {
+      font-family: 'Montserrat';
+      font-size: clamp(1rem, 0.8571rem + 0.2232vw, 1.125rem);
+      line-height: 150%;
+      letter-spacing: 2%;
+      font-weight: 400;
+
+      color: $neutral-600;
+
+      max-width: 736px;
+    }
+
+    .button--primary {
+      flex-direction: row-reverse;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    & {
+      &_text {
+        gap: clamp(2rem, 1.0909rem + 4.5455vw, 4rem);
+        width: 100%;
+
+        align-items: center;
+
+        h2 {
+          font-size: clamp(3rem, 2.5455rem + 2.2727vw, 4rem);
+        }
+        p {
+          font-size: clamp(0.875rem, 0.8182rem + 0.2841vw, 1rem);
+          text-align: center;
+        }
+      }
+
+      &_product_slider {
+        display: none;
+      }
+    }
+  }
+
+  // @media  screen and (max-width: 768px) {
+  //   &{
+
+  //   }
+
+  // }
+
+  // Clothing Animation
+
+  @keyframes clothing_fade_in {
+    0% {
+      opacity: 0;
+      transform: translateX(76.1vh);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes clothing_fade_out {
+    0% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-76.1vh);
+    }
+  }
+}

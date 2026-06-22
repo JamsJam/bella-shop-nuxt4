@@ -1,0 +1,588 @@
+@use '../../utils/' as *;
+
+.expedition {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: $nuance-0;
+  font-family: 'Montserrat';
+
+  &_container {
+    // display: flex;
+    /* min-height: 112vh; */
+    width: 100%;
+
+    // @media (max-width: 900px) {
+    //   min-height: 90vh;
+    // }
+
+    &_box {
+      // position: relative;
+      // display: flex;
+      // justify-content: center;
+      // width: calc(100% - 6.5vh);
+      // min-height: calc(100vh - 9.7vh);
+      // padding: 0 0 21.7vh 0;
+      // height: fit-content;
+
+      display: flex;
+      justify-content: center;
+      align-items: start;
+      gap: 2rem;
+      width: 100dvw;
+      min-height: calc(100dvh - 180px);
+      padding-block: 2rem;
+      /* position: relative; */
+
+      @media (max-width: 900px) {
+        // width: 100%;
+        // padding: 0;
+        // flex-direction: column-reverse;
+        // align-items: center;
+        // margin: 10vh 0;
+
+        flex-direction: column-reverse;
+        align-items: center;
+
+        width: 100%;
+      }
+
+      &_wrapper {
+        // width: calc(45% - 8.7vh);
+        // height: fit-content;
+        // margin: 7.6vh 1vh;
+        box-shadow: 0 0 1vh darken($color: white, $amount: 25);
+        // color: $principal-900;
+        // padding: 4.3vh 5.4vh;
+
+        // box-shadow: 0 0 1vh #bfbfbf;
+        color: #0d0d0d;
+        // height: -moz-fit-content;
+        height: fit-content;
+        /* margin: 7.6vh 1vh; */
+        padding-inline: 1.2rem;
+        padding-block: 2rem;
+        //? 50% - padding - gap
+        width: calc(
+          50% - clamp(1rem, -6.3846rem + 11.5385vw, 4rem) * 2 - 1.5rem
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: stretch;
+        gap: 1.5rem;
+
+        @media (max-width: 900px) {
+          width: 90dvw;
+        }
+
+        @media (max-width: 500px) {
+          padding: 2rem 1rem;
+        }
+
+        &_title {
+          margin-block-end: 2rem;
+
+          h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+          }
+        }
+
+        &_input {
+          position: relative;
+          display: flex;
+          align-items: center;
+          border: 0.1vh solid darken($color: $white, $amount: 30);
+          padding: 0.6vh 1.3vh;
+          img {
+            // width: 3.2vh;
+            // height: 2.2vh;
+            // object-fit: contain;
+            // margin-right: 2.2vh;
+            height: 24px;
+            width: 32px;
+
+            object-fit: contain;
+            object-position: center;
+          }
+          select {
+            font-family: 'Montserrat';
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: transparent;
+            outline: none;
+            border: none;
+            width: 100%;
+            // padding-right: 14.14vh;
+          }
+
+          &_select_country {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+            label {
+              font-size: 0.75rem;
+              font-weight: 300;
+              color: darken($color: $white, $amount: 60);
+            }
+          }
+
+          &_country {
+            // margin: 6.5vh 0 4.3vh 0;
+            // width: fit-content;
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 2rem;
+          }
+        }
+
+        &_delivery_option {
+          // position: relative;
+          // margin-top: 1vh;
+          // // width: calc(100% - 4.5vh);
+          // padding: 1;
+          // height: 11.4vh;
+          border: 0.1vh solid darken($color: $white, $amount: 30);
+          // transition: all ease 0.4s;
+          // overflow: hidden;
+
+          // @media (max-width: 500px) {
+          //   width: calc(100% - 4.3vh);
+          // }
+
+          // border: .1vh solid #b1a5a5;
+          height: 120px;
+          /* margin-top: 1vh; */
+          overflow: hidden;
+          padding: 1rem;
+          position: relative;
+          transition: all 0.4s ease;
+          /* width: calc(100% - 4.5vh); */
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+
+          &_container {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            justify-content: space-around;
+            gap: 1rem;
+          }
+
+          &_box {
+            display: flex;
+            align-items: center;
+            // height: 11.4vh;
+            input {
+              font-weight: 300;
+              width: 2.2vh;
+              height: 2.2vh;
+            }
+
+            label {
+              margin-left: 2.2vh;
+              display: flex;
+              flex-direction: column;
+              font-weight: 300;
+
+              .delivery_label_title {
+                text-transform: uppercase;
+                font-size: 1.5vh;
+              }
+              .delivery_label_calendar {
+                color: darken($color: $white, $amount: 50);
+                font-size: 1.3vh;
+                margin-top: 1vh;
+              }
+            }
+            p {
+              display: flex;
+              align-items: center;
+              position: absolute;
+              font-size: 1.3vh;
+              font-weight: 600;
+              text-transform: uppercase;
+              right: 3.2vh;
+              height: 100%;
+            }
+          }
+
+          &_input {
+            position: relative;
+            // margin: 0 5.4vh 2.2vh 2.2vh;
+
+            // @media (max-width: 500px) {
+            //   margin: 0 1vh 2.2vh 1vh;
+            // }
+
+            input {
+              background-color: transparent;
+              border: 0.1vh solid darken($color: $white, $amount: 30);
+              padding: 2.7vh 2.2vh 1.6vh 2.2vh;
+              font-size: 1.5vh;
+              color: $principal-900;
+              font-family: 'Montserrat';
+              width: 100%;
+            }
+            label {
+              position: absolute;
+              display: flex;
+              align-items: center;
+              left: 2.2vh;
+              top: 0;
+              height: 100%;
+              color: darken($color: $white, $amount: 50);
+              font-weight: 300;
+              font-size: 1.5vh;
+              transition: all ease 0.3s;
+            }
+
+            .label_focused {
+              font-size: 1vh;
+              height: 1vh;
+              top: 1vh;
+            }
+
+            select {
+              font-family: 'Montserrat';
+              background-color: transparent;
+              padding: 2.2vh;
+              font-size: 1.5vh;
+              color: darken($color: $white, $amount: 50);
+              width: calc(100%);
+              border: none;
+            }
+
+            &_box {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              // margin: 0 5.4vh 2.2vh 2.2vh;
+              flex-wrap: wrap;
+              gap: 1rem;
+
+              @media (max-width: 500px) {
+                // margin: 0 1vh 2.2vh 1vh;
+                flex-direction: column;
+              }
+
+              &_split {
+                // width: 48%;
+                margin: 0;
+                width: calc(100% / 2 - 1rem);
+
+                @media (max-width: 768px) {
+                  width: 100%;
+                }
+
+                // @media (max-width: 500px) {
+                //   width: 100%;
+                // }
+              }
+              &_select {
+                border: 0.1vh solid darken($color: $white, $amount: 30);
+                padding-right: 1vh;
+              }
+            }
+
+            p {
+              padding: 1vh;
+              font-size: 1.5vh;
+            }
+          }
+
+          &_address_book {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            &_container {
+              margin: 0 5.4vh 2.2vh 2.2vh;
+              padding: 2.2vh;
+              border: 0.1vh solid darken($color: $white, $amount: 30);
+
+              @media (max-width: 900px) {
+                margin: 0 1vh 2.2vh 1vh;
+              }
+
+              &_button {
+                button {
+                  background-color: $beige;
+                  padding: 1.6vh;
+                  font-family: 'Montserrat';
+                  font-size: 1.6vh;
+                  font-weight: 300;
+                  color: $nuance-0;
+                  border: none;
+                  box-shadow: 0 0.3vh 0.5vh darken($color: $white, $amount: 30);
+                  transition: all ease 0.3s;
+
+                  &:hover {
+                    background-color: darken($color: $beige, $amount: 10);
+                  }
+                }
+              }
+
+              p {
+                margin-top: 4.3vh;
+                color: darken($color: $white, $amount: 50);
+                font-weight: 300;
+                font-size: 1.7vh;
+              }
+            }
+          }
+        }
+
+        .selectedDelivery {
+          // height: fit-content;
+          // align-items: baseline;
+          // padding-bottom: 4.3vh;
+
+          display: flex;
+          /* align-items: baseline; */
+          height: fit-content;
+          padding-block: 2rem;
+          flex-direction: column;
+          justify-content: space-around;
+          align-items: stretch;
+          gap: 2rem;
+        }
+
+        // Summary Container
+
+        &_summary {
+          margin-top: 4.3vh;
+          padding: 1.6vh 0 0 0;
+          border-top: 0.1vh solid darken($color: $white, $amount: 30);
+          &_subtitle {
+            display: flex;
+            justify-content: space-between;
+            margin: 2.2vh 0;
+            color: $principal-900;
+            h4 {
+              font-weight: 500;
+              font-size: 1.7vh;
+            }
+            p {
+              font-weight: 500;
+              font-size: 1.7vh;
+            }
+          }
+          &_items {
+            margin: 2.2vh 0 16.3vh 0;
+          }
+          &_item {
+            position: relative;
+            margin: 1vh 0;
+            display: flex;
+            &_container {
+              width: 70%;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+
+              p {
+                font-size: 1.4vh;
+                font-weight: 500;
+              }
+            }
+            &_price {
+              display: flex;
+              align-items: center;
+              position: absolute;
+              right: 0;
+              height: 100%;
+              p {
+                font-size: 1.4vh;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+
+        &_go_to_checkout_button {
+          margin-top: 4.3vh;
+          button {
+            width: 100%;
+            padding: 2.2vh 0;
+            background-color: $principal-700;
+            border: none;
+            font-size: 1.7vh;
+            font-weight: 700;
+            color: $nuance-0;
+            transition: all ease 0.3s;
+
+            &:hover {
+              background-color: $principal-900;
+            }
+          }
+        }
+
+        &_save_delivery {
+          // margin-top: 7.6vh;
+          label {
+            font-size: 1.3vh;
+          }
+        }
+      }
+
+      &_confirm_address {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: $principal-500;
+
+        &_box {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          position: absolute;
+          width: 54.4vh;
+          max-height: 32.6vh;
+          min-height: 21.7vh;
+          background-color: $grey;
+          padding: 4.3vh;
+          overflow: scroll;
+
+          @media (max-width: 900px) {
+            width: 80%;
+          }
+
+          &_back_button {
+            position: absolute;
+            top: 1.6vh;
+            left: 1.6vh;
+            button {
+              position: relative;
+              font-size: 1.3vh;
+              font-weight: 300;
+              font-family: 'Montserrat';
+              border: none;
+              background-color: transparent;
+
+              &:hover {
+                &::after {
+                  width: 100%;
+                }
+              }
+
+              &::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                bottom: -0.2vh;
+                width: 0;
+                height: 0.1vh;
+                background-color: darken($color: $white, $amount: 30);
+                transition: all ease 0.3s;
+              }
+            }
+          }
+
+          &_no_address {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          h5 {
+            font-size: 1.9vh;
+            font-weight: 300;
+            text-align: center;
+            margin: 4.3vh 0 4.3vh 0;
+          }
+
+          a {
+            position: relative;
+            font-size: 1.5vh;
+            font-weight: 300;
+            text-align: center;
+            margin-top: 2.2vh;
+
+            &:hover {
+              &::after {
+                width: 100%;
+              }
+            }
+
+            &:after {
+              content: '';
+              position: absolute;
+              bottom: -0.2vh;
+              right: 0;
+              height: 1vh;
+              width: 0;
+              background-color: darken($color: $white, $amount: 30);
+              transition: all ease 0.3s;
+            }
+          }
+
+          &_item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            margin-top: 1vh;
+
+            &:hover {
+              button {
+                opacity: 1;
+              }
+            }
+
+            p {
+              width: calc(100% - 4.3vh);
+              padding: 2.2vh;
+              border: 0.1vh solid $principal-900;
+            }
+            button {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              padding: 2.2vh;
+              color: $nuance-0;
+              font-family: 'Montserrat';
+              font-size: 1.7vh;
+              font-weight: 400;
+              border-radius: 0;
+              border: none;
+              background-color: $principal-900;
+              transition: all ease 0.3s;
+              opacity: 0;
+            }
+          }
+
+          &_confirm_button {
+            button {
+              margin-top: 3.2vh;
+              padding: 2.2vh;
+              color: $nuance-0;
+              font-family: 'Montserrat';
+              font-size: 1.7vh;
+              font-weight: 400;
+              border-radius: 0;
+              border: none;
+              background-color: $principal-700;
+              transition: all ease 0.3s;
+
+              &:hover {
+                background-color: $principal-900;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

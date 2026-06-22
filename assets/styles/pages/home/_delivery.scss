@@ -1,0 +1,93 @@
+@use '../../utils/' as *;
+
+.delivery {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  padding-inline: clamp(2rem, -10.5714rem + 19.6429vw, 13rem);
+  padding-block: clamp(2rem, -0.2857rem + 3.5714vw, 4rem);
+
+  background-color: $principal-500;
+  column-gap: 1rem;
+  // overflow: hidden;
+
+  &_bar_item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    &_svgWrapper {
+      // width:  clamp(3rem, 1.8571rem + 1.7857vw, 4rem);
+      // height:  clamp(3rem, 1.8571rem + 1.7857vw, 4rem);
+      background-color: $nuance-0;
+      padding: 8px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+
+      box-shadow: 0 4px 8px 0 hsla(0, 0%, 0%, 0.12);
+
+      svg {
+        width: clamp(1.5rem, 0.9286rem + 0.8929vw, 2rem);
+        height: clamp(1.5rem, 0.9286rem + 0.8929vw, 2rem);
+        stroke: $principal-700;
+      }
+
+      .svg-delivery {
+        g {
+          fill: $principal-700;
+        }
+      }
+    }
+
+    p {
+      font-size: clamp(1rem, 0.7143rem + 0.4464vw, 1.25rem);
+      font-weight: 500;
+      line-height: 150%;
+      letter-spacing: 2%;
+      color: $principal-900;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    & {
+      padding-inline: clamp(2.8125rem, 0.8807rem + 9.6591vw, 7.0625rem);
+      grid-template-columns: repeat(2, 1fr);
+      justify-items: stretch;
+      row-gap: 2rem;
+      column-gap: 1rem;
+
+      &_bar_item {
+        justify-content: flex-start;
+        // gap:1rem;
+
+        p {
+          font-size: clamp(0.875rem, 0.8182rem + 0.2841vw, 1rem);
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    & {
+      padding-inline: clamp(2.8125rem, 0.8807rem + 9.6591vw, 7.0625rem);
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(4, 1fr);
+      place-items: center;
+      row-gap: 2rem;
+      column-gap: 1rem;
+
+      &_bar_item {
+        flex-direction: column;
+        // gap:1rem;
+        p {
+          text-align: center;
+        }
+      }
+    }
+  }
+}

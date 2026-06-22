@@ -1,0 +1,65 @@
+@use '../utils/' as *;
+
+.base_button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  padding-inline: clamp(1.5rem, 0.9286rem + 1.1905vw, 2rem);
+  padding-block: clamp(0.75rem, 0.4643rem + 0.5952vw, 1rem);
+  border-radius: 64px;
+
+  box-shadow: 0 4px 8px hsla(197, 86%, 6%, 0.12);
+
+  font-weight: 500;
+  font-size: clamp(0.875rem, 0.4464rem + 0.8929vw, 1.25rem);
+  line-height: clamp(1.3125rem, 0.6696rem + 1.3393vw, 1.875rem);
+  letter-spacing: 2%;
+
+  transition: background-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+
+  color: $accent-900;
+  text-wrap: nowrap;
+
+  &:focus {
+    box-shadow: 0 0px 0px hsla(197, 86%, 6%, 0.12);
+  }
+
+  svg {
+    stroke: $neutral-700;
+    height: 20px;
+    width: 20px;
+  }
+
+  // @media screen and (max-width:1024) {
+
+  // }
+}
+
+.button--primary {
+  @extend .base_button;
+  background-color: $accent-300;
+
+  &:hover {
+    background-color: $accent-200;
+  }
+
+  &:focus {
+    background-color: $accent-400;
+  }
+}
+
+.button--secondary {
+  @extend .base_button;
+  background-color: $principal-300;
+
+  &:hover {
+    background-color: $principal-200;
+  }
+
+  &:focus {
+    background-color: $principal-400;
+  }
+}
