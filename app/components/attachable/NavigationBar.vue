@@ -30,7 +30,7 @@
 
     <ul v-if="auth === false" class="navigation_system__action">
       <li>
-        <a href="/login" class="nav__action">
+        <NuxtLink to="/login" class="nav__action">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
@@ -45,11 +45,11 @@
           </svg>
 
           <span> Compte </span>
-        </a>
+        </NuxtLink>
       </li>
 
       <li>
-        <a href="/cart" class="nav__action">
+        <NuxtLink to="/cart" class="nav__action">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
@@ -63,7 +63,7 @@
             />
           </svg>
           <span> Panier </span>
-        </a>
+        </NuxtLink>
       </li>
     </ul>
 
@@ -72,7 +72,7 @@
 
 
       <li>
-        <a href="/account" class="nav__action">
+        <NuxtLink to="/account" class="nav__action">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
@@ -87,11 +87,11 @@
           </svg>
 
           <span> Compte </span>
-        </a>
+        </NuxtLink>
       </li>
 
       <li>
-        <a href="/cart" class="nav__action">
+        <NuxtLink to="/cart" class="nav__action">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
@@ -105,7 +105,7 @@
             />
           </svg>
           <span> Panier </span>
-        </a>
+        </NuxtLink>
       </li>
     </ul>
 
@@ -117,16 +117,16 @@
     >
       <div class="navigation_menu_link_container">
         <div class="navigation_menu_link">
-          <a href="/">Accueil</a>
+          <NuxtLink to="/">Accueil</NuxtLink >
         </div>
         <div class="navigation_menu_link">
-          <a href="/clothes">Shop ta tenue</a>
+          <NuxtLink to="/category">Shop ta tenue</NuxtLink >
         </div>
         <div class="navigation_menu_link">
-          <a href="/avatar">Mon avatar</a>
+          <NuxtLink to="/avatar">Mon avatar</NuxtLink >
         </div>
         <div class="navigation_menu_link">
-          <nuxt-link :to="auth ? '/account' : '/login'">Mon compte</nuxt-link>
+          <NuxtLink :to="auth ? '/account' : '/login'">Mon compte</NuxtLink>
         </div>
       </div>
 

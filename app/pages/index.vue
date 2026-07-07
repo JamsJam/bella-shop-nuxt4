@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import type HomepageDTO from '#shared/dto/homepage.dto'
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import WelcomePage from '~/components/homepage/WelcomePage.vue'
@@ -33,30 +33,29 @@ import Foooter from '~/components/attachable/Footer.vue'
 const auth = ref(false)
 const { data: homepage } = await useFetch<HomepageDTO>('/api/page/home')
 
-useHead(computed(() => {
-  const seo = homepage.value?.seo
-  if (!seo) {
+useHead(() => {
+  if (!homepage.value?.seo) {
     return {}
   }
 
   return {
-    title: seo.title,
+    title: homepage.value.seo.title,
     meta: [
-      { name: 'description', content: seo.description },
-      { name: 'keywords', content: seo.keywords },
-      { property: 'og:title', content: seo.ogTitle },
-      { property: 'og:description', content: seo.ogDescription },
-      { property: 'og:url', content: seo.ogUrl },
-      { property: 'og:image', content: seo.ogImage },
+      { name: 'description', content: homepage.value.seo.description },
+      { name: 'keywords', content: homepage.value.seo.keywords },
+      { property: 'og:title', content: homepage.value.seo.ogTitle },
+      { property: 'og:description', content: homepage.value.seo.ogDescription },
+      { property: 'og:url', content: homepage.value.seo.ogUrl },
+      { property: 'og:image', content: homepage.value.seo.ogImage },
     ],
     script: [
       {
         type: 'application/ld+json',
-        children: seo.jsonLd,
+        children: homepage.value.seo.jsonLd,
       },
     ],
   }
-}))
+})
 </script>
 
 <style lang="scss">

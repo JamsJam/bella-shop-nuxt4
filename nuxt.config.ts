@@ -12,15 +12,21 @@ export default defineNuxtConfig({
   
   ssr: true,
   // cors: false,
-  modules: [],
+  modules: ['@pinia/nuxt'],
   runtimeConfig: {
     platformApiBase: "url_to_platform_api",
     public: {
+      platformApiBase: "url_to_platform_api",
       siteUrl: "url_to_site",
       stripePublicKey: "stripe_public_key"
     }
   },
   app: {
+    head: {
+      script: [
+        { src: "https://analytics.ahrefs.com/analytics.js", 'data-key': "6pa4LnzMnrcaiDPQiwDR/g", async: true }
+      ]
+    },
     pageTransition: { name: 'page', mode: 'out-in' },
   },
 

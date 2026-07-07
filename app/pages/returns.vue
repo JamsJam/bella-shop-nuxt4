@@ -2,7 +2,7 @@
   <div class="clothes_page">
     <NavigationBar :auth="auth" />
 
-    <ReturnsPolitics :auth="auth" />
+    <ReturnsPolitics :auth="auth" :blocks="returnsPage?.blocks" />
 
     <Footer :auth="auth" />
   </div>
@@ -25,10 +25,11 @@ export default {
   data: function () {
     return {
       auth: false,
+      returnsPage: null,
     }
   },
-  mounted() {
-    this.verifyLogin()
+  async mounted() {
+    await Promise.all([this.verifyLogin(), this.loadReturnsPage()])
   },
   methods: {
     async verifyLogin() {
@@ -39,16 +40,17 @@ export default {
         this.auth = false
       }
     },
+    async loadReturnsPage() {
+      try {
+        const response = await fetch('/api/page/returns')
+        if (response.ok) {
+          this.returnsPage = await response.json()
+        }
+      } catch (error) {
+        console.error('Failed to load returns page content', error)
+      }
+    },
   },
 }
 </script>
 
-<style lang="scss">
-@use '../sass/utils' as *;
-@use '../sass/base' as *;
-
-.clothes_page {
-  position: relative;
-  overflow: hidden;
-}
-</style>

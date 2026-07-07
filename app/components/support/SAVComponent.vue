@@ -12,15 +12,18 @@
           </h2>
         </div>
         <div class="returns_container_description_paraf">
-          <p><strong>serviceapresvente@bellagp.fr</strong></p>
-          <p>Concernant les problèmes :</p>
-          <p>-De réception colis</p>
-          <p>-De retour colis</p>
-          <p>-Divers autres problèmes concernant votre achat.</p>
-          <p>
-            Soyez précis et clair dans votre mail afin que nous puissions
-            traiter votre demande dans les plus bref délais.
-          </p>
+          <a href="mailto:serviceapresvente@bellagp.fr"><strong>serviceapresvente@bellagp.fr</strong></a>
+          <ul>
+            <li><p>Problèmes de réception de colis</p></li>
+            <li><p>Problèmes de retour de colis</p></li>
+            <li><p>Divers autres problèmes concernant votre achat</p></li>
+            <li><p>Autres questions ou demandes spécifiques</p></li>
+            <li>
+              <p> N'oubliez pas de préciser votre numéro de commande dans le sujet de votre mail.</p>
+              <p>Nous vous répondrons dans les plus brefs délais.</p>
+            </li>
+          </ul>
+          
         </div>
       </div>
     </div>

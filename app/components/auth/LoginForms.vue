@@ -45,13 +45,13 @@
             Connecte-toi
           </button>
           <div class="login_container_forms_inputs_forget_password">
-            <a href="/forgot-password">Mot de passe oublié</a>
+            <NuxtLink to="/forgot-password">Mot de passe oublié</NuxtLink>
           </div>
           <div class="login_container_forms_buttons">
             <p>
               Tu n'est pas encore inscris ?
-              <a href="/signin" class="login_container_forms_buttons_signin"
-                >Inscris toi</a
+              <NuxtLink to="/signin" class="login_container_forms_buttons_signin"
+                >Inscris toi</NuxtLink
               >
             </p>
           </div>

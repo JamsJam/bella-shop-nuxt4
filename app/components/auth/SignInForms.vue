@@ -51,8 +51,8 @@
               <div class="login_container_forms_buttons">
                 <p>
                   Tu as déjà ton compte ?
-                  <a href="/login" class="login_container_forms_buttons_signin"
-                    >Connecte-toi</a
+                  <NuxtLink to="/login" class="login_container_forms_buttons_signin"
+                    >Connecte-toi</NuxtLink
                   >
                 </p>
               </div>

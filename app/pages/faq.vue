@@ -2,7 +2,7 @@
   <div class="clothes_page">
     <NavigationBar :auth="auth" />
 
-    <FAQComponent :auth="auth" />
+    <FAQComponent :auth="auth" :questions="faq?.questions" />
 
     <Footer :auth="auth" />
   </div>
@@ -25,10 +25,11 @@ export default {
   data: function () {
     return {
       auth: false,
+      faq: null,
     }
   },
-  mounted() {
-    this.verifyLogin()
+  async mounted() {
+    await Promise.all([this.verifyLogin(), this.loadFaq()])
   },
   methods: {
     async verifyLogin() {
@@ -39,16 +40,18 @@ export default {
         this.auth = false
       }
     },
+    async loadFaq() {
+      try {
+        const response = await fetch('/api/page/faq')
+        if (response.ok) {
+          this.faq = await response.json()
+        }
+      } catch (error) {
+        console.error('Failed to load FAQ', error)
+      }
+    },
   },
 }
 </script>
 
-<style lang="scss">
-@use '../sass/utils' as *;
-@use '../sass/base' as *;
 
-.clothes_page {
-  position: relative;
-  overflow: hidden;
-}
-</style>

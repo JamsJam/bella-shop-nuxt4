@@ -23,12 +23,12 @@
           </h1>
 
           <p class="welcome_page_content_text" v-html="landing.text"></p>
-          <a href="/clothes" class="button--primary">
+          <nuxt-link to="/category/" class="button--primary">
             <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 20 19" fill="none">
               <path d="M4.1665 9.5H15.8332M15.8332 9.5L10.8332 4.75M15.8332 9.5L10.8332 14.25"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             Commence ton shopping
-          </a>
+          </nuxt-link>
 
         </div>
 

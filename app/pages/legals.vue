@@ -2,7 +2,7 @@
   <div class="clothes_page">
     <NavigationBar :auth="auth" />
 
-    <LegalsComponent :auth="auth" />
+    <LegalsComponent :auth="auth" :legals="legals" />
 
     <Footer :auth="auth" />
   </div>
@@ -25,10 +25,11 @@ export default {
   data: function () {
     return {
       auth: false,
+      legals: null,
     }
   },
-  mounted() {
-    this.verifyLogin()
+  async mounted() {
+    await Promise.all([this.verifyLogin(), this.loadLegals()])
   },
   methods: {
     async verifyLogin() {
@@ -39,16 +40,18 @@ export default {
         this.auth = false
       }
     },
+    async loadLegals() {
+      try {
+        const response = await fetch('/api/page/legals')
+        if (response.ok) {
+          this.legals = await response.json()
+        }
+      } catch (error) {
+        console.error('Failed to load legals content', error)
+      }
+    },
   },
 }
 </script>
 
-<style lang="scss">
-@use '../sass/utils' as *;
-@use '../sass/base' as *;
 
-.clothes_page {
-  position: relative;
-  overflow: hidden;
-}
-</style>

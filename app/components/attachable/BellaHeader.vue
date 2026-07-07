@@ -2,21 +2,21 @@
   <header class="bella_header" :class="headerClass">
     <div v-if="auth === false" class="bella_header_auth_buttons">
       <div class="bella_header_auth_buttons_connexion">
-        <a href="/login">Connexion</a>
+        <nuxt-link to="/login">Connexion</nuxt-link>
       </div>
       <div class="bella_header_auth_buttons_inscription">
-        <a href="/signin">S'inscrire</a>
+        <nuxt-link to="/signin">S'inscrire</nuxt-link>
       </div>
     </div>
 
     <div v-else-if="auth === true" class="bella_header_auth_buttons">
       <div class="bella_header_auth_buttons_account">
-        <a href="/account">Compte</a>
+        <nuxt-link to="/account">Compte</nuxt-link>
       </div>
     </div>
 
     <div class="bella_header_auth_buttons_cart">
-      <a href="/cart">
+      <nuxt-link to="/cart">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="32"

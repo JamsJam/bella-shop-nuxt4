@@ -48,12 +48,3 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@use '../sass/utils' as *;
-@use '../sass/base' as *;
-
-.clothes_page {
-  position: relative;
-  overflow: hidden;
-}
-</style>
