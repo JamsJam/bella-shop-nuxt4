@@ -1,10 +1,10 @@
 <template>
   <div class="clothes_page">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
-    <AvatarCreation :auth="auth" />
+    <AvatarCreation />
 
-    <Foooter :auth="auth" />
+    <Foooter />
   </div>
 </template>
 
@@ -12,9 +12,6 @@
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import AvatarCreation from '~/components/avatar/AvatarCreation.vue'
 import Foooter from '~/components/attachable/Footer.vue'
-
-import { verifyLogin } from '~/utils/auth'
-import { useRuntimeConfig } from '#imports'
 
 export default {
   name: 'ClothesPage',
@@ -24,29 +21,7 @@ export default {
     Foooter,
   },
   data: function () {
-    return {
-      auth: false,
-    }
-  },
-  setup() {
-    return {
-      config: useRuntimeConfig(),
-    }
-  },
-  mounted() {
-    this.verifyLogin()
-  },
-  methods: {
-    async verifyLogin() {
-      try {
-        const apiUrl =
-          this.config.public.platformApiBase || this.config.platformApiBase
-        const isAuthenticated = await verifyLogin(apiUrl)
-        this.auth = isAuthenticated
-      } catch (error) {
-        this.auth = false
-      }
-    },
+    return {}
   },
 }
 </script>

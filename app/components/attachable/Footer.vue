@@ -124,18 +124,26 @@
 </template>
 
 <script>
+import { isUserAuthenticated } from '~/middleware/auth'
+
 export default {
   components: {},
-  props: {
-    auth: {
-      type: Boolean,
-      default: false,
+  data() {
+    return {
+      auth: false,
+    }
+  },
+  mounted() {
+    this.verifyLogin()
+  },
+  methods: {
+    async verifyLogin() {
+      try {
+        this.auth = await isUserAuthenticated()
+      } catch (error) {
+        this.auth = false
+      }
     },
   },
-  data() {
-    return {}
-  },
-  mounted() {},
-  methods: {},
 }
 </script>

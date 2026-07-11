@@ -1,10 +1,10 @@
 <template>
   <div class="clothes_page">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
-    <ConfidentialityComponent :auth="auth" :blocks="confidentiality?.blocks" />
+    <ConfidentialityComponent :blocks="confidentiality?.blocks" />
 
-    <Foooter :auth="auth" />
+    <Foooter />
   </div>
 </template>
 
@@ -12,8 +12,6 @@
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import ConfidentialityComponent from '~/components/support/ConfidentialityComponent.vue'
 import Foooter from '~/components/attachable/Footer.vue'
-
-import { verifyLogin } from '~/utils/auth'
 
 export default {
   name: 'ClothesPage',
@@ -24,22 +22,13 @@ export default {
   },
   data: function () {
     return {
-      auth: false,
       confidentiality: null,
     }
   },
   async mounted() {
-    await Promise.all([this.verifyLogin(), this.loadConfidentiality()])
+    await this.loadConfidentiality()
   },
   methods: {
-    async verifyLogin() {
-      try {
-        const isAuthenticated = await verifyLogin(this.$store.state.apiUrl)
-        this.auth = isAuthenticated
-      } catch (error) {
-        this.auth = false
-      }
-    },
     async loadConfidentiality() {
       try {
         const response = await fetch('/api/page/confidentiality')
@@ -53,5 +42,4 @@ export default {
   },
 }
 </script>
-
 

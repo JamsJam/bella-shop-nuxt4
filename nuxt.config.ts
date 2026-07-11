@@ -15,6 +15,10 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt'],
   runtimeConfig: {
     platformApiBase: "url_to_platform_api",
+    cryptoSecretKey: "crypto_secret_key",
+    stripeMode: "test",
+    stripeSuccessUrl: "url_to_stripe_success_page",
+    stripeCancelUrl: "url_to_stripe_cancel_page",
     public: {
       platformApiBase: "url_to_platform_api",
       siteUrl: "url_to_site",

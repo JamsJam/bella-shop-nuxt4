@@ -131,8 +131,6 @@
 </template>
 
 <script>
-// import PopupComponent from '~/components/attachable/PopupComponent.vue'
-
 export default {
   components: {
     // PopupComponent,
@@ -152,12 +150,15 @@ export default {
   mounted() {},
 
   methods: {
+    getAuthUrl(path) {
+      return `/api/auth/${path}`
+    },
     async handleLogin() {
       const userData = {
         email: this.email,
         password: this.password,
       }
-      const url = `${this.$store.state.apiUrl}/auth/login`
+      const url = this.getAuthUrl('login')
       const options = {
         method: 'POST',
         headers: {
@@ -172,7 +173,7 @@ export default {
         const data = await response.json()
 
         if (response.ok) {
-          this.$router.push('/')
+          this.redirectAfterLogin()
         } else {
           if (data.type === 'confirmation_code') {
             this.userId = data.userId
@@ -192,6 +193,18 @@ export default {
       }
     },
 
+    redirectAfterLogin() {
+      const redirect = this.$route.query.redirect
+      const redirectPath = Array.isArray(redirect) ? redirect[0] : redirect
+
+      if (redirectPath && redirectPath.startsWith('/')) {
+        this.$router.push(redirectPath)
+        return
+      }
+
+      this.$router.push('/')
+    },
+
     focusNextInput(event, index) {
       if (
         this.$refs[`codeInput${index + 1}`] &&
@@ -209,7 +222,7 @@ export default {
         userId: this.userId,
       }
 
-      const url = `${this.$store.state.apiUrl}/auth/verify-confirmation-code`
+      const url = this.getAuthUrl('verify-confirmation-code')
       const options = {
         method: 'POST',
         headers: {
@@ -241,7 +254,7 @@ export default {
         userEmail: this.email,
       }
 
-      const url = `${this.$store.state.apiUrl}/auth/resend-confirmation-code`
+      const url = this.getAuthUrl('resend-confirmation-code')
       const options = {
         method: 'POST',
         headers: {

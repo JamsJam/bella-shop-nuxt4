@@ -39,14 +39,9 @@ import type { LegalsDTO } from '#shared/dto/legals.dto.ts'
 import type { PropType } from 'vue'
 
 const props = defineProps({
-  auth: {
-    type: Boolean,
-    default: false,
-  },
   legals: {
     type: Object as PropType<LegalsDTO | null>,
     default: null,
   },
 })
 </script>
-

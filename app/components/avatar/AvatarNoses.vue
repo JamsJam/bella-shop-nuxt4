@@ -42,12 +42,10 @@
 </template>
 
 <script>
-// import BellaHeader from '~/components/attachable/BellaHeader.vue';
 import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
 
 export default {
   components: {
-    // BellaHeader,
   },
   props: {
     auth: {

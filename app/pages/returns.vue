@@ -1,10 +1,10 @@
 <template>
   <div class="clothes_page">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
-    <ReturnsPolitics :auth="auth" :blocks="returnsPage?.blocks" />
+    <ReturnsPolitics :blocks="returnsPage?.blocks" />
 
-    <Footer :auth="auth" />
+    <Footer />
   </div>
 </template>
 
@@ -12,8 +12,6 @@
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import ReturnsPolitics from '~/components/support/ReturnsPolitics.vue'
 import Footer from '~/components/attachable/Footer.vue'
-
-import { verifyLogin } from '~/utils/auth'
 
 export default {
   name: 'ClothesPage',
@@ -24,22 +22,13 @@ export default {
   },
   data: function () {
     return {
-      auth: false,
       returnsPage: null,
     }
   },
   async mounted() {
-    await Promise.all([this.verifyLogin(), this.loadReturnsPage()])
+    await this.loadReturnsPage()
   },
   methods: {
-    async verifyLogin() {
-      try {
-        const isAuthenticated = await verifyLogin(this.$store.state.apiUrl)
-        this.auth = isAuthenticated
-      } catch (error) {
-        this.auth = false
-      }
-    },
     async loadReturnsPage() {
       try {
         const response = await fetch('/api/page/returns')
@@ -53,4 +42,3 @@ export default {
   },
 }
 </script>
-

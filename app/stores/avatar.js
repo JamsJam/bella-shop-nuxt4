@@ -73,18 +73,18 @@ export const useAvatarStore = defineStore('avatar', {
     },
   },
   actions: {
-    save() {
+    async save() {
       if (!import.meta.client) {
         return
       }
 
-      const encryptedAvatar = encryptData({
+      const encryptedAvatar = await encryptData({
         clothesId: this.clothesId,
         model: this.model,
       })
       localStorage.setItem('avatar', encryptedAvatar)
     },
-    load() {
+    async load() {
       if (!import.meta.client) {
         return
       }
@@ -92,27 +92,27 @@ export const useAvatarStore = defineStore('avatar', {
       const encryptedAvatar = localStorage.getItem('avatar')
 
       if (!encryptedAvatar) {
-        this.save()
+        await this.save()
         return
       }
 
       try {
-        const decryptedAvatar = decryptData(encryptedAvatar)
+        const decryptedAvatar = await decryptData(encryptedAvatar)
         this.clothesId = decryptedAvatar.clothesId || []
         this.model = normalizeAvatarModel(decryptedAvatar.model)
       } catch (error) {
         this.clothesId = []
         this.model = defaultAvatarModel()
-        this.save()
+        await this.save()
       }
     },
-    setClothesId(clothesId) {
+    async setClothesId(clothesId) {
       this.clothesId = clothesId
-      this.save()
+      await this.save()
     },
-    setModel(model) {
+    async setModel(model) {
       this.model = normalizeAvatarModel(model)
-      this.save()
+      await this.save()
     },
   },
 })

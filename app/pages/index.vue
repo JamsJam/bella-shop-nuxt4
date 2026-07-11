@@ -1,12 +1,12 @@
 <template>
   <div class="main">
-    <NavigationBar  />
+    <NavigationBar />
 
     <WelcomePage :section="homepage?.sections?.landing" />
     <BestSellers :section="homepage?.sections?.bestseller" />
     <About :section="homepage?.sections?.about" :highlights="homepage?.sections?.highlights" />
     <Manual :section="homepage?.sections?.manual" />
-    <Delivery :auth="auth" :section="homepage?.sections?.return?.steps" />
+    <Delivery :section="homepage?.sections?.return?.steps" />
 
 
     <Foooter />
@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import type HomepageDTO from '#shared/dto/homepage.dto'
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import WelcomePage from '~/components/homepage/WelcomePage.vue'
@@ -30,7 +29,6 @@ import Manual from '~/components/homepage/Manual.vue'
 import Delivery from '~/components/homepage/Delivery.vue'
 import Foooter from '~/components/attachable/Footer.vue'
 
-const auth = ref(false)
 const { data: homepage } = await useFetch<HomepageDTO>('/api/page/home')
 
 useHead(() => {

@@ -1,10 +1,10 @@
 <template>
   <div class="clothes_page">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
-    <DeliveryComponent :auth="auth" />
+    <DeliveryComponent />
 
-    <Footer :auth="auth" />
+    <Footer />
   </div>
 </template>
 
@@ -12,8 +12,6 @@
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import DeliveryComponent from '~/components/support/DeliveryComponent.vue'
 import Footer from '~/components/attachable/Footer.vue'
-
-import { verifyLogin } from '~/utils/auth'
 
 export default {
   name: 'DeliveryPage',
@@ -23,22 +21,7 @@ export default {
     Footer,
   },
   data() {
-    return {
-      auth: false,
-    }
-  },
-  mounted() {
-    this.verifyLogin()
-  },
-  methods: {
-    async verifyLogin() {
-      try {
-        const isAuthenticated = await verifyLogin(this.$store.state.apiUrl)
-        this.auth = isAuthenticated
-      } catch (error) {
-        this.auth = false
-      }
-    },
+    return {}
   },
 }
 </script>

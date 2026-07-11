@@ -6,7 +6,7 @@
       </div>
       <div class="forgot_password_container_object">
         <input
-          type="mail"
+          type="email"
           v-model="userEmail"
           placeholder="Votre email"
           required
@@ -29,7 +29,7 @@
         />
       </div>
       <div class="forgot_password_container_button">
-        <button @click="waitingUpdatePassword()">
+        <button type="button" @click="waitingUpdatePassword()">
           Modifier votre mot de passe
         </button>
       </div>
@@ -88,37 +88,29 @@
         />
       </div>
       <div class="forgot_password_code_send_new_code">
-        <button @click="waitingUpdatePassword()">
+        <button type="button" @click="resendConfirmationCode()">
           Renvoyer un code de confirmation
         </button>
       </div>
       <div class="forgot_password_container_button">
-        <button @click="handleConfirmCode()">Confirmer</button>
+        <button type="button" @click="handleConfirmCode()">Confirmer</button>
       </div>
     </div>
 
     <div class="footer_container"></div>
 
-    <!-- <PopupComponent :popup_message="popupMessage" /> -->
+    <PopupComponent :popup_message="popupMessage" />
   </div>
 </template>
 
 <script>
-// import BellaHeader from '~/components/attachable/BellaHeader.vue';
-// import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import PopupComponent from '~/components/attachable/PopupComponent.vue'
 
 import inputValidations from '~/utils/inputValidations'
 
 export default {
   components: {
-    // BellaHeader,
-    // PopupComponent,
-  },
-  props: {
-    auth: {
-      type: Boolean,
-      default: false,
-    },
+    PopupComponent,
   },
   data() {
     return {
@@ -135,9 +127,48 @@ export default {
     }
   },
   computed: {},
-  // mounted() {},
 
   methods: {
+    getErrorMessage(error) {
+      if (!error) {
+        return 'Une erreur est survenue.'
+      }
+
+      if (typeof error === 'string') {
+        return error
+      }
+
+      if (Array.isArray(error)) {
+        return error[0] || 'Une erreur est survenue.'
+      }
+
+      return error.message || error.error || 'Une erreur est survenue.'
+    },
+    async readResponseData(response) {
+      try {
+        return await response.json()
+      } catch {
+        return null
+      }
+    },
+    assertResetCodeRequested(response, data) {
+      if (!response.ok) {
+        throw new Error(this.getErrorMessage(data?.error || data?.message))
+      }
+
+      if (data?.error || data?.success === false) {
+        throw new Error(this.getErrorMessage(data.error || data.message))
+      }
+
+      if (!data?.userId) {
+        throw new Error(
+          this.getErrorMessage(
+            data?.message ||
+              "Le serveur n'a pas confirmé l'envoi du code de réinitialisation."
+          )
+        )
+      }
+    },
     validateUserEmail(input) {
       if (!inputValidations.isNotEmpty(input)) {
         throw new Error("L'adresse e-mail ne peut pas être vide.")
@@ -191,50 +222,82 @@ export default {
           this.userNewPassword
         )
 
-        const response = await fetch(
-          `${this.$store.state.apiUrl}/auth/waiting-new-password`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userEmail: this.userEmail,
-            }),
-          }
-        )
+        const response = await fetch('/api/auth/waiting-new-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userEmail: this.userEmail,
+          }),
+        })
 
-        const data = await response.json()
+        const data = await this.readResponseData(response)
 
-        if (!response.ok) {
-          this.resendCodeTimeout = true
-          setTimeout(() => {
-            this.resendCodeTimeout = false
-          }, 10000)
-          throw new data.error()
+        this.assertResetCodeRequested(response, data)
+
+        this.userId = data.userId
+        this.awaitingConfirmAccount = true
+        this.popupMessage = {
+          type: 'valid',
+          message: data.message || 'Code de confirmation envoyé.',
         }
-
-        if (response.ok) {
-          this.userId = data.userId
-          this.awaitingConfirmAccount = true
-          this.popupMessage = {
-            type: 'valid',
-            message: data.message,
-          }
-          this.resendCodeTimeout = true
-          setTimeout(() => {
-            this.resendCodeTimeout = false
-          }, 10000)
-        }
-
-        // Vous pouvez également ajouter ici des actions supplémentaires après l'envoi réussi, comme afficher un message de confirmation.
+        this.resendCodeTimeout = true
+        setTimeout(() => {
+          this.resendCodeTimeout = false
+        }, 10000)
       } catch (error) {
-        console.error('Erreur:', error.message)
+        const message = this.getErrorMessage(error)
+        console.error('Erreur:', message)
         this.popupMessage = {
           type: 'error',
-          message: error.message,
+          message,
         }
-        // Vous pouvez ajouter ici la logique pour gérer les erreurs lors de l'envoi du message.
+      }
+    },
+
+    async resendConfirmationCode() {
+      try {
+        if (this.resendCodeTimeout) {
+          throw new Error('Reessayer dans quelques secondes')
+        }
+
+        if (!this.userId) {
+          throw new Error(
+            'Impossible de renvoyer un code sans demande de réinitialisation valide.'
+          )
+        }
+
+        const response = await fetch('/api/auth/waiting-new-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userEmail: this.userEmail,
+          }),
+        })
+
+        const data = await this.readResponseData(response)
+
+        this.assertResetCodeRequested(response, data)
+
+        this.userId = data.userId
+        this.popupMessage = {
+          type: 'valid',
+          message: data.message || 'Code de confirmation renvoyé.',
+        }
+        this.resendCodeTimeout = true
+        setTimeout(() => {
+          this.resendCodeTimeout = false
+        }, 10000)
+      } catch (error) {
+        const message = this.getErrorMessage(error)
+        console.error('Erreur:', message)
+        this.popupMessage = {
+          type: 'error',
+          message,
+        }
       }
     },
 
@@ -250,13 +313,21 @@ export default {
     async handleConfirmCode() {
       const code = this.code.join('')
 
+      if (code.length !== 6) {
+        this.popupMessage = {
+          type: 'error',
+          message: 'Le code de confirmation doit contenir 6 caractères.',
+        }
+        return
+      }
+
       const requestData = {
         code: code.toUpperCase(),
         userId: this.userId,
         newPassword: this.userNewPassword,
       }
 
-      const url = `${this.$store.state.apiUrl}/auth/verify-confirmation-code-reset-password`
+      const url = '/api/auth/verify-confirmation-code-reset-password'
       const options = {
         method: 'POST',
         headers: {
@@ -267,227 +338,31 @@ export default {
 
       try {
         const response = await fetch(url, options)
-        const data = await response.json()
+        const data = await this.readResponseData(response)
 
-        if (response.ok) {
-          this.popupMessage = {
-            type: 'valid',
-            message: data.message,
-          }
-
-          setTimeout(() => {
-            this.$router.push('/login')
-          }, 3000)
-        } else {
-          // Gérer les erreurs
-          throw data.error
+        if (!response.ok || data?.error || data?.success === false) {
+          throw new Error(this.getErrorMessage(data?.error || data?.message))
         }
+
+        this.popupMessage = {
+          type: 'valid',
+          message: data?.message || 'Mot de passe modifié.',
+        }
+
+        setTimeout(() => {
+          this.$router.push('/login')
+        }, 3000)
 
         return data
       } catch (error) {
-        console.error('Erreur lors de la confirmation du code :', error)
+        const message = this.getErrorMessage(error)
+        console.error('Erreur lors de la confirmation du code :', message)
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message,
         }
       }
     },
   },
 }
 </script>
-
-<!-- <style scoped lang="scss">
-// @import '../../sass/utils/variables';
-// @import '../../sass/base/base';
-
-.forgot_password {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  background-color: $grey;
-
-  &_container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    min-height: calc(100vh - 9.7vh);
-    width: 30%;
-    font-family: 'Montserrat';
-
-    @media (max-width: 1100px) {
-      width: 60%;
-    }
-
-    @media (max-width: 600px) {
-      width: 80%;
-    }
-
-    &_title {
-      margin-bottom: 5vh;
-      h2 {
-        font-size: 3vh;
-        font-weight: 600;
-        text-align: center;
-        text-transform: uppercase;
-        color: darken($color: $white, $amount: 30);
-      }
-
-      @media (max-width: 900px) {
-        margin-top: 10vh;
-      }
-    }
-    &_object {
-      margin-top: 3vh;
-      width: 100%;
-      input {
-        background-color: white;
-        border: 0.1vh solid darken($color: $white, $amount: 10);
-        padding: 1.6vh 2.2vh;
-        font-family: 'Montserrat';
-        width: calc(100% - 4.3vh);
-        border-radius: 0.5vh;
-        outline: none;
-        box-shadow: 0 0.5vh 1vh darken($color: $white, $amount: 20);
-        font-size: 1.5vh;
-      }
-    }
-    &_message {
-      margin-top: 3.2vh;
-      width: 100%;
-      textarea {
-        resize: none;
-        font-family: 'Montserrat';
-        width: calc(100% - 4.3vh);
-        border: 0.1vh solid darken($color: $white, $amount: 10);
-        border-radius: 0.5vh;
-        padding: 2.2vh;
-        background-color: white;
-        outline: none;
-        box-shadow: 0 0.5vh 1vh darken($color: $white, $amount: 20);
-        font-size: 1.5vh;
-        height: 21.7vh;
-        overflow: scroll;
-      }
-    }
-    &_button {
-      margin-top: 5.4vh;
-      button {
-        padding: 1.6vh 2.2vh;
-        background-color: $beige;
-        font-size: 1.7vh;
-        border: none;
-        box-shadow: 0 0.5vh 1vh darken($color: $white, $amount: 20);
-        color: $white;
-        width: 100%;
-        transition: all ease 0.3s;
-
-        &:hover {
-          background-color: darken($color: $beige, $amount: 10);
-        }
-      }
-    }
-  }
-
-  &_code {
-    &_title {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      h3 {
-        font-size: 3.2vh;
-        font-weight: 700;
-        text-transform: uppercase;
-        text-align: center;
-        max-width: 76.1vh;
-      }
-      p {
-        margin-top: 1vh;
-        font-size: 1.7vh;
-        font-weight: 300;
-        text-align: center;
-      }
-    }
-    &_inputs {
-      display: flex;
-      justify-content: center;
-      margin-top: 6.5vh;
-      input {
-        font-size: 2.2vh;
-        font-weight: 500;
-        font-family: 'Montserrat';
-        color: $black;
-        text-transform: uppercase;
-        text-align: center;
-        background-color: $white;
-        border: 0.3vh solid transparent;
-        border-radius: 0.5vh;
-        outline: none;
-        width: fit-content;
-        width: 2.3vh;
-        padding: 2.2vh;
-        margin: 2.2vh;
-        transition: all ease 0.3s;
-
-        &:focus {
-          border: 0.2vh solid darken($color: $white, $amount: 50);
-        }
-      }
-    }
-    &_send_new_code {
-      margin-top: 5vh;
-      display: flex;
-      justify-content: center;
-
-      button {
-        background-color: transparent;
-        border: none;
-        outline: none;
-        position: relative;
-        z-index: 16;
-        font-size: 1.4vh;
-        color: lighten($color: $black, $amount: 50);
-        transition: all ease 0.3s;
-
-        &:visited {
-          color: lighten($color: $black, $amount: 50);
-        }
-        &:hover {
-          color: $black;
-
-          &::after {
-            width: 0;
-          }
-        }
-
-        &::after {
-          content: '';
-          position: absolute;
-          bottom: -0.5vh;
-          right: 0;
-          width: 100%;
-          height: 0.1vh;
-          background-color: lighten($color: $black, $amount: 70);
-          transition: all ease 0.3s;
-        }
-      }
-    }
-  }
-
-  .navbar_area {
-    width: 6.5vh;
-    height: 100%;
-
-    @media (max-width: 900) {
-      height: 0;
-      width: 0;
-    }
-  }
-
-  .footer_container {
-    width: 100%;
-    height: 21.7vh;
-  }
-}
-</style> -->

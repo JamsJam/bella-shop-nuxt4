@@ -1,14 +1,10 @@
 <template>
   <div class="category_page">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
     <CategoryPageHeader :slug="categorySlug" />
 
-    <CategoryClothes 
-      :auth="auth" 
-      :categoryData="categoryData"
-
-    />
+    <CategoryClothes :categoryData="categoryData" />
 
     <Footer />
   </div>
@@ -20,8 +16,6 @@ import CategoryPageHeader from '~/components/category/CategoryPageHeader.vue'
 import CategoryClothes from '~/components/category/CategoryClothes.vue'
 import Footer from '~/components/attachable/Footer.vue'
 
-import { verifyLogin } from '~/utils/auth'
-
 export default {
   name: 'ClothesCategory',
   components: {
@@ -32,13 +26,11 @@ export default {
   },
   data: function () {
     return {
-      auth: false,
       categoryData: null,
       pending: false,
     }
   },
   async mounted() {
-    await this.verifyLogin()
     await this.fetchCategoryData()
   },
   computed: {
@@ -47,14 +39,6 @@ export default {
     },
   },
   methods: {
-    async verifyLogin() {
-      try {
-        const isAuthenticated = await verifyLogin(this.$store.state.apiUrl)
-        this.auth = isAuthenticated
-      } catch (error) {
-        this.auth = false
-      }
-    },
     async fetchCategoryData() {
       try {
         this.pending = true

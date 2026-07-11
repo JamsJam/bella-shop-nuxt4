@@ -127,10 +127,6 @@ export default {
 
   },
   props: {
-    auth: {
-      type: Boolean,
-      default: false,
-    },
     categoryData: {
       type: Object,
       default: null,

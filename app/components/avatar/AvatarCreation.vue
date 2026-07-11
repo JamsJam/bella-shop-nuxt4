@@ -1,6 +1,5 @@
 <template>
   <div class="avatar_creation">
-    <!--<BellaHeader :auth="auth"/>-->
     <div class="avatar_creation_header">
       <h1 class="avatar_creation_header_title">
         Crée ton avatar
@@ -412,7 +411,6 @@
 </template>
 
 <script>
-// import BellaHeader from '~/components/attachable/BellaHeader.vue';
 
 import AvatarEyes from '~/components/avatar/AvatarEyes.vue'
 import AvatarHairs from '~/components/avatar/AvatarHairs.vue'
@@ -430,7 +428,6 @@ import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
 
 export default {
   components: {
-    // BellaHeader,
 
     AvatarEyes,
     AvatarHairs,
@@ -442,12 +439,6 @@ export default {
     AvatarMorphologies,
     AvatarClothes,
     AvatarAccessories,
-  },
-  props: {
-    auth: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -466,7 +457,7 @@ export default {
         return this.avatarStore.model
       },
       set(model) {
-        this.avatarStore.setModel(model)
+        void this.avatarStore.setModel(model)
       },
     },
     clothesId: {
@@ -474,7 +465,7 @@ export default {
         return this.avatarStore.clothesId
       },
       set(clothesId) {
-        this.avatarStore.setClothesId(clothesId)
+        void this.avatarStore.setClothesId(clothesId)
       },
     },
     avatarBody() {
@@ -482,18 +473,18 @@ export default {
     },
   },
   async mounted() {
-    this.retrieveAvatarData()
+    await this.retrieveAvatarData()
     await this.avatarCatalogStore.hydrateFromAvatarModel(this.avatarPreview)
   },
   methods: {
     closeCustomisationComponent() {
       this.currentCustomizationComponent = ''
     },
-    saveAvatarModel() {
-      this.avatarStore.save()
+    async saveAvatarModel() {
+      await this.avatarStore.save()
     },
-    retrieveAvatarData() {
-      this.avatarStore.load()
+    async retrieveAvatarData() {
+      await this.avatarStore.load()
     },
     setCurrentCustomizationComponent(customizationComponent) {
       if (this.currentCustomizationComponent !== customizationComponent) {

@@ -26,10 +26,6 @@ import type { StaticBlockDTO } from '#shared/dto/staticPage.dto.ts'
 export default {
   components: {},
   props: {
-    auth: {
-      type: Boolean,
-      default: false,
-    },
     blocks: {
       type: Array as () => StaticBlockDTO[],
       default: () => [],

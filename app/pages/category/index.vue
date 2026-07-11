@@ -1,6 +1,6 @@
 <template>
     <div class="clothes_page">
-        <NavigationBar :auth="auth" />
+        <NavigationBar />
 
 
         <div class="clothes_selection">
@@ -52,20 +52,18 @@
         </div>
 
 
-        <Footer :auth="auth" />
+        <Footer />
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useNuxtApp } from '#imports'
 import type CategoryPageDTO from '#shared/dto/categorypage.dto'
 import type { CategoryListDTO } from '#shared/dto/categorylist.dto'
 import type { BandeauDTO } from '#shared/dto/bandeau.dto'
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import Footer from '~/components/attachable/Footer.vue'
 
-const auth = ref(false)
 const page = ref<CategoryPageDTO | null>(null)
 const categories = computed<CategoryListDTO[]>(() => page.value?.categories ?? [])
 const bandeau = computed<BandeauDTO | null>(() => page.value?.bandeau ?? null)
@@ -94,26 +92,6 @@ useHead(() => {
   }
 })
 
-const { $store } = useNuxtApp()
-
-// async function verifyLogin() {
-//   try {
-//     const response = await fetch(`${$store.state.apiUrl}/auth/verify-login`, {
-//       method: 'GET',
-//       credentials: 'include',
-//     })
-
-//     if (!response.ok) {
-//       throw new Error("Échec de la requête pour vérifier l'authentification")
-//     }
-
-//     auth.value = true
-//   } catch (error) {
-//     auth.value = false
-//     console.error('Erreur lors de la vérification de l\'authentification :', error)
-//   }
-// }
-
 async function loadCategoryPage() {
   try {
     const response = await fetch('/api/category')
@@ -126,7 +104,7 @@ async function loadCategoryPage() {
 }
 
 onMounted(async () => {
-  await Promise.all([verifyLogin(), loadCategoryPage()])
+  await loadCategoryPage()
 })
 </script>
 
@@ -139,6 +117,5 @@ onMounted(async () => {
     overflow: hidden;
 }
 </style>
-
 
 

@@ -25,10 +25,6 @@
 import type { FAQBlockDTO } from '#shared/dto/faq.dto.ts'
 
 const props = defineProps({
-  auth: {
-    type: Boolean,
-    default: false,
-  },
   questions: {
     type: Array as () => FAQBlockDTO[],
     default: () => [],
@@ -37,5 +33,4 @@ const props = defineProps({
 
 const questions = props.questions
 </script>
-
 

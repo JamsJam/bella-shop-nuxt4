@@ -1,10 +1,10 @@
 <template>
   <div class="clothes_page">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
-    <LegalsComponent :auth="auth" :legals="legals" />
+    <LegalsComponent :legals="legals" />
 
-    <Footer :auth="auth" />
+    <Footer />
   </div>
 </template>
 
@@ -12,8 +12,6 @@
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import LegalsComponent from '~/components/support/LegalsComponent.vue'
 import Footer from '~/components/attachable/Footer.vue'
-
-import { verifyLogin } from '~/utils/auth'
 
 export default {
   name: 'ClothesPage',
@@ -24,22 +22,13 @@ export default {
   },
   data: function () {
     return {
-      auth: false,
       legals: null,
     }
   },
   async mounted() {
-    await Promise.all([this.verifyLogin(), this.loadLegals()])
+    await this.loadLegals()
   },
   methods: {
-    async verifyLogin() {
-      try {
-        const isAuthenticated = await verifyLogin(this.$store.state.apiUrl)
-        this.auth = isAuthenticated
-      } catch (error) {
-        this.auth = false
-      }
-    },
     async loadLegals() {
       try {
         const response = await fetch('/api/page/legals')
@@ -53,5 +42,4 @@ export default {
   },
 }
 </script>
-
 

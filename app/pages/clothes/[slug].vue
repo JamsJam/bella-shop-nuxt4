@@ -1,6 +1,6 @@
 <template>
   <div class="clothes_product">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
     <main class="clothes_product_page">
       <div class="clothes_product_page_inner">
@@ -37,20 +37,17 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import ProductHeader from '~/components/product/ProductHeader.vue'
 import ProductImages from '~/components/product/ProductImages.vue'
 import ProductSelection from '~/components/product/ProductSelection.vue'
 import { useAvatarStore } from '~/stores/avatar'
 import { useCartStore } from '~/stores/cart'
-import { verifyLogin } from '~/utils/auth'
 
 const route = useRoute()
 const avatarStore = useAvatarStore()
 const cartStore = useCartStore()
-const config = useRuntimeConfig()
-const auth = ref(false)
 
 const { data } = await useFetch(() => `/api/clothes/${route.params.slug}`)
 
@@ -75,15 +72,6 @@ const selectedColor = ref(null)
 const selectedSize = ref(null)
 
 cartStore.load()
-
-onMounted(async () => {
-  try {
-    const apiUrl = config.public.platformApiBase || config.platformApiBase
-    auth.value = await verifyLogin(apiUrl)
-  } catch (error) {
-    auth.value = false
-  }
-})
 
 watch(
   product,
@@ -134,6 +122,6 @@ function addToAvatarClothes() {
   }
 
   const currentIds = Array.isArray(avatarStore.clothesId) ? avatarStore.clothesId : []
-  avatarStore.setClothesId([...new Set([...currentIds, variantId])])
+  void avatarStore.setClothesId([...new Set([...currentIds, variantId])])
 }
 </script>

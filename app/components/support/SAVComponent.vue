@@ -33,12 +33,6 @@
 <script>
 export default {
   components: {},
-  props: {
-    auth: {
-      type: Boolean,
-      default: false,
-    },
-  },
   data() {
     return {}
   },

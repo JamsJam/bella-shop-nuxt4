@@ -1,21 +1,21 @@
-export default defineNuxtRouteMiddleware(async () => {
-  const config = useRuntimeConfig()
-  const apiUrl = config.platformApiBase
-
-  if (!apiUrl) {
-    console.error('auth middleware: platformApiBase is not défini')
-    return false
-  }
-
+export async function isUserAuthenticated(): Promise<boolean> {
   try {
-    const response = await fetch(`${apiUrl}/auth/verify-login`, {
-      method: 'GET',
-      credentials: 'include',
+    const response = await $fetch.raw('/api/auth/verify-login', {
+      headers: import.meta.server ? useRequestHeaders(['cookie']) : undefined,
+      ignoreResponseError: true,
     })
 
-    return response.ok
+    return response.status >= 200 && response.status < 300
   } catch (error) {
     console.error('auth middleware: erreur de vérification de connexion', error)
     return false
+  }
+}
+
+export default defineNuxtRouteMiddleware(async () => {
+  const isAuthenticated = await isUserAuthenticated()
+
+  if (!isAuthenticated) {
+    return navigateTo('/login')
   }
 })

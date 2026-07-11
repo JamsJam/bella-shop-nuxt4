@@ -1,6 +1,6 @@
 <template>
   <div class="cart_page">
-    <NavigationBar :auth="auth" />
+    <NavigationBar />
 
     <main class="cart_page_container">
       <div class="cart_page_header">
@@ -76,9 +76,9 @@
             <strong>{{ formatPrice(cartStore.subtotal) }}</strong>
           </div>
 
-          <button type="button" class="button--primary cart_page_checkout">
+          <NuxtLink to="/expedition" class="button--primary cart_page_checkout">
             Commander
-          </button>
+          </NuxtLink>
 
           <button
             type="button"
@@ -101,27 +101,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import { useCartStore } from '~/stores/cart'
-import { verifyLogin } from '~/utils/auth'
 
 const cartStore = useCartStore()
-const config = useRuntimeConfig()
-const auth = ref(false)
 
 cartStore.load()
 
 const cartItems = computed(() => cartStore.items)
-
-onMounted(async () => {
-  try {
-    const apiUrl = config.public.platformApiBase || config.platformApiBase
-    auth.value = await verifyLogin(apiUrl)
-  } catch (error) {
-    auth.value = false
-  }
-})
 
 function formatPrice(price) {
   return new Intl.NumberFormat('fr-FR', {

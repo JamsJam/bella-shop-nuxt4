@@ -139,8 +139,6 @@
 </template>
 
 <script>
-// import PopupComponent from '~/components/attachable/PopupComponent.vue'
-
 export default {
   components: {
     // PopupComponent,
@@ -162,13 +160,16 @@ export default {
   mounted() {},
 
   methods: {
+    getAuthUrl(path) {
+      return `/api/auth/${path}`
+    },
     async handleSignIn() {
       const userData = {
         email: this.email,
         password: this.password,
       }
 
-      const url = `${this.$store.state.apiUrl}/auth/signup`
+      const url = this.getAuthUrl('signup')
       const options = {
         method: 'POST',
         headers: {
@@ -222,7 +223,7 @@ export default {
         userId: this.userId,
       }
 
-      const url = `${this.$store.state.apiUrl}/auth/verify-confirmation-code`
+      const url = this.getAuthUrl('verify-confirmation-code')
       const options = {
         method: 'POST',
         headers: {
@@ -262,7 +263,7 @@ export default {
         email: this.email,
         password: this.password,
       }
-      const url = `${this.$store.state.apiUrl}/auth/login`
+      const url = this.getAuthUrl('login')
       const options = {
         method: 'POST',
         headers: {
@@ -302,7 +303,7 @@ export default {
         userEmail: this.email,
       }
 
-      const url = `${this.$store.state.apiUrl}/auth/resend-confirmation-code`
+      const url = this.getAuthUrl('resend-confirmation-code')
       const options = {
         method: 'POST',
         headers: {
