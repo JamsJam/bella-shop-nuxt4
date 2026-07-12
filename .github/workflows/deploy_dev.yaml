@@ -50,6 +50,7 @@ jobs:
             ' "$1"
             }
 
+            
             NUXT_PLATFORM_API_BASE_VALUE=https://api.demo.bellagp.com
             NUXT_PUBLIC_PLATFORM_API_BASE_VALUE=https://api.demo.bellagp.com
             NUXT_PUBLIC_SITE_URL_VALUE=https://demo.bellagp.com
