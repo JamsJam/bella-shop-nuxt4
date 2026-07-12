@@ -13,3 +13,5 @@ module.exports = {
     },
   ],
 }
+
+mkdir -p /var/log/nginx/test.bellagp.fr && chown nginx:nginx /var/log/nginx/test.bellagp.fr &&chmod 750 /var/log/nginx/test.bellagp.fr
