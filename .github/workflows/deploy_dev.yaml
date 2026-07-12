@@ -51,13 +51,13 @@ jobs:
             }
 
 
-            NUXT_PLATFORM_API_BASE_VALUE=https://api.demo.bellagp.com
-            NUXT_PUBLIC_PLATFORM_API_BASE_VALUE=https://api.demo.bellagp.com
-            NUXT_PUBLIC_SITE_URL_VALUE=https://demo.bellagp.com
-            NUXT_CRYPTO_SECRET_KEY_VALUE=demo_crypto_secret_key_replace_me
-            NUXT_STRIPE_MODE_VALUE=test
-            NUXT_STRIPE_SUCCESS_URL_VALUE=https://demo.bellagp.com/confirm
-            NUXT_STRIPE_CANCEL_URL_VALUE=https://demo.bellagp.com/expedition
+            NUXT_PLATFORM_API_BASE_VALUE="$(dotenv_quote "$API_URL")"
+            NUXT_PUBLIC_PLATFORM_API_BASE_VALUE="$(dotenv_quote "$PUBLIC_API_URL")"
+            NUXT_PUBLIC_SITE_URL_VALUE="$(dotenv_quote "$PUBLIC_SITE_URL")"
+            NUXT_CRYPTO_SECRET_KEY_VALUE="$(dotenv_quote "$CRYPT_KEY")"
+            NUXT_STRIPE_MODE_VALUE="$(dotenv_quote "$STRIPE_MODE")"
+            NUXT_STRIPE_SUCCESS_URL_VALUE="$(dotenv_quote "$SUCCESS_URL")"
+            NUXT_STRIPE_CANCEL_URL_VALUE="$(dotenv_quote "$CANCEL_URL")"
 
 
             cat > .env.production <<EOF
@@ -75,7 +75,7 @@ jobs:
             NUXT_STRIPE_CANCEL_URL=${NUXT_STRIPE_CANCEL_URL_VALUE}
             EOF
 
-            chmod 600 .env.local
+            chmod 600 .env.production
 
             npm ci
             npm run build
