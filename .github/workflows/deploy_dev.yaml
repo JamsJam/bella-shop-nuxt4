@@ -79,4 +79,4 @@ jobs:
 
             npm ci
             npm run build
-            pm2 restart node .output/server/index.mjs
+            pm2 reload ecosystem.config.cjs
