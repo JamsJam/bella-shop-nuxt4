@@ -60,7 +60,7 @@ jobs:
             NUXT_STRIPE_CANCEL_URL_VALUE=https://demo.bellagp.com/expedition
 
 
-            cat > .env.local <<EOF
+            cat > .env.production <<EOF
             # Configuration de l'application
             NUXT_PLATFORM_API_BASE=${NUXT_PLATFORM_API_BASE_VALUE}
             NUXT_PUBLIC_PLATFORM_API_BASE=${NUXT_PUBLIC_PLATFORM_API_BASE_VALUE}
