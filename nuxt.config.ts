@@ -14,13 +14,13 @@ export default defineNuxtConfig({
   // cors: false,
   modules: ['@pinia/nuxt'],
   runtimeConfig: {
-    platformApiBase: "url_to_platform_api",
+    platformApiBase: "platform_api_base",
     cryptoSecretKey: "crypto_secret_key",
     stripeMode: "test",
     stripeSuccessUrl: "url_to_stripe_success_page",
     stripeCancelUrl: "url_to_stripe_cancel_page",
     public: {
-      platformApiBase: "url_to_platform_api",
+      platformApiBase: "platform_api_base",
       siteUrl: "url_to_site",
       stripePublicKey: "stripe_public_key"
     }

@@ -50,7 +50,7 @@
           <div class="login_container_forms_buttons">
             <p>
               Tu n'est pas encore inscris ?
-              <NuxtLink to="/signin" class="login_container_forms_buttons_signin"
+              <NuxtLink to="/signup" class="login_container_forms_buttons_signup"
                 >Inscris toi</NuxtLink
               >
             </p>
@@ -164,7 +164,7 @@ export default {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ user: userData }),
+        body: JSON.stringify( userData ),
         credentials: 'include',
       }
 
@@ -176,7 +176,7 @@ export default {
           this.redirectAfterLogin()
         } else {
           if (data.type === 'confirmation_code') {
-            this.userId = data.userId
+            this.userId = data.id ?? data.userId
             this.awaitingConfirmAccount = true
           }
           throw data.error
@@ -219,7 +219,7 @@ export default {
 
       const requestData = {
         code: code.toUpperCase(),
-        userId: this.userId,
+        id: this.userId,
       }
 
       const url = this.getAuthUrl('verify-confirmation-code')

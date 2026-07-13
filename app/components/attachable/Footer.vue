@@ -23,7 +23,7 @@
           </li>
           <li>
             <NuxtLink v-if="auth" to="/account">Suivre ma commande</NuxtLink>
-            <NuxtLink v-else-if="!auth" to="/login">Suivre ma commande</NuxtLink>
+            <NuxtLink v-else to="/login">Suivre ma commande</NuxtLink>
           </li>
 
           <li>

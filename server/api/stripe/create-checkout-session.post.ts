@@ -133,6 +133,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event)
   const cookie = getHeader(event, 'cookie')
+  const token = getCookie(event, 'token')
   const cart = parseCartCookie(cartCookie)
   const shipping =
     normalizeShippingPayload(body?.shipping) || parseShippingCookie(shippingCookie)
@@ -159,6 +160,7 @@ export default defineEventHandler(async (event) => {
     method: 'GET',
     headers: {
       ...(cookie ? { cookie } : {}),
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
       accept: 'application/json',
     },
     ignoreResponseError: true,

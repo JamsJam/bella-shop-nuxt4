@@ -1,6 +1,6 @@
 @use '../../utils/' as *;
 
-.signin_page {
+.signup_page {
   background-color: $nuance-0;
 
   &_container {
@@ -207,7 +207,7 @@
       align-items: center;
       flex-direction: column;
 
-      &_signin {
+      &_signup {
         font-size: 14px;
         color: $accent-800;
         font-weight: 700;

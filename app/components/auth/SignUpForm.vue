@@ -1,24 +1,29 @@
 <template>
-  <div class="signin">
-    <div class="signin_page">
-      <div class="signin_page_container">
-        <div class="signin_page_forms">
-          <div v-if="!awaitingConfirmAccount" class="signin_page_forms">
-            <div class="signin_page_forms_title">
+  <div class="signup">
+    <div class="signup_page">
+      <div class="signup_page_container">
+        <div class="signup_page_forms">
+          <form
+            v-if="!awaitingConfirmAccount"
+            class="signup_page_forms"
+            @submit.prevent="handleSignUp"
+          >
+            <div class="signup_page_forms_title">
               <h1>Inscription</h1>
-              <div class="signin_page_forms_subtitle">
+              <div class="signup_page_forms_subtitle">
                 <p>C’est parti ! Rejoins-nous et commence ton shopping.</p>
               </div>
             </div>
 
-            <div class="signin_page_forms_inputs">
+            <div class="signup_page_forms_inputs">
               <div class="inputWrapper">
-                <label for="user-e-mail">E-mail</label>
+                <label for="user-email">E-mail</label>
                 <input
                   id="user-email"
                   type="email"
                   v-model="email"
                   placeholder="Adresse e-mail"
+                  required
                 />
               </div>
 
@@ -29,6 +34,7 @@
                   type="password"
                   v-model="password"
                   placeholder="Mot de passe"
+                  required
                 />
               </div>
 
@@ -41,32 +47,33 @@
                   type="password"
                   v-model="repeatPassword"
                   placeholder="Répéter le mot de passe"
+                  required
                 />
               </div>
 
-              <button class="button--secondary" @click="handleSignIn()">
+              <button class="button--secondary" type="submit">
                 Rejoins Bella
               </button>
 
-              <div class="login_container_forms_buttons">
+              <div class="signup_page_forms_buttons">
                 <p>
                   Tu as déjà ton compte ?
-                  <NuxtLink to="/login" class="login_container_forms_buttons_signin"
+                  <NuxtLink to="/login" class="signup_page_forms_buttons_login"
                     >Connecte-toi</NuxtLink
                   >
                 </p>
               </div>
             </div>
-          </div>
+          </form>
 
-          <div v-if="awaitingConfirmAccount" class="signin_page_forms_code">
-            <div class="signin_page_forms_code_title">
+          <div v-if="awaitingConfirmAccount" class="signup_page_forms_code">
+            <div class="signup_page_forms_code_title">
               <h3>
                 Confirmer votre compte avec le code envoyé à votre adresse mail
               </h3>
               <p>{{ email }}</p>
             </div>
-            <div class="signin_page_forms_code_inputs">
+            <div class="signup_page_forms_code_inputs">
               <input
                 ref="codeInput1"
                 type="text"
@@ -110,12 +117,12 @@
                 @input="focusNextInput($event, 6)"
               />
             </div>
-            <div class="signin_page_forms_code_send_new_code">
+            <div class="signup_page_forms_code_send_new_code">
               <button @click="resendConfirmationCode()">
                 Renvoyer un code de confirmation
               </button>
             </div>
-            <div class="signin_page_forms_buttons">
+            <div class="signup_page_forms_buttons">
               <button class="button--primary" @click="handleConfirmCode()">
                 Confirmer
               </button>
@@ -123,7 +130,7 @@
           </div>
         </div>
 
-        <div class="signin_page_image">
+        <div class="signup_page_image">
           <img src="/images/logos/bella_logo_black.png" alt="" />
           <p>
             Découvre nos vêtements, accessoires, nouveautés. On est là pour te
@@ -134,12 +141,13 @@
       </div>
     </div>
 
-    <PopupComponent :popup_message="popupMessage" />
+   
   </div>
 </template>
 
 <script>
 export default {
+  name: 'SignUpForm',
   components: {
     // PopupComponent,
   },
@@ -163,7 +171,7 @@ export default {
     getAuthUrl(path) {
       return `/api/auth/${path}`
     },
-    async handleSignIn() {
+    async handleSignUp() {
       const userData = {
         email: this.email,
         password: this.password,
@@ -175,21 +183,21 @@ export default {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ user: userData }),
+        body: JSON.stringify( userData ),
         credentials: 'include',
       }
 
       try {
-        const response = await fetch(url, options)
-        const data = await response.json()
-
+        
         if (this.password !== this.repeatPassword) {
           throw new Error('Les mots de passe doivent correspondre')
         }
+        const response = await fetch(url, options)
+        const data = await response.json()
 
         if (response.ok) {
           this.awaitingConfirmAccount = true
-          this.userId = data.userId
+          this.userId = data.id ?? data.userId
         }
 
         if (!response.ok) {
@@ -198,10 +206,10 @@ export default {
 
         return data
       } catch (error) {
-        this.popupMessage = {
-          type: 'error',
-          message: error,
-        }
+        // this.popupMessage = {
+        //   type: 'error',
+        //   message: error,
+        // }
         return error
       }
     },
@@ -220,7 +228,7 @@ export default {
 
       const requestData = {
         code: code.toUpperCase(),
-        userId: this.userId,
+        id: this.userId,
       }
 
       const url = this.getAuthUrl('verify-confirmation-code')
@@ -281,7 +289,7 @@ export default {
           this.$router.push('/')
         } else {
           if (data.type === 'confirmation_code') {
-            this.userId = data.userId
+            this.userId = data.id ?? data.userId
             this.awaitingConfirmAccount = true
           }
           throw data.error

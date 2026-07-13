@@ -1,20 +1,20 @@
 <template>
-  <div class="signin_page">
+  <div class="signup_page">
     <NavigationBar />
 
-    <SignInForms />
+    <SignUpForm />
   </div>
 </template>
 
 <script>
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
-import SignInForms from '~/components/auth/SignInForms.vue'
+import SignUpForm from '~/components/auth/SignUpForm.vue'
 
 export default {
-  name: 'ClothesPage',
+  name: 'SignUpPage',
   components: {
     NavigationBar,
-    SignInForms,
+    SignUpForm,
   },
   data: function () {
     return {}
@@ -28,7 +28,7 @@ export default {
 // @use '../sass/utils' as *;
 // @use '../sass/base' as *;
 
-.signin_page {
+.signup_page {
   overflow: hidden;
 }
 </style>
