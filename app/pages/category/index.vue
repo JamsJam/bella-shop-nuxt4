@@ -40,10 +40,17 @@
                     <!--! grid component-->
 
                 </div>
-                <div class="clothes_selection_container_hero">
-                    <div class="clothes_selection_container_hero_container">
-                        <h2>Quel <strong>vêtement</strong> te convient le mieux ?</h2>
-                        <NuxtLink to="/avatar" class="button--primary"> Crée ton avatar </NuxtLink>
+
+
+                <div
+                    class="clothes_selection_container_hero"
+                    :style="categoryPage?.bandeau?.background
+                        ? { background: `url('${categoryPage.bandeau.background}') 50%/cover no-repeat` }
+                        : { background: 'url(../images/clothes/category_banniere.jpg) 50%/cover no-repeat' }"
+                >
+                    <div class="clothes_selection_container_hero_container" >
+                        <h2 v-html="categoryPage?.bandeau?.title || 'Quel vêtement <strong> te convient</strong> le mieux ?'"></h2>
+                        <NuxtLink to="/avatar" class="button--primary" > {{ categoryPage?.bandeau?.cta || 'Crée ton avatar' }} </NuxtLink>
                     </div>
                 </div>
             </div>
@@ -57,55 +64,38 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import type CategoryPageDTO from '#shared/dto/categorypage.dto'
 import type { CategoryListDTO } from '#shared/dto/categorylist.dto'
-import type { BandeauDTO } from '#shared/dto/bandeau.dto'
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import Footer from '~/components/attachable/Footer.vue'
 
-const page = ref<CategoryPageDTO | null>(null)
-const categories = computed<CategoryListDTO[]>(() => page.value?.categories ?? [])
-const bandeau = computed<BandeauDTO | null>(() => page.value?.bandeau ?? null)
-
+const { data: categoryPage } = await useFetch<CategoryPageDTO>('/api/category')
+const categories = computed<CategoryListDTO[]>(() => categoryPage.value?.categories ?? [])
 useHead(() => {
-  if (!page.value?.seo) {
-    return {}
+  if (categoryPage.value?.seo) {
+    return {
+      title: categoryPage.value.seo.title,
+      meta: [
+        { name: 'description', content: categoryPage.value.seo.description },
+        { name: 'keywords', content: categoryPage.value.seo.keywords },
+        { property: 'og:title', content: categoryPage.value.seo.ogTitle },
+        { property: 'og:description', content: categoryPage.value.seo.ogDescription },
+        { property: 'og:url', content: categoryPage.value.seo.ogUrl },
+        { property: 'og:image', content: categoryPage.value.seo.ogImage },
+      ],
+      script: [
+        {
+          type: 'application/ld+json',
+          children: categoryPage.value.seo.jsonLd,
+        },
+      ],
+    }
   }
 
-  return {
-    title: page.value.seo.title,
-    meta: [
-      { name: 'description', content: page.value.seo.description },
-      { name: 'keywords', content: page.value.seo.keywords },
-      { property: 'og:title', content: page.value.seo.ogTitle },
-      { property: 'og:description', content: page.value.seo.ogDescription },
-      { property: 'og:url', content: page.value.seo.ogUrl },
-      { property: 'og:image', content: page.value.seo.ogImage },
-    ],
-    script: [
-      {
-        type: 'application/ld+json',
-        children: page.value.seo.jsonLd,
-      },
-    ],
-  }
 })
 
-async function loadCategoryPage() {
-  try {
-    const response = await fetch('/api/category')
-    if (!response.ok) throw new Error('Failed to fetch category page')
-    const data = await response.json()
-    page.value = data
-  } catch (error) {
-    console.error('Erreur lors du chargement de la page catégories:', error)
-  }
-}
 
-onMounted(async () => {
-  await loadCategoryPage()
-})
 </script>
 
 <style lang="scss">
@@ -117,5 +107,4 @@ onMounted(async () => {
     overflow: hidden;
 }
 </style>
-
 
