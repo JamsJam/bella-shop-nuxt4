@@ -32,6 +32,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
+          envs: API_URL,PUBLIC_API_URL,PUBLIC_SITE_URL,CRYPT_KEY,STRIPE_MODE,SUCCESS_URL,CANCEL_URL
           script: |
             set -e
             mkdir -p /var/www/${{ secrets.SERVER_USER }}/test.${{ secrets.DOMAIN }}/
@@ -79,4 +80,4 @@ jobs:
 
             npm ci
             npm run build
-            pm2 reload ecosystem.config.cjs
+            pm2 reload ecosystem.config.cjs --update-env

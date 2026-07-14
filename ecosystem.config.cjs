@@ -6,11 +6,10 @@ module.exports = {
       exec_mode: 'cluster',
       instances: 'max',
       script: './.output/server/index.mjs',
+      node_args: '--env-file=.env.production',
       env: {
         NODE_ENV: 'production',
-        node_args: 'env-file .env.production',
       },
     },
   ],
 }
-
