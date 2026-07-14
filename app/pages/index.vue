@@ -33,7 +33,9 @@ const { data: homepage } = await useFetch<HomepageDTO>('/api/page/home')
 
 useHead(() => {
   if (!homepage.value?.seo) {
-    return {}
+    return {
+      
+    }
   }
 
   return {
