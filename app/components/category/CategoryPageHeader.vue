@@ -38,7 +38,7 @@ export default {
 
 <style lang="scss" scoped>
 .category_page_header {
-  width: min(90vw, 1200px);
+  width: min(90dvw, 75rem);
   margin: 5rem auto 2.5rem;
 }
 
@@ -61,7 +61,7 @@ export default {
 
 .category_page_header_title {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2rem, 5dvw, 4rem);
   font-weight: 700;
   line-height: 1;
 }

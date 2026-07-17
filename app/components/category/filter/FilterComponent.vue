@@ -1,9 +1,11 @@
 <template>
-  <div ref="filterMenu_2" class="category_container_box_filter_container_type">
-    <button @click="toggleFilterMenu(2)">
+  <div
+    class="category_container_box_filter_container_type"
+    :class="{ 'is-open': isOpen }"
+  >
+    <button type="button" :aria-expanded="isOpen" @click="isOpen = !isOpen">
       <p>{{ label }}</p>
       <svg
-        ref="filterMenuIcon_2"
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -82,6 +84,7 @@ export default {
       selectedFilters: [],
       localMinPrice: 0,
       localMaxPrice: null,
+      isOpen: false,
     }
   },
   watch: {
@@ -111,19 +114,6 @@ export default {
     },
     filterValue(filter) {
       return typeof filter === 'string' ? filter : filter.id
-    },
-    toggleFilterMenu(menuIndex) {
-      const thisFilterMenu = this.$refs['filterMenu_' + menuIndex]
-      const thisFilterMenuIcon = this.$refs['filterMenuIcon_' + menuIndex]
-      if (thisFilterMenu) {
-        if (thisFilterMenu.style.maxHeight === '100%') {
-          thisFilterMenuIcon.style.transform = 'rotateZ(360deg)'
-          thisFilterMenu.style.maxHeight = '4.3vh'
-        } else {
-          thisFilterMenuIcon.style.transform = 'rotateZ(180deg)'
-          thisFilterMenu.style.maxHeight = '100%'
-        }
-      }
     },
   },
 }

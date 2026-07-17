@@ -8,10 +8,17 @@
 
         <div class="category_container_box_filter">
           <div class="category_container_box_filter_container">
-            <div ref="filterMenu_1" class="category_container_box_filter_container_type">
-              <button @click="toggleFilterMenu(1)">
+            <div
+              class="category_container_box_filter_container_type"
+              :class="{ 'is-open': categoriesFilterOpen }"
+            >
+              <button
+                type="button"
+                :aria-expanded="categoriesFilterOpen"
+                @click="categoriesFilterOpen = !categoriesFilterOpen"
+              >
                 <p>Vêtements</p>
-                <svg ref="filterMenuIcon_1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                   viewBox="0 0 21 21">
                   <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                     d="m14.5 8.5l-4 4l-4-4" />
@@ -186,6 +193,7 @@ export default {
       imageIndexes: {},
       appliedFilters: [],
       pageNumber: 1,
+      categoriesFilterOpen: false,
     }
   },
   computed: {
@@ -390,20 +398,6 @@ export default {
       } else {
         // Pas de promotion, retourner le prix normal
         return price.toFixed(2) // Arrondir à 2 décimales
-      }
-    },
-
-    toggleFilterMenu(menuIndex) {
-      const thisFilterMenu = this.$refs['filterMenu_' + menuIndex]
-      const thisFilterMenuIcon = this.$refs['filterMenuIcon_' + menuIndex]
-      if (thisFilterMenu) {
-        if (thisFilterMenu.style.maxHeight === '100%') {
-          thisFilterMenuIcon.style.transform = 'rotateZ(360deg)'
-          thisFilterMenu.style.maxHeight = '4.3vh'
-        } else {
-          thisFilterMenuIcon.style.transform = 'rotateZ(180deg)'
-          thisFilterMenu.style.maxHeight = '100%'
-        }
       }
     },
 
