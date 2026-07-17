@@ -25,7 +25,7 @@ export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => 
   const APIPlatform = config.platformApiBase || 'http://localhost:8000'
 
   const platformClothes = await $fetch<PlatformCategoryClotheDTO[]>(
-    `/api/category/${encodeURIComponent(slug)}`,
+    `/category/${encodeURIComponent(slug)}`,
     {
       baseURL: APIPlatform,
       method: 'GET',
