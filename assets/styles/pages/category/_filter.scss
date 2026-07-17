@@ -378,6 +378,67 @@
               transition: all ease 0.3s;
             }
 
+            &_navigation {
+              position: absolute;
+              z-index: 2;
+              top: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 4vh;
+              height: 4vh;
+              padding: 0;
+              border: 0;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.82);
+              color: $black;
+              cursor: pointer;
+              transform: translateY(-50%);
+              transition: background-color 0.2s ease, transform 0.2s ease;
+
+              span {
+                font-size: 3vh;
+                line-height: 1;
+                transform: translateY(-0.15vh);
+              }
+
+              &:hover,
+              &:focus-visible {
+                background: $nuance-0;
+                transform: translateY(-50%) scale(1.08);
+              }
+
+              &_previous {
+                left: 1.2vh;
+              }
+
+              &_next {
+                right: 1.2vh;
+              }
+            }
+
+            &_dots {
+              position: absolute;
+              z-index: 2;
+              bottom: 1.4vh;
+              left: 50%;
+              display: flex;
+              gap: 0.7vh;
+              transform: translateX(-50%);
+
+              span {
+                width: 0.8vh;
+                height: 0.8vh;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.55);
+                box-shadow: 0 0 0 0.1vh rgba(0, 0, 0, 0.18);
+
+                &.active {
+                  background: $nuance-0;
+                }
+              }
+            }
+
             &_promo {
               position: absolute;
               left: 2.2vh;

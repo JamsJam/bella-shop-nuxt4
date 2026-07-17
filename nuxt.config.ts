@@ -12,6 +12,9 @@ export default defineNuxtConfig({
   
   ssr: true,
   // cors: false,
+  routeRules: {
+    '/': { prerender: true },
+  },
   modules: ['@pinia/nuxt'],
   runtimeConfig: {
     platformApiBase: "platform_api_base",

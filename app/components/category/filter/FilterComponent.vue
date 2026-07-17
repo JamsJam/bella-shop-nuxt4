@@ -46,11 +46,11 @@
         class="category_container_box_filter_container_type_box_item"
       >
         <label v-if="label !== 'Promotions'" class="checkbox-container">
-          {{ filter.name }}
-          <input type="checkbox" v-model="selectedFilters" :value="filter.id" />
+          {{ filterLabel(filter) }}
+          <input type="checkbox" v-model="selectedFilters" :value="filterValue(filter)" />
           <div
             class="checkbox-custom"
-            :class="{ checked: selectedFilters.includes(filter.id) }"
+            :class="{ checked: selectedFilters.includes(filterValue(filter)) }"
           ></div>
         </label>
         <label v-if="label === 'Promotions'" class="checkbox-container">
@@ -106,6 +106,12 @@ export default {
   },
   mounted() {},
   methods: {
+    filterLabel(filter) {
+      return typeof filter === 'string' ? filter : filter.name
+    },
+    filterValue(filter) {
+      return typeof filter === 'string' ? filter : filter.id
+    },
     toggleFilterMenu(menuIndex) {
       const thisFilterMenu = this.$refs['filterMenu_' + menuIndex]
       const thisFilterMenuIcon = this.$refs['filterMenuIcon_' + menuIndex]

@@ -43,7 +43,7 @@ export default {
       try {
         this.pending = true
         const slug = this.$route.params.slug
-        const response = await $fetch(`/api/category/${slug}`)
+        const response = await $fetch(`/api/category/${encodeURIComponent(slug)}`)
         this.categoryData = response
       } catch (error) {
         console.error('Erreur lors du chargement de la catégorie:', error)

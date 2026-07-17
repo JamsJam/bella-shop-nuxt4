@@ -49,13 +49,40 @@
               class="category_container_box_clothes_card"
               >
               <div class="category_container_box_clothes_card_image">
-                <img :src="clothing.image" :alt="clothing.name" />
+                <img :src="currentImage(clothing)" :alt="clothing.name" />
+
+                <template v-if="clothingImages(clothing).length > 1">
+                  <button
+                    type="button"
+                    class="category_container_box_clothes_card_image_navigation category_container_box_clothes_card_image_navigation_previous"
+                    :aria-label="`Image précédente de ${clothing.name}`"
+                    @click.prevent.stop="changeImage(clothing, -1)"
+                  >
+                    <span aria-hidden="true">‹</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="category_container_box_clothes_card_image_navigation category_container_box_clothes_card_image_navigation_next"
+                    :aria-label="`Image suivante de ${clothing.name}`"
+                    @click.prevent.stop="changeImage(clothing, 1)"
+                  >
+                    <span aria-hidden="true">›</span>
+                  </button>
+
+                  <div class="category_container_box_clothes_card_image_dots" aria-hidden="true">
+                    <span
+                      v-for="(_, imageIndex) in clothingImages(clothing)"
+                      :key="imageIndex"
+                      :class="{ active: currentImageIndex(clothing) === imageIndex }"
+                    ></span>
+                  </div>
+                </template>
               </div>
               <div class="category_container_box_clothes_card_text">
                 <p class="category_container_box_clothes_card_text_title">
                   {{ clothing.name }}
                 </p>
-                <div class="category_container_box_clothes_card_text_price">
+                <div v-if="clothing.price !== undefined" class="category_container_box_clothes_card_text_price">
                   <p class="category_container_box_clothes_card_text_price">
                     {{ clothing.price }} €
                   </p>
@@ -156,6 +183,7 @@ export default {
         },
       ],
       filteredClothes: [],
+      imageIndexes: {},
       appliedFilters: [],
       pageNumber: 1,
     }
@@ -177,19 +205,45 @@ export default {
     await this.fetchCategories()
     if (this.categoryData) {
       this.initializeFromCategoryData(this.categoryData)
-    } else {
-      await this.fetchClothesColorVariants()
-      await this.fetchColors()
-      await this.fetchSizes()
-      await this.fetchPromotions()
     }
   },
   methods: {
+    clothingKey(clothing) {
+      return String(clothing.id || clothing.slug)
+    },
+
+    clothingImages(clothing) {
+      const images = Array.isArray(clothing.images)
+        ? clothing.images.filter((image) => typeof image === 'string' && image.length > 0)
+        : []
+
+      return images.length > 0 ? images : (clothing.image ? [clothing.image] : [])
+    },
+
+    currentImageIndex(clothing) {
+      return this.imageIndexes[this.clothingKey(clothing)] || 0
+    },
+
+    currentImage(clothing) {
+      const images = this.clothingImages(clothing)
+      return images[this.currentImageIndex(clothing)] || ''
+    },
+
+    changeImage(clothing, direction) {
+      const images = this.clothingImages(clothing)
+      if (images.length < 2) return
+
+      const key = this.clothingKey(clothing)
+      const nextIndex = (this.currentImageIndex(clothing) + direction + images.length) % images.length
+      this.imageIndexes = { ...this.imageIndexes, [key]: nextIndex }
+    },
+
     initializeFromCategoryData(data) {
       // Initialiser les vêtements depuis l'API
       if (data.clothes && Array.isArray(data.clothes)) {
         this.filteredClothes = data.clothes
         this.totalClothes = data.clothes.length
+        this.imageIndexes = {}
       }
 
       // Initialiser les filtres depuis l'API
@@ -400,8 +454,48 @@ export default {
       }
     },
 
-    applyFilters() {
-      this.fetchClothesColorVariants()
+    async applyFilters() {
+      const colorFilter = this.appliedFilters.find(
+        (filter) => filter.label === 'Couleur'
+      )
+      const sizeFilter = this.appliedFilters.find(
+        (filter) => filter.label === 'Taille'
+      )
+      const priceFilter = this.appliedFilters.find(
+        (filter) => filter.label === 'Prix'
+      )
+
+      const minPrice = priceFilter?.values?.minPrice
+      const maxPrice = priceFilter?.values?.maxPrice
+      const price =
+        minPrice !== undefined ||
+        (maxPrice !== null && maxPrice !== undefined)
+          ? [minPrice ?? 0, maxPrice ?? '']
+          : undefined
+
+      try {
+        this.loaderStatus = true
+
+        const clothes = await $fetch(
+          `/api/search/${encodeURIComponent(this.$route.params.slug)}`,
+          {
+            query: {
+              'color[]': colorFilter?.values?.length ? colorFilter.values : undefined,
+              'size[]': sizeFilter?.values?.length ? sizeFilter.values : undefined,
+              'price[]': price,
+            },
+          }
+        )
+
+        this.filteredClothes = Array.isArray(clothes) ? clothes : []
+        this.totalClothes = this.filteredClothes.length
+        this.imageIndexes = {}
+        this.pageNumber = 1
+      } catch (error) {
+        console.error("Une erreur s'est produite lors du filtrage :", error)
+      } finally {
+        this.loaderStatus = false
+      }
     },
 
     async handleClothesPage(count) {
