@@ -16,7 +16,7 @@ export interface ClotheColorDTO {
 }
 
 export interface ClotheSizeDTO {
-  id: string
+  id: number
   name: string
 }
 

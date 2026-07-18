@@ -106,6 +106,8 @@
 }
 
 .product_selection_color {
+  display: inline-block;
+  flex: 0 0 auto;
   width: 2rem;
   height: 2rem;
   padding: 0;

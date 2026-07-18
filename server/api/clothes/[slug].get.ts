@@ -17,10 +17,27 @@ interface PlatformSizeGuideDTO {
   sizes: PlatformSizeGuideSizeDTO[]
 }
 
+interface PlatformSizeDTO {
+  id: number
+  name: string
+}
+
 interface PlatformColorDTO {
   name: string
   slug: string
   hexa: string | null
+}
+
+interface PlatformClothesVariantItemDTO {
+  slug: string
+  name: string
+  color: string
+  hexa?: string | null
+}
+
+interface PlatformClothesVariantDTO {
+  name: string
+  variants: PlatformClothesVariantItemDTO[]
 }
 
 interface PlatformRelatedProductDTO {
@@ -42,9 +59,10 @@ interface PlatformVariantDTO {
   description: string | null
   metadescription: string | null
   category: PlatformCategoryDTO
+  clothesVariant: PlatformClothesVariantDTO
   image: string | null
   images: string[]
-  sizes: string[]
+  sizes: PlatformSizeDTO[]
   sizeGuide: PlatformSizeGuideDTO | null
   colors: PlatformColorDTO[]
   relatedProducts: PlatformRelatedProductDTO[]
@@ -97,6 +115,35 @@ const mapSizeGuide = (guide: PlatformSizeGuideDTO | null): ClotheDetailsDTO['siz
   }
 }
 
+const mapColors = (variant: PlatformVariantDTO): ClotheDetailsDTO['colors'] => {
+  const colorsBySlug = new Map(
+    (Array.isArray(variant.colors) ? variant.colors : []).map((color) => [color.slug, color])
+  )
+  const clothesVariants = Array.isArray(variant.clothesVariant?.variants)
+    ? variant.clothesVariant.variants
+    : []
+
+  if (clothesVariants.length > 0) {
+    return clothesVariants.map((clotheVariant) => {
+      const color = colorsBySlug.get(clotheVariant.slug)
+
+      return {
+        name: clotheVariant.color || color?.name || '',
+        slug: clotheVariant.slug,
+        hex: normalizeHex(clotheVariant.hexa ?? color?.hexa ?? null),
+        href: `/clothes/${clotheVariant.slug}`,
+      }
+    })
+  }
+
+  return Array.from(colorsBySlug.values(), (color) => ({
+    name: color.name,
+    slug: color.slug,
+    hex: normalizeHex(color.hexa),
+    href: `/clothes/${color.slug}`,
+  }))
+}
+
 export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
   const slug = getRouterParam(event, 'slug')
 
@@ -141,16 +188,11 @@ export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
       alt: `${variantName} - image ${index + 1}`,
     })),
     sizes: (Array.isArray(variant.sizes) ? variant.sizes : []).map((size) => ({
-      id: size.toLowerCase(),
-      name: size,
+      id: size.id,
+      name: size.name,
     })),
     sizeGuide: mapSizeGuide(variant.sizeGuide),
-    colors: (Array.isArray(variant.colors) ? variant.colors : []).map((color) => ({
-      name: color.name,
-      slug: color.slug,
-      hex: normalizeHex(color.hexa),
-      href: `/clothes/${color.slug}`,
-    })),
+    colors: mapColors(variant),
     relatedClothes: (Array.isArray(variant.relatedProducts) ? variant.relatedProducts : []).map((clothe) => ({
       name: deslugify(clothe.slug),
       slug: clothe.slug,
