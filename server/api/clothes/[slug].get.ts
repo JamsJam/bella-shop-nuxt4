@@ -97,7 +97,7 @@ export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
   const config = useRuntimeConfig(event)
   const APIPlatform = config.platformApiBase || 'http://localhost:8000'
   const variant = await $fetch<PlatformVariantDTO>(
-    `/api/variant/${encodeURIComponent(slug)}`,
+    `/variant/${encodeURIComponent(slug)}`,
     {
       baseURL: APIPlatform,
       method: 'GET',
