@@ -44,6 +44,13 @@ interface PlatformVariantDTO {
   relatedProducts: PlatformRelatedProductDTO[]
 }
 
+const deslugify = (slug: string) =>
+  slug
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
+
 const normalizeHex = (hexa: string | null) => {
   if (!hexa) {
     return '#cccccc'
@@ -110,9 +117,10 @@ export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
   const imageUrls = [variant.image, ...(Array.isArray(variant.images) ? variant.images : [])]
     .filter((image): image is string => typeof image === 'string' && image.length > 0)
     .filter((image, index, images) => images.indexOf(image) === index)
+  const variantName = deslugify(variant.slug)
 
   return {
-    name: variant.name,
+    name: variantName,
     slug: variant.slug,
     price: variant.price / 100,
     description: variant.description || '',
@@ -120,7 +128,7 @@ export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
     images: imageUrls.map((src, index) => ({
       id: index + 1,
       src,
-      alt: `${variant.name} - image ${index + 1}`,
+      alt: `${variantName} - image ${index + 1}`,
     })),
     sizes: (Array.isArray(variant.sizes) ? variant.sizes : []).map((size) => ({
       id: size.toLowerCase(),
@@ -134,7 +142,7 @@ export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
       href: `/clothes/${color.slug}`,
     })),
     relatedClothes: (Array.isArray(variant.relatedProducts) ? variant.relatedProducts : []).map((clothe) => ({
-      name: clothe.name,
+      name: deslugify(clothe.slug),
       slug: clothe.slug,
       image: clothe.image || undefined,
       images: Array.isArray(clothe.images) ? clothe.images : [],

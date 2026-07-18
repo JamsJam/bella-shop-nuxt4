@@ -4,7 +4,7 @@
 
     <main class="clothes_product_page">
       <div class="clothes_product_page_inner">
-        <NuxtLink to="/category" class="clothes_product_page_back">
+        <NuxtLink :to="/category/route.params.category" class="clothes_product_page_back">
           Retour
         </NuxtLink>
 
@@ -35,6 +35,8 @@
         <ProductRecommendations :clothes="product.relatedClothes" />
       </div>
     </main>
+
+    <Footer />
   </div>
 </template>
 
@@ -47,6 +49,7 @@ import ProductSelection from '~/components/product/ProductSelection.vue'
 import ProductRecommendations from '~/components/product/ProductRecommendations.vue'
 import { useAvatarStore } from '~/stores/avatar'
 import { useCartStore } from '~/stores/cart'
+import Footer from '~/components/attachable/Footer.vue'
 
 const route = useRoute()
 const avatarStore = useAvatarStore()
