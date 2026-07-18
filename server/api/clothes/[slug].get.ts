@@ -30,12 +30,18 @@ interface PlatformRelatedProductDTO {
   images: string[]
 }
 
+interface PlatformCategoryDTO {
+  name: string
+  slug: string
+}
+
 interface PlatformVariantDTO {
   name: string
   slug: string
   price: number
   description: string | null
   metadescription: string | null
+  category: PlatformCategoryDTO
   image: string | null
   images: string[]
   sizes: string[]
@@ -125,6 +131,10 @@ export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
     price: variant.price / 100,
     description: variant.description || '',
     metadescription: variant.metadescription || '',
+    category: {
+      name: variant.category.name,
+      slug: variant.category.slug,
+    },
     images: imageUrls.map((src, index) => ({
       id: index + 1,
       src,

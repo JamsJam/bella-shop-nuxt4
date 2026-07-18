@@ -4,7 +4,7 @@
 
     <main class="clothes_product_page">
       <div class="clothes_product_page_inner">
-        <NuxtLink :to="/category/route.params.category" class="clothes_product_page_back">
+        <NuxtLink :to="`/category/${product.category.slug}`" class="clothes_product_page_back">
           Retour
         </NuxtLink>
 
@@ -64,6 +64,10 @@ const fallbackProduct = {
   price: 0,
   description: '',
   metadescription: '',
+  category: {
+    name: '',
+    slug: '',
+  },
   images: [],
   colors: [],
   sizes: [],

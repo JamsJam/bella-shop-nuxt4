@@ -31,6 +31,11 @@ export interface ClotheSizeGuideDTO {
   rows: Array<Record<string, string>>
 }
 
+export interface ClotheCategoryDTO {
+  name: string
+  slug: string
+}
+
 export default interface ClotheDetailsDTO {
   id?: number
   slug: string
@@ -38,6 +43,7 @@ export default interface ClotheDetailsDTO {
   price: number
   description: string
   metadescription: string
+  category: ClotheCategoryDTO
   images: ClotheImageDTO[]
   colors: ClotheColorDTO[]
   sizes: ClotheSizeDTO[]
