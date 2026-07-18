@@ -4,16 +4,16 @@
       <p class="product_selection_label">Couleur : {{ selectedColorName }}</p>
 
       <div class="product_selection_colors">
-        <button
+        <NuxtLink
           v-for="color in colors"
-          :key="color.id"
-          type="button"
+          :key="color.slug"
+          :to="color.href"
           class="product_selection_color"
           :class="{ product_selection_color_active: isSelectedColor(color) }"
           :style="{ backgroundColor: color.hex }"
           :aria-label="color.name"
           @click="$emit('select-color', color)"
-        ></button>
+        ></NuxtLink>
       </div>
     </div>
 
@@ -110,7 +110,7 @@ export default {
   },
   methods: {
     isSelectedColor(color) {
-      return this.selectedColor?.id === color.id
+      return this.selectedColor?.slug === color.slug
     },
     isSelectedSize(size) {
       if (!this.selectedSize) {

@@ -1,110 +1,143 @@
-interface ProductImageDTO {
-  id: number
-  src: string
-  alt: string
+import type ClotheDetailsDTO from '#shared/dto/clotheDetails.dto'
+
+interface PlatformMeasurementDTO {
+  code: string
+  label: string
+  value: string
+  unit: string
 }
 
-interface ProductColorDTO {
-  id: number
-  variantId: number
+interface PlatformSizeGuideSizeDTO {
+  label: string
+  measurements: PlatformMeasurementDTO[]
+}
+
+interface PlatformSizeGuideDTO {
+  unit: string
+  sizes: PlatformSizeGuideSizeDTO[]
+}
+
+interface PlatformColorDTO {
   name: string
-  hex: string
-}
-
-interface ProductSizeDTO {
-  id: string
-  name: string
-}
-
-interface ProductSizeGuideDTO {
-  title: string
-  columns: Array<{
-    key: string
-    label: string
-  }>
-  rows: Array<Record<string, string>>
-}
-
-interface ProductPageDTO {
-  id: number
   slug: string
-  name: string
-  price: number
-  description: string
-  images: ProductImageDTO[]
-  colors: ProductColorDTO[]
-  sizes: ProductSizeDTO[]
-  sizeGuide: ProductSizeGuideDTO
+  hexa: string | null
 }
 
-const deslugifyProductName = (slug = '') =>
-  slug
-    .replace(/[-_]+/g, ' ')
-    .trim()
-    .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
+interface PlatformRelatedProductDTO {
+  name: string
+  slug: string
+  image: string | null
+  images: string[]
+}
 
-export default defineEventHandler((event): ProductPageDTO => {
-  const slug = getRouterParam(event, 'slug') || 'vetement'
-  const name = deslugifyProductName(slug)
+interface PlatformVariantDTO {
+  name: string
+  slug: string
+  price: number
+  description: string | null
+  metadescription: string | null
+  image: string | null
+  images: string[]
+  sizes: string[]
+  sizeGuide: PlatformSizeGuideDTO | null
+  colors: PlatformColorDTO[]
+  relatedProducts: PlatformRelatedProductDTO[]
+}
+
+const normalizeHex = (hexa: string | null) => {
+  if (!hexa) {
+    return '#cccccc'
+  }
+
+  return `#${hexa.replace(/^#/, '')}`
+}
+
+const mapSizeGuide = (guide: PlatformSizeGuideDTO | null): ClotheDetailsDTO['sizeGuide'] => {
+  if (!guide) {
+    return { title: 'Guide des tailles', columns: [], rows: [] }
+  }
+
+  const measurementColumns = new Map<string, string>()
+
+  for (const size of guide.sizes) {
+    for (const measurement of size.measurements) {
+      measurementColumns.set(measurement.code, measurement.label)
+    }
+  }
 
   return {
-    id: 1,
-    slug,
-    name,
-    price: 79.9,
-    description:
-      'Une pièce pensée pour compléter votre dressing BellaGP avec une coupe confortable, une finition soignée et un style facile à porter au quotidien.',
-    images: [
-      {
-        id: 1,
-        src: '/images/clothes/category_banniere.jpg',
-        alt: `${name} vue principale`,
-      },
-      {
-        id: 2,
-        src: '/images/clothes/login_image.png',
-        alt: `${name} vue detail`,
-      },
-      {
-        id: 3,
-        src: '/images/clothes/signin_image.png',
-        alt: `${name} vue portee`,
-      },
-      {
-        id: 4,
-        src: '/images/homepage/best-seller-arriere-plan.jpg',
-        alt: `${name} ambiance`,
-      },
+    title: 'Guide des tailles',
+    columns: [
+      { key: 'size', label: 'Taille' },
+      ...Array.from(measurementColumns, ([key, label]) => ({ key, label })),
     ],
-    colors: [
-      { id: 1, variantId: 101, name: 'Noir', hex: '#111111' },
-      { id: 2, variantId: 102, name: 'Blanc', hex: '#f4f4f4' },
-      { id: 3, variantId: 103, name: 'Rose', hex: '#e9a4b6' },
-      { id: 4, variantId: 104, name: 'Vert', hex: '#276f45' },
-    ],
-    sizes: [
-      { id: 'xs', name: 'XS' },
-      { id: 's', name: 'S' },
-      { id: 'm', name: 'M' },
-      { id: 'l', name: 'L' },
-      { id: 'xl', name: 'XL' },
-    ],
-    sizeGuide: {
-      title: 'Guide des tailles',
-      columns: [
-        { key: 'size', label: 'Taille' },
-        { key: 'chest', label: 'Poitrine' },
-        { key: 'waist', label: 'Taille' },
-        { key: 'hips', label: 'Hanches' },
-        { key: 'length', label: 'Longueur' },
-      ],
-      rows: [
-        { size: 'XS', chest: '78-84 cm', waist: '60-66 cm', hips: '86-90 cm', length: '58 cm' },
-        { size: 'S', chest: '84-90 cm', waist: '66-72 cm', hips: '90-96 cm', length: '60 cm' },
-        { size: 'M', chest: '90-96 cm', waist: '72-78 cm', hips: '96-102 cm', length: '62 cm' },
-        { size: 'L', chest: '96-104 cm', waist: '78-86 cm', hips: '102-110 cm', length: '64 cm' },
-        { size: 'XL', chest: '104-112 cm', waist: '86-94 cm', hips: '110-118 cm', length: '66 cm' },
-      ],
-    },
+    rows: guide.sizes.map((size) => {
+      const row: Record<string, string> = { size: size.label }
+
+      for (const measurement of size.measurements) {
+        const unit = measurement.unit || guide.unit
+        row[measurement.code] = `${measurement.value}${unit ? ` ${unit}` : ''}`
+      }
+
+      return row
+    }),
+  }
+}
+
+export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
+  const slug = getRouterParam(event, 'slug')
+
+  if (!slug) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Le slug du vêtement est requis',
+    })
+  }
+
+  const config = useRuntimeConfig(event)
+  const APIPlatform = config.platformApiBase || 'http://localhost:8000'
+  const variant = await $fetch<PlatformVariantDTO>(
+    `/api/variant/${encodeURIComponent(slug)}`,
+    {
+      baseURL: APIPlatform,
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    }
+  )
+
+  const imageUrls = [variant.image, ...(Array.isArray(variant.images) ? variant.images : [])]
+    .filter((image): image is string => typeof image === 'string' && image.length > 0)
+    .filter((image, index, images) => images.indexOf(image) === index)
+
+  return {
+    name: variant.name,
+    slug: variant.slug,
+    price: variant.price / 100,
+    description: variant.description || '',
+    metadescription: variant.metadescription || '',
+    images: imageUrls.map((src, index) => ({
+      id: index + 1,
+      src,
+      alt: `${variant.name} - image ${index + 1}`,
+    })),
+    sizes: (Array.isArray(variant.sizes) ? variant.sizes : []).map((size) => ({
+      id: size.toLowerCase(),
+      name: size,
+    })),
+    sizeGuide: mapSizeGuide(variant.sizeGuide),
+    colors: (Array.isArray(variant.colors) ? variant.colors : []).map((color) => ({
+      name: color.name,
+      slug: color.slug,
+      hex: normalizeHex(color.hexa),
+      href: `/clothes/${color.slug}`,
+    })),
+    relatedClothes: (Array.isArray(variant.relatedProducts) ? variant.relatedProducts : []).map((clothe) => ({
+      name: clothe.name,
+      slug: clothe.slug,
+      image: clothe.image || undefined,
+      images: Array.isArray(clothe.images) ? clothe.images : [],
+    })),
   }
 })

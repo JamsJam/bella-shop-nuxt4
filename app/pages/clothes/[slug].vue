@@ -31,6 +31,8 @@
             />
           </div>
         </div>
+
+        <ProductRecommendations :clothes="product.relatedClothes" />
       </div>
     </main>
   </div>
@@ -42,6 +44,7 @@ import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import ProductHeader from '~/components/product/ProductHeader.vue'
 import ProductImages from '~/components/product/ProductImages.vue'
 import ProductSelection from '~/components/product/ProductSelection.vue'
+import ProductRecommendations from '~/components/product/ProductRecommendations.vue'
 import { useAvatarStore } from '~/stores/avatar'
 import { useCartStore } from '~/stores/cart'
 
@@ -57,6 +60,7 @@ const fallbackProduct = {
   name: 'Produit',
   price: 0,
   description: '',
+  metadescription: '',
   images: [],
   colors: [],
   sizes: [],
@@ -65,6 +69,7 @@ const fallbackProduct = {
     columns: [],
     rows: [],
   },
+  relatedClothes: [],
 }
 
 const product = computed(() => data.value || fallbackProduct)
@@ -76,7 +81,9 @@ cartStore.load()
 watch(
   product,
   (currentProduct) => {
-    selectedColor.value = currentProduct.colors?.[0] || null
+    selectedColor.value = currentProduct.colors?.find((color) => color.slug === route.params.slug)
+      || currentProduct.colors?.[0]
+      || null
     selectedSize.value = currentProduct.sizes?.[0] || null
   },
   { immediate: true }
