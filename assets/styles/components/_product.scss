@@ -168,9 +168,10 @@
 }
 
 .product_recommendations_grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 2rem;
 }
 
 .product_recommendations_card {
@@ -183,6 +184,7 @@
   overflow: hidden;
   border-radius: 8px;
   background: #f4f4f4;
+  height: 200px;
 }
 
 .product_recommendations_image img {
@@ -313,10 +315,6 @@
   .product_selection_group {
     grid-template-columns: 1fr;
     gap: 0.7rem;
-  }
-
-  .product_recommendations_grid {
-    grid-template-columns: 1fr;
   }
 
   .product_size_guide_overlay {
