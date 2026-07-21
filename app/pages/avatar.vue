@@ -2,28 +2,18 @@
   <div class="clothes_page">
     <NavigationBar />
 
-    <AvatarCreation />
+    <AvatarCreation :initial-skin-colors="skinColorData?.skinColors || []" />
 
     <Foooter />
   </div>
 </template>
 
-<script>
+<script setup>
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import AvatarCreation from '~/components/avatar/AvatarCreation.vue'
 import Foooter from '~/components/attachable/Footer.vue'
 
-export default {
-  name: 'ClothesPage',
-  components: {
-    NavigationBar,
-    AvatarCreation,
-    Foooter,
-  },
-  data: function () {
-    return {}
-  },
-}
+const { data: skinColorData } = await useFetch('/api/avatar/skin-colors')
 </script>
 
 <style lang="scss">

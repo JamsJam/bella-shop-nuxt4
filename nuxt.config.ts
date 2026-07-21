@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   ssr: true,
   // cors: false,
   routeRules: {
-    '/': { prerender: true },
+    '/': { prerender: false },
   },
   modules: ['@pinia/nuxt'],
   runtimeConfig: {

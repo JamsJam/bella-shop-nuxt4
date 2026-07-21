@@ -6,6 +6,7 @@ const defaultAvatarModel = () => ({
     image: '/images/avatar/template_avatar_morphology.webp',
   },
   morphotype: null,
+  body: null,
   face: {
     image: '/images/avatar/template_avatar_face.webp',
   },
@@ -40,6 +41,7 @@ const normalizeAvatarModel = (model = {}) => ({
   ...model,
   morphology: model.morphology || defaultAvatarModel().morphology,
   morphotype: model.morphotype || null,
+  body: model.body || null,
   face: model.face || defaultAvatarModel().face,
   accessory: model.accessory || null,
   hair: model.hair || defaultAvatarModel().hair,
@@ -66,8 +68,8 @@ export const useAvatarStore = defineStore('avatar', {
       if (state.model.avatarClothing) {
         return state.model.avatarClothing.image
       }
-      if (state.model.morphotype) {
-        return state.model.morphotype.image
+      if (state.model.body) {
+        return state.model.body.image
       }
       return state.model.morphology.image
     },

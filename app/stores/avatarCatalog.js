@@ -5,11 +5,21 @@ const fetchJson = async (path) => {
   return await $fetch(path)
 }
 
+const normalizeSkinColor = (skinColor) => ({
+  id: skinColor.id,
+  name: skinColor.name || '',
+  hexa: skinColor.hexa || '',
+  colorValue: skinColor.hexa
+    ? `#${String(skinColor.hexa).replace(/^#/, '')}`
+    : '',
+})
+
 export const useAvatarCatalogStore = defineStore('avatarCatalog', {
   state: () => ({
     skincolors: [],
     morphologies: [],
     morphotypes: [],
+    bodies: [],
     faces: [],
     accessoryFaces: [],
     accessories: [],
@@ -27,65 +37,51 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
     async hydrateBaseCatalog() {
       await Promise.all([
         this.skincolors.length === 0 ? this.fetchSkinColors() : null,
-        this.morphologies.length === 0 ? this.fetchMorphologies() : null,
         this.accessories.length === 0 ? this.fetchAccessories() : null,
-        this.haircolors.length === 0 ? this.fetchHairColors() : null,
-        this.eyecolors.length === 0 ? this.fetchEyeColors() : null,
-        this.eyebrowcolors.length === 0 ? this.fetchEyebrowColors() : null,
-        this.mouthcolors.length === 0 ? this.fetchMouthColors() : null,
       ])
     },
     async hydrateFromAvatarModel(model) {
       await this.hydrateBaseCatalog()
 
       await Promise.all([
-        model?.skincolor?.id && model?.morphology?.id
-          ? this.fetchMorphotypesBySkinColorAndMorphology(
-              model.skincolor.id,
-              model.morphology.id
-            )
-          : null,
         model?.skincolor?.id
-          ? this.fetchFacesBySkinColorId(
-              model.skincolor.id,
-              model.accessory?.id || null
-            )
+          ? this.fetchFacesBySkinColorId(model.skincolor.id)
           : null,
         model?.skincolor?.id
           ? this.fetchNosesBySkinColorId(model.skincolor.id)
           : null,
-        model?.haircolor?.id
-          ? this.fetchHairsByHairColorId(model.haircolor.id)
-          : null,
-        model?.eyecolor?.id ? this.fetchEyesByEyeColorId(model.eyecolor.id) : null,
-        model?.eyebrowcolor?.id
-          ? this.fetchEyesBrowByEyebrowColorId(model.eyebrowcolor.id)
-          : null,
-        model?.mouthcolor?.id
-          ? this.fetchMouthesByMouthColorId(model.mouthcolor.id)
-          : null,
       ])
     },
     async fetchSkinColors() {
-      const data = await fetchJson('/api/avatar/skincolors/getAll')
-      this.skincolors = data.skincolors || []
+      const data = await fetchJson('/api/avatar/skin-colors')
+      this.hydrateSkinColors(data?.skinColors)
     },
-    async fetchMorphologies() {
-      const data = await fetchJson('/api/avatar/morphologies/getAll')
-      this.morphologies = data.morphologies || []
+    hydrateSkinColors(skinColors) {
+      this.skincolors = Array.isArray(skinColors)
+        ? skinColors.map((skinColor) => normalizeSkinColor(skinColor))
+        : []
+    },
+    async fetchMorphologiesBySkinColorId(skincolorId) {
+      const data = await fetchJson(
+        `/api/avatar/skin-colors/${skincolorId}/morphologies`
+      )
+      this.morphologies = Array.isArray(data?.items)
+        ? data.items
+        : data?.morphologies || []
+      return this.morphologies
     },
     async fetchMorphotypesBySkinColorAndMorphology(skincolorId, morphologyId) {
       const data = await fetchJson(
-        `/api/avatar/morphotypes/getByColor?colorId=${skincolorId}&morphologyId=${morphologyId}`
+        `/api/avatar/skin-colors/${skincolorId}/morphologies/${morphologyId}/morphotypes`
       )
-      this.morphotypes = data.morphotypes || []
+      this.morphotypes = Array.isArray(data?.items)
+        ? data.items
+        : data?.morphotypes || []
       return this.morphotypes
     },
-    async fetchFacesBySkinColorId(skincolorId, accessoryId = null) {
-      const data = await fetchJson(
-        `/api/avatar/faces/getByColor?colorId=${skincolorId}&accessoryId=${accessoryId || ''}`
-      )
-      this.faces = data.faces || []
+    async fetchFacesBySkinColorId(skincolorId) {
+      const data = await fetchJson(`/api/avatar/skin-colors/${skincolorId}/faces`)
+      this.faces = Array.isArray(data?.items) ? data.items : []
       return this.faces
     },
     async fetchAccessoryFacesBySkinColorId(skincolorId, faceVariant) {
@@ -107,18 +103,10 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       this.hairs = data.hairs || []
       return this.hairs
     },
-    async fetchHairColors() {
-      const data = await fetchJson('/api/avatar/haircolors/getAll')
-      this.haircolors = data.haircolors || []
-    },
     async fetchEyesByEyeColorId(eyecolorId) {
       const data = await fetchJson(`/api/avatar/eyes/getByColor?colorId=${eyecolorId}`)
       this.eyes = data.eyes || []
       return this.eyes
-    },
-    async fetchEyeColors() {
-      const data = await fetchJson('/api/avatar/eyecolors/getAll')
-      this.eyecolors = data.eyecolors || []
     },
     async fetchEyesBrow() {
       const data = await fetchJson('/api/avatar/eyebrows/getAll')
@@ -136,9 +124,16 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       this.eyebrowcolors = data.eyebrowcolors || []
     },
     async fetchNosesBySkinColorId(skincolorId) {
-      const data = await fetchJson(`/api/avatar/noses/getByColor?colorId=${skincolorId}`)
-      this.noses = data.noses || []
+      const data = await fetchJson(`/api/avatar/skin-colors/${skincolorId}/noses`)
+      this.noses = Array.isArray(data?.items) ? data.items : []
       return this.noses
+    },
+    async fetchBodiesBySkinColorAndMorphotype(skincolorId, morphotypeId) {
+      const data = await fetchJson(
+        `/api/avatar/skin-colors/${skincolorId}/morphotypes/${morphotypeId}/bodies`
+      )
+      this.bodies = Array.isArray(data?.items) ? data.items : []
+      return this.bodies
     },
     async fetchMouthes() {
       const data = await fetchJson('/api/avatar/mouths/getAll')
@@ -148,10 +143,6 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       const data = await fetchJson(`/api/avatar/mouths/getByColor?colorId=${mouthColorId}`)
       this.mouthes = data.mouthes || []
       return this.mouthes
-    },
-    async fetchMouthColors() {
-      const data = await fetchJson('/api/avatar/mouthcolors/getAll')
-      this.mouthcolors = data.mouthcolors || []
     },
     async fetchClothesByIds(clothesId) {
       const variantIds = JSON.stringify(clothesId)

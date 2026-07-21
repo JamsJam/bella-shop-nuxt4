@@ -73,19 +73,6 @@
             </button>
             <button
               class="avatar_creation_container_menu_buttons_box_item"
-              @click="setCurrentCustomizationComponent('accessories')"
-            >
-              <div class="svg_wrapper">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path
-                    d="M12 2a5 5 0 0 0-5 5c0 1.79.94 3.36 2.35 4.24A7 7 0 1 0 19 17.73a1 1 0 0 0-2-.2A5 5 0 1 1 12 12a5 5 0 0 0 0-10Zm0 2a3 3 0 1 1 0 6a3 3 0 0 1 0-6Z"
-                  />
-                </svg>
-              </div>
-              Accessoires
-            </button>
-            <button
-              class="avatar_creation_container_menu_buttons_box_item"
               @click="setCurrentCustomizationComponent('morphologies')"
             >
               <div class="svg_wrapper">
@@ -221,6 +208,19 @@
                 </svg>
               </div>
               Vêtements
+            </button>
+            <button
+              class="avatar_creation_container_menu_buttons_box_item"
+              @click="setCurrentCustomizationComponent('accessories')"
+            >
+              <div class="svg_wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path
+                    d="M12 2a5 5 0 0 0-5 5c0 1.79.94 3.36 2.35 4.24A7 7 0 1 0 19 17.73a1 1 0 0 0-2-.2A5 5 0 1 1 12 12a5 5 0 0 0 0-10Zm0 2a3 3 0 1 1 0 6a3 3 0 0 1 0-6Z"
+                  />
+                </svg>
+              </div>
+              Accessoires
             </button>
           </div>
         </div>
@@ -440,15 +440,24 @@ export default {
     AvatarClothes,
     AvatarAccessories,
   },
+  props: {
+    initialSkinColors: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       currentCustomizationComponent: '',
     }
   },
-  setup() {
+  setup(props) {
+    const avatarCatalogStore = useAvatarCatalogStore()
+    avatarCatalogStore.hydrateSkinColors(props.initialSkinColors)
+
     return {
       avatarStore: useAvatarStore(),
-      avatarCatalogStore: useAvatarCatalogStore(),
+      avatarCatalogStore,
     }
   },
   computed: {
@@ -536,37 +545,96 @@ export default {
       this.saveAvatarModel()
     },
     async handleSkinColorSelection(skincolor) {
+      const currentMorphology = this.avatarPreview.morphology
+      const currentMorphotype = this.avatarPreview.morphotype
+      const currentBody = this.avatarPreview.body
+
+      this.avatarPreview.skincolor = skincolor
+
+      const [morphologiesResult, nosesResult, facesResult] =
+        await Promise.allSettled([
+          this.avatarCatalogStore.fetchMorphologiesBySkinColorId(skincolor.id),
+          this.avatarCatalogStore.fetchNosesBySkinColorId(skincolor.id),
+          this.avatarCatalogStore.fetchFacesBySkinColorId(skincolor.id),
+        ])
+
+      const findEquivalentOrFirst = (items, currentItem) =>
+        items.find((item) => item.name === currentItem?.name) || items[0] || null
+
+      if (morphologiesResult.status === 'fulfilled') {
+        const compatibleMorphology = currentMorphology?.id
+          ? morphologiesResult.value.find(
+              (morphology) =>
+                morphology.id === currentMorphology.id ||
+                morphology.name === currentMorphology.name
+            ) || null
+          : null
+        const fallbackMorphology =
+          morphologiesResult.value.find((morphology) => morphology.id === 53) ||
+          null
+
+        this.avatarPreview.morphology =
+          compatibleMorphology || fallbackMorphology
+
+        if (this.avatarPreview.morphology) {
+          try {
+            const morphotypes =
+              await this.avatarCatalogStore.fetchMorphotypesBySkinColorAndMorphology(
+                skincolor.id,
+                this.avatarPreview.morphology.id
+              )
+
+            this.avatarPreview.morphotype = currentMorphotype
+              ? morphotypes.find(
+                  (morphotype) => morphotype.name === currentMorphotype.name
+                ) || null
+              : null
+          } catch (error) {
+            this.avatarCatalogStore.morphotypes = []
+            this.avatarPreview.morphotype = null
+            console.error(error)
+          }
+        } else {
+          this.avatarCatalogStore.morphotypes = []
+          this.avatarPreview.morphotype = null
+        }
+      } else {
+        this.avatarCatalogStore.morphologies = []
+        this.avatarCatalogStore.morphotypes = []
+        this.avatarPreview.morphology = null
+        this.avatarPreview.morphotype = null
+      }
+
+      if (this.avatarPreview.morphotype) {
+        await this.fetchAndSelectBody(
+          skincolor,
+          this.avatarPreview.morphotype,
+          currentBody
+        )
+      } else {
+        this.avatarCatalogStore.bodies = []
+        this.avatarPreview.body = null
+      }
+
+      if (nosesResult.status === 'fulfilled') {
+        this.avatarPreview.nose = findEquivalentOrFirst(
+          nosesResult.value,
+          this.avatarPreview.nose
+        )
+      }
+
+      if (facesResult.status === 'fulfilled') {
+        this.avatarPreview.face = findEquivalentOrFirst(
+          facesResult.value,
+          this.avatarPreview.face
+        )
+      }
+
       try {
-        if (this.avatarPreview.morphotype && this.avatarPreview.morphotype.id) {
-          await this.handleFetchMorphotypesWhileColorChanging(
-            this.avatarPreview.morphotype,
-            skincolor
-          )
-        } else {
-          await this.handleFetchMorphotypesWhileColorChanging(null, skincolor)
-        }
-
-        if (this.avatarPreview.nose && this.avatarPreview.nose.id) {
-          await this.handleFetchNosesWhileColorChanging(
-            this.avatarPreview.nose,
-            skincolor
-          )
-        } else {
-          await this.handleFetchNosesWhileColorChanging(null, skincolor)
-        }
-
-        if (this.avatarPreview.face && this.avatarPreview.face.id) {
-          await this.handleFetchFacesWhileColorChanging(
-            this.avatarPreview.face,
-            skincolor
-          )
-        } else {
-          await this.handleFetchFacesWhileColorChanging(null, skincolor)
-        }
-
         if (
           this.avatarPreview.avatarClothing &&
-          this.avatarPreview.avatarClothing
+          this.avatarPreview.morphotype &&
+          Array.isArray(this.avatarPreview.selectedClothing)
         ) {
           const topClothing = this.avatarPreview.selectedClothing.find(
             (item) => item.type === 'Haut'
@@ -585,16 +653,41 @@ export default {
             this.avatarPreview.morphotype
           )
         }
-
-        this.avatarPreview.skincolor = skincolor
-        this.saveAvatarModel()
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(
-          "Une erreur s'est produite lors de la récupération des morphotypes :",
-          err,
-          skincolor
+          "Une erreur s'est produite lors de l'actualisation du vêtement :",
+          err
         )
+      }
+
+      this.saveAvatarModel()
+    },
+    async fetchAndSelectBody(skincolor, morphotype, currentBody = null) {
+      this.avatarCatalogStore.bodies = []
+
+      if (!skincolor?.id || !morphotype?.id) {
+        this.avatarPreview.body = null
+        return null
+      }
+
+      try {
+        const bodies =
+          await this.avatarCatalogStore.fetchBodiesBySkinColorAndMorphotype(
+            skincolor.id,
+            morphotype.id
+          )
+
+        this.avatarPreview.body =
+          bodies.find((body) => body.name === currentBody?.name) ||
+          bodies[0] ||
+          null
+
+        return this.avatarPreview.body
+      } catch (error) {
+        this.avatarPreview.body = null
+        console.error(error)
+        return null
       }
     },
     handleHairColorSelection(haircolor) {
@@ -606,24 +699,32 @@ export default {
       this.saveAvatarModel()
     },
     async handleMorphologySelection(morphology) {
+      const currentBody = this.avatarPreview.body
       this.avatarPreview.morphology = morphology
 
       if (this.avatarPreview.morphotype) {
-        const mophotypeName = this.avatarPreview.morphotype.name.slice(1, -1)
+        const currentMorphotype = this.avatarPreview.morphotype
+        const morphotypes = this.avatarCatalogStore.morphotypes
 
-        const morphotypes =
-          await this.avatarCatalogStore.fetchMorphotypesBySkinColorAndMorphology(
-            this.avatarPreview.skincolor.id,
-            morphology.id
-          )
-
-        this.avatarPreview.morphotype = await morphotypes.find(
-          (morphotype) => {
-            return morphotype.name.slice(1, -1) === mophotypeName
-          }
-        )
-        // this.avatarPreview.morphotype = foundMorphotype;
+        this.avatarPreview.morphotype =
+          morphotypes.find(
+            (morphotype) => morphotype.name === currentMorphotype.name
+          ) ||
+          morphotypes[0] ||
+          null
       }
+
+      if (this.avatarPreview.morphotype) {
+        await this.fetchAndSelectBody(
+          this.avatarPreview.skincolor,
+          this.avatarPreview.morphotype,
+          currentBody
+        )
+      } else {
+        this.avatarCatalogStore.bodies = []
+        this.avatarPreview.body = null
+      }
+
       if (
         this.avatarPreview.morphotype &&
         this.avatarPreview.selectedClothing &&
@@ -653,6 +754,12 @@ export default {
     },
     async handleMorphotypeSelection(morphotype) {
       try {
+        await this.fetchAndSelectBody(
+          this.avatarPreview.skincolor,
+          morphotype,
+          this.avatarPreview.body
+        )
+
         if (this.avatarPreview.avatarClothing) {
           const topClothing = this.avatarPreview.selectedClothing.find(
             (item) => item.type === 'Haut'
@@ -747,41 +854,6 @@ export default {
         outfitClothing,
         this.avatarPreview.morphotype
       )
-    },
-
-    async handleFetchMorphotypesWhileColorChanging(morphotype, skincolor) {
-      try {
-        const morphotypes =
-          await this.avatarCatalogStore.fetchMorphotypesBySkinColorAndMorphology(
-            skincolor.id,
-            morphotype ? morphotype.morphology_id : 53
-          )
-
-        const foundMorphotype = morphotypes.find((el) => {
-          if (morphotype) {
-            return (
-              el.morphology_id === morphotype.morphology_id &&
-              el.skincolor_id === skincolor.id &&
-              el.size_id === morphotype.size_id
-            )
-          } else {
-            return (
-              el.morphology_id === 53 &&
-              el.skincolor_id === skincolor.id &&
-              el.size_id === 14
-            )
-          }
-        })
-
-        if (foundMorphotype) {
-          this.avatarPreview.morphotype = foundMorphotype
-        } else {
-          throw new Error("Le morphotype de cette couleur n'existe pas.")
-        }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        throw new Error(err)
-      }
     },
 
     async handleFetchNosesWhileColorChanging(nose, skincolor) {

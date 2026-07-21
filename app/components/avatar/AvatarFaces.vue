@@ -22,11 +22,14 @@
         </button>
       </div>
       <div
-        v-else-if="selectedSkinColor !== null && faces.length === 0"
+        v-else-if="selectedSkinColor"
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Aucunes formes de visage de cette couleur</p>
+          <p v-if="facesLoading">Chargement des visages...</p>
+          <p v-else>
+            {{ facesError || 'Aucune forme de visage pour cette couleur' }}
+          </p>
         </div>
       </div>
       <div v-else class="avatar_creation_container_choices_container_item_list">
@@ -61,7 +64,10 @@ export default {
     },
   },
   data() {
-    return {}
+    return {
+      facesLoading: false,
+      facesError: '',
+    }
   },
   setup() {
     return {
@@ -72,32 +78,31 @@ export default {
     faces() {
       return this.avatarCatalogStore.faces
     },
-    selectedAccessoryId() {
-      return this.selectedAccessory ? this.selectedAccessory.id : null
-    },
   },
   async mounted() {
-    try {
-      if (this.faces.length === 0 && this.selectedSkinColor) {
-        await this.fetchFacesBySkinColorId(
-          this.selectedSkinColor.id,
-          this.selectedAccessoryId
-        )
-      }
-    } catch (err) {
-      console.error(err)
+    if (this.selectedSkinColor?.id) {
+      await this.fetchFacesBySkinColorId(this.selectedSkinColor.id)
     }
   },
 
   methods: {
-    async fetchFacesBySkinColorId(selectedSkinColorId, accessoryId = null) {
+    async fetchFacesBySkinColorId(selectedSkinColorId) {
+      this.facesLoading = true
+      this.facesError = ''
+
       try {
-        await this.avatarCatalogStore.fetchFacesBySkinColorId(
-          selectedSkinColorId,
-          accessoryId
+        const data = await $fetch(
+          `/api/avatar/skin-colors/${selectedSkinColorId}/faces`
         )
+        this.avatarCatalogStore.faces = Array.isArray(data?.items)
+          ? data.items
+          : []
       } catch (err) {
-        throw new Error(err)
+        this.avatarCatalogStore.faces = []
+        this.facesError = 'Impossible de charger les visages'
+        console.error(err)
+      } finally {
+        this.facesLoading = false
       }
     },
     selectFace(face) {

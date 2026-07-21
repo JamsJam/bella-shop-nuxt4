@@ -22,6 +22,7 @@ const normalizeCountry = (country) => ({
 export const useShippingStore = defineStore('shipping', {
   state: () => ({
     countries: [],
+    vat: 0,
     selectedCountryCode: null,
     shippingInfo: null,
   }),
@@ -63,13 +64,17 @@ export const useShippingStore = defineStore('shipping', {
         shippingInfo: this.shippingInfo,
       }
     },
-    async fetchCountries() {
-      const countries = await $fetch('/api/shipping/countries')
+    hydrateCheckoutConfig(countries, vat) {
+      this.vat = Number(vat || 0)
       this.countries = Array.isArray(countries)
         ? countries.map((country) => normalizeCountry(country))
         : []
 
-      if (!this.selectedCountryCode && this.countries.length > 0) {
+      const selectedCountryStillExists = this.countries.some(
+        (country) => country.code === this.selectedCountryCode
+      )
+
+      if (!selectedCountryStillExists && this.countries.length > 0) {
         this.selectCountry(this.countries[0].code)
       }
     },

@@ -6,113 +6,60 @@ import {
   setResponseStatus,
 } from 'h3'
 
-const parseCartCookie = (cartCookie: string) => {
+interface CartSizeDTO {
+  id?: number
+}
+
+interface CartItemDTO {
+  size?: CartSizeDTO | null
+  quantity?: number
+}
+
+interface CheckoutItemDTO {
+  variantId: number
+  quantity: number
+}
+
+interface CreateCheckoutSessionBody {
+  shippingDestination?: string
+}
+
+const parseCartCookie = (cartCookie: string): CartItemDTO[] => {
   try {
     const cart = JSON.parse(cartCookie)
-
-    if (!Array.isArray(cart)) {
-      return []
-    }
-
-    return cart
+    return Array.isArray(cart) ? cart : []
   } catch {
     return []
   }
 }
 
-const parseShippingCookie = (shippingCookie?: string) => {
-  if (!shippingCookie) {
-    return null
-  }
-
-  try {
-    const shipping = JSON.parse(shippingCookie)
-
-    if (!shipping || typeof shipping !== 'object') {
-      return null
-    }
-
-    return shipping as {
-      selectedCountryCode?: string
-      shippingInfo?: Record<string, unknown>
-    }
-  } catch {
-    return null
-  }
-}
-
-const normalizeShippingPayload = (shipping: unknown) => {
-  if (!shipping || typeof shipping !== 'object') {
-    return null
-  }
-
-  return shipping as {
-    selectedCountryCode?: string
-    shippingInfo?: Record<string, unknown>
-  }
-}
-
-const deliveryCountriesMock = [
-  {
-    code: 'GP',
-    name: 'Guadeloupe',
-    flag: '/images/checkout/flags/guadeloupe_flag.png',
-    deliveryFee: 4.5,
-  },
-  {
-    code: 'MQ',
-    name: 'Martinique',
-    flag: '/images/checkout/flags/martinique_flag.png',
-    deliveryFee: 8.9,
-  },
-  {
-    code: 'MF',
-    name: 'Saint-Martin',
-    flag: '/images/checkout/flags/france_flag.png',
-    deliveryFee: 12.9,
-  },
-  {
-    code: 'FR',
-    name: 'France',
-    flag: '/images/checkout/flags/france_flag.png',
-    deliveryFee: 14.9,
-  },
-]
-
-const getCartPrice = (cart: Array<{ unitPrice?: number; price?: number; quantity?: number }>) =>
-  cart.reduce((total, item) => {
-    const unitPrice = Number(item.unitPrice ?? item.price ?? 0)
+const mapCheckoutItems = (cart: CartItemDTO[]): CheckoutItemDTO[] =>
+  cart.map((item) => {
+    const variantId = Number(item.size?.id)
     const quantity = Number(item.quantity ?? 1)
 
-    return total + unitPrice * quantity
-  }, 0)
+    if (!Number.isInteger(variantId) || variantId <= 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Une variante du panier est invalide.',
+      })
+    }
 
-const getStripeMode = (mode: unknown) => {
-  if (mode === 'prod') {
-    return 'prod'
-  }
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Une quantité du panier est invalide.',
+      })
+    }
 
-  return 'test'
-}
-
-const getDeliveryCountry = (selectedCountryCode?: string) => {
-  if (!selectedCountryCode) {
-    return null
-  }
-
-  return (
-    deliveryCountriesMock.find(
-      (country) => country.code === selectedCountryCode
-    ) || null
-  )
-}
+    return { variantId, quantity }
+  })
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig(event)
   const apiUrl = config.platformApiBase
-  const stripeMode = getStripeMode(config.stripeMode)
-  const successUrl = config.stripeSuccessUrl
-  const cancelUrl = config.stripeCancelUrl
+  const body = await readBody<CreateCheckoutSessionBody>(event)
+  const shippingDestination = body?.shippingDestination?.trim()
 
   if (!apiUrl) {
     throw createError({
@@ -121,8 +68,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (!shippingDestination) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'La destination de livraison est requise.',
+    })
+  }
+
   const cartCookie = getCookie(event, 'bella_cart')
-  const shippingCookie = getCookie(event, 'bella_shipping')
 
   if (!cartCookie) {
     throw createError({
@@ -131,62 +84,28 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const body = await readBody(event)
-  const cookie = getHeader(event, 'cookie')
-  const token = getCookie(event, 'token')
-  const cart = parseCartCookie(cartCookie)
-  const shipping =
-    normalizeShippingPayload(body?.shipping) || parseShippingCookie(shippingCookie)
-  const deliveryCountry = getDeliveryCountry(shipping?.selectedCountryCode)
-  const deliveryFee = Number(deliveryCountry?.deliveryFee || 0)
-  const shippingInfo = shipping?.shippingInfo || null
-  const price = getCartPrice(cart) + deliveryFee
+  const items = mapCheckoutItems(parseCartCookie(cartCookie))
 
-  if (cart.length === 0 || price <= 0) {
+  if (items.length === 0) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Le panier est vide.',
     })
   }
 
-  if (!deliveryCountry || !shippingInfo) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Les informations de livraison sont incomplètes.',
-    })
-  }
-
-  const userResponse = await $fetch.raw(`${apiUrl}/auth/verify-login`, {
-    method: 'GET',
+  const cookie = getHeader(event, 'cookie')
+  const token = getCookie(event, 'token')
+  const response = await $fetch.raw('/checkout/carts', {
+    baseURL: apiUrl,
+    method: 'POST',
+    body: {
+      items,
+      currency: 'EUR',
+      shippingDestination,
+    },
     headers: {
       ...(cookie ? { cookie } : {}),
       ...(token ? { authorization: `Bearer ${token}` } : {}),
-      accept: 'application/json',
-    },
-    ignoreResponseError: true,
-  })
-
-  if (userResponse.status < 200 || userResponse.status >= 300) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Utilisateur non authentifié.',
-    })
-  }
-
-  const response = await $fetch.raw(`${apiUrl}/stripe/create-checkout-session`, {
-    method: 'POST',
-    body: {
-      cart,
-      price,
-      deliveryCountry,
-      shippingInfo,
-      stripeMode,
-      user: userResponse._data,
-      successUrl,
-      cancelUrl,
-    },
-    headers: {
-      ...(cookie ? { cookie } : {}),
       accept: 'application/json',
       'content-type': 'application/json',
     },

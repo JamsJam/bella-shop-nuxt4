@@ -1,30 +1,55 @@
-const deliveryCountriesMock = [
-  {
-    code: 'GP',
-    name: 'Guadeloupe',
-    flag: '/images/checkout/flags/guadeloupe_flag.png',
-    deliveryFee: 4.5,
-  },
-  {
-    code: 'MQ',
-    name: 'Martinique',
-    flag: '/images/checkout/flags/martinique_flag.png',
-    deliveryFee: 8.9,
-  },
-  {
-    code: 'MF',
-    name: 'Saint-Martin',
-    flag: '/images/checkout/flags/france_flag.png',
-    deliveryFee: 12.9,
-  },
-  {
-    code: 'FR',
-    name: 'France',
-    flag: '/images/checkout/flags/france_flag.png',
-    deliveryFee: 14.9,
-  },
-]
+import { createError, setResponseStatus } from 'h3'
 
-export default defineEventHandler(async () => {
-  return deliveryCountriesMock
+interface ShippingCountryDTO {
+  destination?: string
+  priceCents?: number
+  flag?: string | null
+}
+
+interface ShippingCountryListDTO {
+  countries?: ShippingCountryDTO[]
+}
+
+const getAbsoluteUrl = (path: string | null | undefined, apiUrl: string) => {
+  if (!path) {
+    return ''
+  }
+
+  try {
+    return new URL(path, apiUrl).toString()
+  } catch {
+    return path
+  }
+}
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event)
+  const apiUrl = config.platformApiBase
+
+  if (!apiUrl) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Api Base is not configured',
+    })
+  }
+
+  const response = await $fetch.raw<ShippingCountryListDTO>(
+    '/checkout/contry',
+    {
+      baseURL: apiUrl,
+      headers: {
+        accept: 'application/json',
+      },
+      ignoreResponseError: true,
+    }
+  )
+
+  setResponseStatus(event, response.status)
+
+  return (response._data?.countries || []).map((country) => ({
+    code: country.destination || '',
+    name: country.destination || '',
+    flag: getAbsoluteUrl(country.flag, apiUrl),
+    deliveryFee: Number(country.priceCents || 0) / 100,
+  }))
 })

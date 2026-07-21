@@ -6,7 +6,10 @@
           <h2>Couleurs des yeux</h2>
         </div>
 
-        <div class="avatar_creation_container_choices_container_item_list">
+        <div
+          v-if="eyecolors.length > 0"
+          class="avatar_creation_container_choices_container_item_list"
+        >
           <button
             v-for="(eyecolor, index) in eyecolors"
             :key="index"
@@ -22,6 +25,15 @@
               :style="{ backgroundColor: eyecolor.colorValue }"
             ></div>
           </button>
+        </div>
+        <div
+          v-else
+          class="avatar_creation_container_choices_container_item_list empty"
+        >
+          <div class="avatar_creation_container_choices_container_item_list_text">
+            <p v-if="colorsLoading">Chargement des couleurs des yeux...</p>
+            <p v-else>{{ colorsError || 'Aucune couleur des yeux disponible' }}</p>
+          </div>
         </div>
       </div>
 
@@ -52,7 +64,7 @@
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Aucunes formes des yeux de cette couleur</p>
+          <p>Aucune forme d'yeux disponible pour cette couleur</p>
         </div>
       </div>
 
@@ -61,7 +73,7 @@
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Choisissez une couleur des yeux</p>
+          <p>Veuillez sélectionner une couleur des yeux</p>
         </div>
       </div>
     </div>
@@ -87,7 +99,11 @@ export default {
     },
   },
   data() {
-    return {}
+    return {
+      colorsLoading: true,
+      colorsError: '',
+      eyesLoading: false,
+    }
   },
   setup() {
     return {
@@ -104,49 +120,69 @@ export default {
   },
   async mounted() {
     try {
-      if (this.eyes.length === 0 && this.selectedEyesColor) {
+      if (this.selectedEyesColor?.id) {
         await this.fetchEyesByEyesColorId(this.selectedEyesColor.id)
       }
     } catch (err) {
       console.error(err)
     }
     if (this.eyecolors.length === 0) {
-      this.fetchEyeColors()
+      await this.fetchEyeColors()
+    } else {
+      this.colorsLoading = false
     }
   },
 
   methods: {
     async fetchEyesByEyesColorId(selectedEyesColorId) {
+      this.eyesLoading = true
+      this.avatarCatalogStore.eyes = []
       try {
-        await this.avatarCatalogStore.fetchEyesByEyeColorId(
-          selectedEyesColorId
+        const data = await $fetch(
+          `/api/avatar/eye-colors/${selectedEyesColorId}/eyes`
         )
+        this.avatarCatalogStore.eyes = Array.isArray(data?.items) ? data.items : []
       } catch (err) {
-        throw new Error(err)
+        console.error(err)
+      } finally {
+        this.eyesLoading = false
       }
     },
     async fetchEyeColors() {
       try {
-        await this.avatarCatalogStore.fetchEyeColors()
+        this.colorsError = ''
+        const data = await $fetch('/api/avatar/eye-colors')
+        const colors = data?.eyeColors || data?.eyecolors || data?.items || []
+
+        this.avatarCatalogStore.eyecolors = colors.map((color) => ({
+          ...color,
+          colorValue: color.hexa
+            ? `#${String(color.hexa).replace(/^#/, '')}`
+            : color.colorValue || '',
+        }))
+
+        if (this.avatarCatalogStore.eyecolors.length === 0) {
+          this.colorsError = 'Aucune couleur des yeux disponible'
+        }
       } catch (error) {
+        this.colorsError = 'Impossible de charger les couleurs des yeux'
         console.error(
           "Une erreur s'est produite lors de la récupération de la couleur des yeux :",
           error
         )
+      } finally {
+        this.colorsLoading = false
       }
     },
     selectEye(eye) {
       this.$emit('select-eye', eye)
     },
     async selectEyeColor(eyecolor) {
-      this.$emit('select-eyecolor', eyecolor)
-      await this.fetchEyesByEyesColorId(eyecolor.id)
-
       try {
         this.$emit('select-eyecolor', eyecolor)
         await this.fetchEyesByEyesColorId(eyecolor.id)
 
-        if (this.selectedEyes.id) {
+        if (this.selectedEyes?.id) {
           const currentEyes = this.selectedEyes
           const foundEyes = this.eyes.find(
             (el) =>

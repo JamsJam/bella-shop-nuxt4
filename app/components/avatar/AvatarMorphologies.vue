@@ -129,38 +129,46 @@ export default {
       return this.avatarCatalogStore.morphologies
     },
     morphotypes() {
-      if (this.selectedMorphology) {
-        return this.avatarCatalogStore.morphotypes.filter(
-          (morphotype) =>
-            morphotype.morphology_id === this.selectedMorphology.id &&
-            morphotype.skincolor_id === this.skincolor.id
-        )
-      } else {
-        return []
-      }
+      return this.selectedMorphology ? this.avatarCatalogStore.morphotypes : []
     },
   },
   watch: {
     skincolor() {
-      this.fetchMorphotypesBySkinColorAndMorphology()
-    },
-    selectedMorphology() {
-      this.fetchMorphotypesBySkinColorAndMorphology()
+      this.fetchMorphologies()
     },
   },
-  mounted() {
-    if (this.morphologies.length === 0) {
-      this.fetchMorphologies()
+  async mounted() {
+    if (this.skincolor?.id) {
+      await this.fetchMorphologies()
     }
-    if (this.selectedMorphology.id) {
+    const selectedMorphologyIsAvailable = this.morphologies.some(
+      (morphology) => morphology.id === this.selectedMorphology?.id
+    )
+
+    if (selectedMorphologyIsAvailable) {
       this.fetchMorphotypesBySkinColorAndMorphology()
+    } else {
+      const fallbackMorphology = this.morphologies.find(
+        (morphology) => morphology.id === 53
+      )
+
+      if (fallbackMorphology) {
+        await this.selectMorphology(fallbackMorphology)
+      }
     }
   },
 
   methods: {
     async fetchMorphologies() {
+      this.avatarCatalogStore.morphologies = []
+      this.avatarCatalogStore.morphotypes = []
+
+      if (!this.skincolor?.id) return
+
       try {
-        await this.avatarCatalogStore.fetchMorphologies()
+        await this.avatarCatalogStore.fetchMorphologiesBySkinColorId(
+          this.skincolor.id
+        )
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(
@@ -170,6 +178,8 @@ export default {
       }
     },
     async fetchMorphotypesBySkinColorAndMorphology() {
+      if (!this.skincolor?.id || !this.selectedMorphology?.id) return
+
       try {
         await this.avatarCatalogStore.fetchMorphotypesBySkinColorAndMorphology(
           this.skincolor.id,
@@ -183,7 +193,11 @@ export default {
         )
       }
     },
-    selectMorphology(morphology) {
+    async selectMorphology(morphology) {
+      await this.avatarCatalogStore.fetchMorphotypesBySkinColorAndMorphology(
+        this.skincolor.id,
+        morphology.id
+      )
       this.$emit('select-morphology', morphology)
     },
     selectMorphotype(morphotype) {

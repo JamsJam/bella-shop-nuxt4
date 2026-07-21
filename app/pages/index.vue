@@ -4,7 +4,11 @@
 
     <WelcomePage :section="homepage?.sections?.landing" />
     <BestSellers :section="homepage?.sections?.bestseller" />
-    <About :section="homepage?.sections?.about" :highlights="homepage?.sections?.highlights" />
+    <About
+      :section="homepage?.sections?.about"
+      :highlights="homepage?.sections?.highlights"
+      :vat="vatConfig?.vat || 0"
+    />
     <Manual :section="homepage?.sections?.manual" />
     <Delivery :section="homepage?.sections?.return?.steps" />
 
@@ -29,7 +33,10 @@ import Manual from '~/components/homepage/Manual.vue'
 import Delivery from '~/components/homepage/Delivery.vue'
 import Foooter from '~/components/attachable/Footer.vue'
 
-const { data: homepage } = await useFetch<HomepageDTO>('/api/page/home')
+const [{ data: homepage }, { data: vatConfig }] = await Promise.all([
+  useFetch<HomepageDTO>('/api/page/home'),
+  useFetch<{ vat: number }>('/api/shipping/vat'),
+])
 
 useHead(() => {
   if (!homepage.value?.seo) {

@@ -4,7 +4,10 @@
       <div class="avatar_creation_container_choices_container_item_title">
         <h2>Couleurs de peau</h2>
       </div>
-      <div class="avatar_creation_container_choices_container_item_list">
+      <div
+        v-if="skincolors.length > 0"
+        class="avatar_creation_container_choices_container_item_list"
+      >
         <button
           v-for="(skincolor, index) in skincolors"
           :key="index"
@@ -20,6 +23,17 @@
             :style="{ backgroundColor: skincolor.colorValue }"
           ></div>
         </button>
+      </div>
+      <div
+        v-else
+        class="avatar_creation_container_choices_container_item_list empty"
+      >
+        <div class="avatar_creation_container_choices_container_item_list_text">
+          <p v-if="skinColorsLoading">Chargement des couleurs de peau...</p>
+          <p v-else>
+            {{ skinColorsError || 'Aucune couleur de peau disponible' }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -41,7 +55,10 @@ export default {
     },
   },
   data() {
-    return {}
+    return {
+      skinColorsLoading: true,
+      skinColorsError: '',
+    }
   },
   setup() {
     return {
@@ -53,54 +70,32 @@ export default {
       return this.avatarCatalogStore.skincolors
     },
   },
-  mounted() {
-    if (this.skincolors.length === 0) {
-      this.fetchSkinColors()
-    }
+  async mounted() {
+    await this.fetchSkinColors()
   },
 
   methods: {
     async fetchSkinColors() {
+      this.skinColorsLoading = true
+      this.skinColorsError = ''
+
       try {
-        await this.avatarCatalogStore.fetchSkinColors()
+        const data = await $fetch('/api/avatar/skin-colors')
+        this.avatarCatalogStore.hydrateSkinColors(data?.skinColors)
+
+        if (this.skincolors.length === 0) {
+          this.skinColorsError = 'Aucune couleur de peau disponible'
+        }
       } catch (error) {
-        //         this.avatarCatalogStore.skincolors = [
-        // {
-        // "id": 5,
-        // "name": "Noir 1",
-        // "colorValue": "#492f20"
-        // },
-        // {
-        // "id": 6,
-        // "name": "Noir 2",
-        // "colorValue": "#7b5438"
-        // },
-        // {
-        // "id": 8,
-        // "name": "Marron 1",
-        // "colorValue": "#a37955"
-        // },
-        // {
-        // "id": 9,
-        // "name": "Marron 2",
-        // "colorValue": "#c39f7c"
-        // },
-        // {
-        // "id": 10,
-        // "name": "Blanc 1",
-        // "colorValue": "#fbbd93"
-        // },
-        // {
-        // "id": 11,
-        // "name": "Blanc 2",
-        // "colorValue": "#e8cdbb"
-        // }
-        // ]
+        this.avatarCatalogStore.skincolors = []
+        this.skinColorsError = 'Impossible de charger les couleurs de peau'
         // eslint-disable-next-line no-console
         console.error(
           "Une erreur s'est produite lors de la récupération des couleurs de peau :",
           error
         )
+      } finally {
+        this.skinColorsLoading = false
       }
     },
     selectSkinColor(skincolor) {

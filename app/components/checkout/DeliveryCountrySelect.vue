@@ -9,7 +9,7 @@
       <select
         id="delivery-country"
         v-model="selectedCountryCode"
-        :disabled="disabled || loading"
+        :disabled="disabled"
         required
       >
         <option
@@ -43,11 +43,6 @@ export default {
       shippingStore,
     }
   },
-  data() {
-    return {
-      loading: false,
-    }
-  },
   computed: {
     selectedCountry() {
       return this.shippingStore.selectedCountry
@@ -62,16 +57,9 @@ export default {
       },
     },
   },
-  async mounted() {
-    this.loading = true
+  mounted() {
     this.shippingStore.load()
-
-    try {
-      await this.shippingStore.fetchCountries()
-      this.$emit('change', this.shippingStore.selectedCountry)
-    } finally {
-      this.loading = false
-    }
+    this.$emit('change', this.shippingStore.selectedCountry)
   },
   methods: {
     formatPrice(price) {

@@ -71,13 +71,9 @@ const inputValidations = {
       // Ajoutez d'autres pays ici...
     }
 
-    // Vérifie si le pays est pris en charge
-    if (!phoneRegexByCountry.hasOwnProperty(country)) {
-      throw new Error(`Pays non pris en charge: ${country}`)
-    }
-
-    // Récupère l'expression régulière pour le pays spécifié
-    const regex = phoneRegexByCountry[country]
+    const regex =
+      phoneRegexByCountry[country] ||
+      /^(?:\+?\d{1,4}[\s.-]?)?(?:\d[\s.-]?){7,11}\d$/
 
     // Supprime tous les espaces du numéro de téléphone
     const phoneNumberWithoutSpaces = phoneNumber.replace(/\s/g, '')

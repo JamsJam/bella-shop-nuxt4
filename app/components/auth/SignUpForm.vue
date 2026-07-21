@@ -168,41 +168,25 @@ export default {
   mounted() {},
 
   methods: {
-    getAuthUrl(path) {
-      return `/api/auth/${path}`
-    },
     async handleSignUp() {
       const userData = {
         email: this.email,
         password: this.password,
       }
 
-      const url = this.getAuthUrl('signup')
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify( userData ),
-        credentials: 'include',
-      }
-
       try {
-        
         if (this.password !== this.repeatPassword) {
           throw new Error('Les mots de passe doivent correspondre')
         }
-        const response = await fetch(url, options)
-        const data = await response.json()
 
-        if (response.ok) {
-          this.awaitingConfirmAccount = true
-          this.userId = data.id ?? data.userId
-        }
+        const data = await $fetch('/api/auth/signup', {
+          method: 'POST',
+          body: userData,
+          credentials: 'include',
+        })
 
-        if (!response.ok) {
-          throw data.error[0]
-        }
+        this.awaitingConfirmAccount = true
+        this.userId = data.id ?? data.userId
 
         return data
       } catch (error) {
@@ -231,29 +215,13 @@ export default {
         id: this.userId,
       }
 
-      const url = this.getAuthUrl('verify-confirmation-code')
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      }
-
       try {
-        const response = await fetch(url, options)
-        const data = await response.json()
+        const data = await $fetch('/api/auth/verify-confirmation-code', {
+          method: 'POST',
+          body: requestData,
+        })
 
-        if (response.ok) {
-          await this.handleLogin()
-        } else {
-          // Gérer les erreurs
-          console.error('Erreur lors de la confirmation du code :', data.error)
-          this.popupMessage = {
-            type: 'error',
-            message: 'Erreur lors de la confirmation du code',
-          }
-        }
+        await this.handleLogin()
 
         return data
       } catch (error) {
@@ -271,37 +239,29 @@ export default {
         email: this.email,
         password: this.password,
       }
-      const url = this.getAuthUrl('login')
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user: userData }),
-        credentials: 'include',
-      }
 
       try {
-        const response = await fetch(url, options)
-        const data = await response.json()
+        const data = await $fetch('/api/auth/login', {
+          method: 'POST',
+          body: userData,
+          credentials: 'include',
+        })
 
-        if (response.ok) {
-          this.$router.push('/')
-        } else {
-          if (data.type === 'confirmation_code') {
-            this.userId = data.id ?? data.userId
-            this.awaitingConfirmAccount = true
-          }
-          throw data.error
-        }
+        await this.$router.push('/')
 
         return data
       } catch (error) {
         console.error(error)
 
+        const data = error?.data
+        if (data?.type === 'confirmation_code') {
+          this.userId = data.id ?? data.userId
+          this.awaitingConfirmAccount = true
+        }
+
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: data?.error ?? error?.message ?? error,
         }
       }
     },
@@ -311,41 +271,24 @@ export default {
         userEmail: this.email,
       }
 
-      const url = this.getAuthUrl('resend-confirmation-code')
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      }
-
       try {
         if (this.resendCodeTimeout) {
           throw new Error('Reessayer dans quelques secondes')
         }
 
-        const response = await fetch(url, options)
-        const data = await response.json()
+        const data = await $fetch('/api/auth/resend-confirmation-code', {
+          method: 'POST',
+          body: requestData,
+        })
 
-        if (response.ok) {
-          this.popupMessage = {
-            type: 'valid',
-            message: data.message,
-          }
-          this.resendCodeTimeout = true
-          setTimeout(() => {
-            this.resendCodeTimeout = false
-          }, 10000)
+        this.popupMessage = {
+          type: 'valid',
+          message: data.message,
         }
-
-        if (!response.ok) {
-          this.resendCodeTimeout = true
-          setTimeout(() => {
-            this.resendCodeTimeout = false
-          }, 10000)
-          throw data.error
-        }
+        this.resendCodeTimeout = true
+        setTimeout(() => {
+          this.resendCodeTimeout = false
+        }, 10000)
       } catch (error) {
         console.error(error)
         this.popupMessage = {

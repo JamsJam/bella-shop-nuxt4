@@ -72,6 +72,10 @@ export default {
       type: Object as PropType<HomepageHighlightsDTO | null>,
       default: null,
     },
+    vat: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -127,7 +131,10 @@ export default {
         const priceAfterDiscount = Number(
           this.calculatedPrice(priceNumber, product.promo)
         )
-        const priceWithTax = (priceAfterDiscount * 1.085).toFixed(2)
+        const priceWithTax = (
+          priceAfterDiscount *
+          (1 + this.vat / 100)
+        ).toFixed(2)
 
         return {
           id: product.id,

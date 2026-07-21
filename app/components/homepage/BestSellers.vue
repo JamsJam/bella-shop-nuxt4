@@ -43,31 +43,33 @@
           :key="item.id"
           class="card"
         >
-          <!--
-                ?--------  Image  --------
-              -->
-          <div class="card_image">
-            <img :src="item.preview_image" :alt="item.name" />
-          </div>
+          <NuxtLink :to="`/clothes/${item.slug}`" class="card_product_link">
+            <!--
+                  ?--------  Image  --------
+                -->
+            <div class="card_image">
+              <img :src="item.preview_image" :alt="item.name" />
+            </div>
 
-          <!--
-                ?--------  infos  --------
-              -->
+            <!--
+                  ?--------  infos  --------
+                -->
+            <div class="card_text">
+              <div class="card_text_title">
+                <h3>{{ item.name }}</h3>
+              </div>
+
+              <div class="card_text_price">
+                <p>{{ item.calcultedPriceTTC }} €</p>
+              </div>
+            </div>
+          </NuxtLink>
+
           <div class="card_text">
-            <div class="card_text_title">
-              <h3>{{ item.name }}</h3>
-            </div>
-
-            <div class="card_text_price">
-              <p>{{ item.calcultedPriceTTC }} €</p>
-            </div>
-
-            <nuxt-link
-              :to="{
-                path: `/product/clothing`,
-                query: { product_id: item.id },
-              }"
+            <button
+              type="button"
               class="button--secondary"
+              @click.stop="addToCart(item)"
             >
               <!--svg cart here-->
               <svg
@@ -83,7 +85,7 @@
                 />
               </svg>
               Ajouter au panier
-            </nuxt-link>
+            </button>
           </div>
         </article>
       </div>
@@ -122,6 +124,7 @@
 
 import type { PropType } from 'vue'
 import type { HomepageBestsellerDTO, BestSellerProductDTO } from '#shared/dto/homepage.dto'
+import { useCartStore } from '~/stores/cart'
 
 export default {
   props: {
@@ -129,6 +132,13 @@ export default {
       type: Object as PropType<HomepageBestsellerDTO | null>,
       default: null,
     },
+  },
+  setup() {
+    const cartStore = useCartStore()
+
+    return {
+      cartStore,
+    }
   },
   data() {
     return {
@@ -148,12 +158,12 @@ export default {
       return (this.section?.products || []).map((product : BestSellerProductDTO) => {
         const images = this.parseImages(product.images)
         const preview_image = images.length ? images[0] : ''
-        const priceNumber = Number(product.price || 0)
+        const priceNumber = Number(product.price || 0) / 100
 
         return {
           ...product,
           preview_image,
-          calcultedPriceTTC: (priceNumber * 1.085).toFixed(2),
+          calcultedPriceTTC: priceNumber.toFixed(2),
         }
       })
     },
@@ -174,6 +184,23 @@ export default {
     },
   },
   methods: {
+    addToCart(item: BestSellerProductDTO & {
+      preview_image: string
+      calcultedPriceTTC: string
+    }) {
+      this.cartStore.addItem({
+        productId: item.id,
+        productSlug: item.slug,
+        productName: item.name,
+        image: item.preview_image,
+        unitPrice: Number(item.price || 0) / 100,
+        color: null,
+        size: {
+          id: item.id,
+          name: '',
+        },
+      })
+    },
     parseImages(images: string): string[] {
       if (!images) {
         return []

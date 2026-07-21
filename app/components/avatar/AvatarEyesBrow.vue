@@ -4,7 +4,10 @@
       <div class="avatar_creation_container_choices_container_item_title">
         <h2>Couleurs des sourcils</h2>
       </div>
-      <div class="avatar_creation_container_choices_container_item_list">
+      <div
+        v-if="eyebrowcolors.length > 0"
+        class="avatar_creation_container_choices_container_item_list"
+      >
         <button
           v-for="(eyebrowcolor, index) in eyebrowcolors"
           :key="index"
@@ -21,6 +24,15 @@
             :style="{ backgroundColor: eyebrowcolor.colorValue }"
           ></div>
         </button>
+      </div>
+      <div
+        v-else
+        class="avatar_creation_container_choices_container_item_list empty"
+      >
+        <div class="avatar_creation_container_choices_container_item_list_text">
+          <p v-if="colorsLoading">Chargement des couleurs de sourcils...</p>
+          <p v-else>Aucune couleur de sourcils disponible</p>
+        </div>
       </div>
 
       <div class="avatar_creation_container_choices_container_item_title">
@@ -48,7 +60,7 @@
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Aucunes formes de sourcils de cette couleur</p>
+          <p>Aucune forme de sourcils disponible pour cette couleur</p>
         </div>
       </div>
       <div
@@ -56,7 +68,7 @@
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Choisissez une couleur de sourcils</p>
+          <p>Veuillez sélectionner une couleur de sourcils</p>
         </div>
       </div>
     </div>
@@ -82,7 +94,9 @@ export default {
     },
   },
   data() {
-    return {}
+    return {
+      colorsLoading: true,
+    }
   },
   setup() {
     return {
@@ -98,20 +112,22 @@ export default {
     },
   },
   async mounted() {
-    if (this.eyebrowcolors.length === 0) {
-      await this.fetchEyebrowColors()
-    }
-    if (this.eyesbrow.length === 0 && this.selectedEyebrowColor) {
+    await this.fetchEyebrowColors()
+    if (this.selectedEyebrowColor?.id) {
       await this.fetchEyesBrowByEyebrowColorId(this.selectedEyebrowColor.id)
     }
   },
 
   methods: {
     async fetchEyesBrowByEyebrowColorId(eyebrowColorId) {
+      this.avatarCatalogStore.eyesbrow = []
       try {
-        await this.avatarCatalogStore.fetchEyesBrowByEyebrowColorId(
-          eyebrowColorId
+        const data = await $fetch(
+          `/api/avatar/eyebrow-colors/${eyebrowColorId}/eyebrows`
         )
+        this.avatarCatalogStore.eyesbrow = Array.isArray(data?.items)
+          ? data.items
+          : []
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(
@@ -122,12 +138,24 @@ export default {
     },
     async fetchEyebrowColors() {
       try {
-        await this.avatarCatalogStore.fetchEyebrowColors()
+        const data = await $fetch('/api/avatar/eyebrow-colors')
+        const colors =
+          data?.eyebrowColors || data?.eyebrowcolors || data?.items || []
+
+        this.avatarCatalogStore.eyebrowcolors = colors.map((color) => ({
+          ...color,
+          colorValue: color.hexa
+            ? `#${String(color.hexa).replace(/^#/, '')}`
+            : color.colorValue || '',
+        }))
       } catch (error) {
+        this.avatarCatalogStore.eyebrowcolors = []
         console.error(
           "Une erreur s'est produite lors de la récupération des couleurs des sourcils :",
           error
         )
+      } finally {
+        this.colorsLoading = false
       }
     },
     selectEyeBrow(eyebrow) {

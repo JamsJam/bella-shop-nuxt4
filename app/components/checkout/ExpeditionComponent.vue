@@ -315,16 +315,10 @@
             v-if="expeditionStatus !== 'payment'"
             class="expedition_container_box_wrapper_go_to_checkout_button"
           >
-            <button @click="handlePaiement()">Valider et payer</button>
+            <button :disabled="paymentLoading" @click="handlePaiement()">
+              {{ paymentLoading ? 'Redirection…' : 'Valider et payer' }}
+            </button>
           </div>
-
-          <PaymentForm
-            v-if="expeditionStatus === 'payment'"
-            :cartData="cartData"
-            :shipping="deliveryCost"
-            :shippingInfo="shippingInfo"
-            :auth="auth"
-          />
         </div>
 
         <div class="expedition_container_box_wrapper">
@@ -381,8 +375,8 @@
           </div>
         </div>
 
-        <!--
-        <div v-if="confirmAdress && selectAddress" class="expedition_container_box_confirm_address">
+
+        <!--<div v-if="confirmAdress && selectAddress" class="expedition_container_box_confirm_address">
           <div class="expedition_container_box_confirm_address_box">
             <div class="expedition_container_box_confirm_address_box_back_button">
               <button @click="backToExpedition()">Retourner au choix d'expedition</button>
@@ -401,8 +395,8 @@
               <button @click="validAddress(selectAddress[0])">Confirmer cette adresse</button>
             </div>
           </div>
-        </div>
-  -->
+        </div>-->
+
       </div>
     </div>
 
@@ -412,7 +406,6 @@
 
 <script>
 import DeliveryCountrySelect from '~/components/checkout/DeliveryCountrySelect.vue'
-import PaymentForm from '~/components/checkout/PaymentForm.vue'
 import { decryptData, encryptData } from '~/utils/crypto'
 import inputValidations from '~/utils/inputValidations'
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
@@ -422,18 +415,26 @@ import { useShippingStore } from '~/stores/shipping'
 export default {
   components: {
     DeliveryCountrySelect,
-    PaymentForm,
     PopupComponent,
   },
   props: {
-    auth: {
-      type: Boolean,
-      default: false,
+    initialCountries: {
+      type: Array,
+      default: () => [],
+    },
+    initialVat: {
+      type: Number,
+      default: 0,
     },
   },
-  setup() {
+  setup(props) {
     const cartStore = useCartStore()
     const shippingStore = useShippingStore()
+    shippingStore.load()
+    shippingStore.hydrateCheckoutConfig(
+      props.initialCountries,
+      props.initialVat
+    )
 
     return {
       cartStore,
@@ -443,6 +444,7 @@ export default {
   data() {
     return {
       outOfStock: false,
+      paymentLoading: false,
       popupMessage: null,
       addressBook: null,
       selectedDelivery: null, // Ajouter selectedDelivery à vos données
@@ -452,41 +454,41 @@ export default {
       surname: '',
 
       selectedCountry: 'GP',
-      countries: [
-        {
-          label: 'Guadeloupe',
-          value: 'GP',
-          flag: '/images/checkout/flags/guadeloupe_flag.png',
-          tel: '+590 690',
-        },
-        {
-          label: 'Martinique',
-          value: 'MQ',
-          flag: '/images/checkout/flags/martinique_flag.png',
-          tel: '+596 691',
-        },
-        {
-          label: 'Saint-martin',
-          value: 'MF',
-          flag: '/images/checkout/flags/france_flag.png',
-          tel: '+33',
-        },
-        {
-          label: 'France',
-          value: 'FR',
-          flag: '/images/checkout/flags/france_flag.png',
-          tel: '+33',
-        },
-      ],
+      // countries: [
+      //   {
+      //     label: 'Guadeloupe',
+      //     value: 'GP',
+      //     flag: '/images/checkout/flags/guadeloupe_flag.png',
+      //     tel: '+590 690',
+      //   },
+      //   {
+      //     label: 'Martinique',
+      //     value: 'MQ',
+      //     flag: '/images/checkout/flags/martinique_flag.png',
+      //     tel: '+596 691',
+      //   },
+      //   {
+      //     label: 'Saint-martin',
+      //     value: 'MF',
+      //     flag: '/images/checkout/flags/france_flag.png',
+      //     tel: '+33',
+      //   },
+      //   {
+      //     label: 'France',
+      //     value: 'FR',
+      //     flag: '/images/checkout/flags/france_flag.png',
+      //     tel: '+33',
+      //   },
+      // ],
 
-      deliveryOptions: [
-        {
-          label: { title: 'Livraison a domicile' },
-          value: 4.5,
-          price: '4.50 €',
-        },
-        // { label: {title: 'Point de retrait'}, value: 0.00, price: '0.00 €'}
-      ],
+      // deliveryOptions: [
+      //   {
+      //     label: { title: 'Livraison a domicile' },
+      //     value: 4.5,
+      //     price: '4.50 €',
+      //   },
+      //   // { label: {title: 'Point de retrait'}, value: 0.00, price: '0.00 €'}
+      // ],
 
       addressSuggestions: [],
       selectAddress: null,
@@ -837,7 +839,9 @@ export default {
     },
 
     taxes() {
-      return (Math.trunc(this.cartStore.subtotal * 8.5) / 100).toFixed(2)
+      return (
+        Math.trunc(this.cartStore.subtotal * this.shippingStore.vat) / 100
+      ).toFixed(2)
     },
 
     total() {
@@ -1015,13 +1019,13 @@ export default {
 
     // Validation Input Methods :
 
-    validateCountryCode(input) {
+    validateShippingDestination(input) {
       if (!inputValidations.isNotEmpty(input)) {
         throw new Error('Vous devez choisir votre pays.')
       }
 
-      if (!inputValidations.validateCountryCode(input)) {
-        throw new Error("Le choisis n'existe pas.")
+      if (!this.shippingStore.countries.some((country) => country.code === input)) {
+        throw new Error("Le pays choisi n'existe pas.")
       }
     },
 
@@ -1224,19 +1228,17 @@ export default {
     },
 
     async handlePaiement() {
-      try {
-        if (!this.auth) {
-          this.$router.push('/login')
-          throw new Error('Veuillez vous connecter avant toutes opérations')
-        }
+      this.paymentLoading = true
+      this.popupMessage = null
 
-        if (this.outOfStock) {
-          throw new Error('Un produit est en rupture de stock')
-        }
+      try {
+        // if (this.outOfStock) {
+        //   throw new Error('Un produit est en rupture de stock')
+        // }
         // Validation de shippingTitle
         this.validateName(this.name, 0, 100)
         this.validateSurname(this.surname, 0, 100)
-        this.validateCountryCode(this.shippingStore.selectedCountryCode)
+        this.validateShippingDestination(this.shippingStore.selectedCountryCode)
         this.validateShippingTitle(this.shippingTitle, 3, 400)
         this.validateShippingAddress(this.shippingAddress, 3, 400)
         this.validateShippingAddressComplement(this.shippingAddress2, 0, 400)
@@ -1268,7 +1270,21 @@ export default {
 
         this.shippingStore.setShippingInfo(this.shippingInfo)
 
-        this.expeditionStatus = 'payment'
+        const checkout = await $fetch('/api/stripe/create-checkout-session', {
+          method: 'POST',
+          body: {
+            shippingDestination: this.shippingStore.selectedCountry?.name,
+          },
+          credentials: 'include',
+        })
+
+        const checkoutUrl = checkout?.checkoutUrl
+
+        if (!checkoutUrl) {
+          throw new Error("La session Stripe n'a pas retourné de lien.")
+        }
+
+        await navigateTo(checkoutUrl, { external: true })
 
         //  this.confirmAdress = true
 
@@ -1276,13 +1292,20 @@ export default {
 
         //  this.selectAddress = response
       } catch (error) {
+        const backendError = error?.data?.error || error?.data?.message
+        const message = Array.isArray(backendError)
+          ? backendError[0]
+          : backendError || error?.statusMessage || error?.message
+
         // Si une erreur est attrapée, affichez le message d'erreur ou effectuez une action appropriée
         this.popupMessage = {
           type: 'error',
-          message: error.message,
+          message: message || 'Impossible de préparer le paiement.',
         }
-        console.error(error.message)
+        console.error(message || error)
         // Ou vous pouvez également lancer l'erreur à un niveau supérieur pour qu'elle soit gérée là où handlePaiement est appelée
+      } finally {
+        this.paymentLoading = false
       }
     },
 

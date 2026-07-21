@@ -4,7 +4,10 @@
       <div class="avatar_creation_container_choices_container_item_title">
         <h2>Couleurs de la bouche</h2>
       </div>
-      <div class="avatar_creation_container_choices_container_item_list">
+      <div
+        v-if="mouthcolors.length > 0"
+        class="avatar_creation_container_choices_container_item_list"
+      >
         <button
           v-for="(mouthcolor, index) in mouthcolors"
           :key="index"
@@ -20,6 +23,15 @@
             :style="{ backgroundColor: mouthcolor.colorValue }"
           ></div>
         </button>
+      </div>
+      <div
+        v-else
+        class="avatar_creation_container_choices_container_item_list empty"
+      >
+        <div class="avatar_creation_container_choices_container_item_list_text">
+          <p v-if="colorsLoading">Chargement des couleurs de bouche...</p>
+          <p v-else>{{ colorsError || 'Aucune couleur de bouche disponible' }}</p>
+        </div>
       </div>
 
       <div class="avatar_creation_container_choices_container_item_title">
@@ -47,7 +59,7 @@
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Aucunes formes de bouche de cette couleur</p>
+          <p>Aucune forme de bouche disponible pour cette couleur</p>
         </div>
       </div>
       <div
@@ -55,7 +67,7 @@
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Choisissez une couleur de bouche</p>
+          <p>Veuillez sélectionner une couleur de bouche</p>
         </div>
       </div>
     </div>
@@ -81,7 +93,10 @@ export default {
     },
   },
   data() {
-    return {}
+    return {
+      colorsLoading: true,
+      colorsError: '',
+    }
   },
   setup() {
     return {
@@ -99,16 +114,24 @@ export default {
   async mounted() {
     if (this.mouthcolors.length === 0) {
       await this.fetchMouthColors()
+    } else {
+      this.colorsLoading = false
     }
-    if (this.mouthes.length === 0 && this.selectedMouthColor) {
+    if (this.selectedMouthColor?.id) {
       await this.fetchMouthesByMouthColorId(this.selectedMouthColor.id)
     }
   },
 
   methods: {
     async fetchMouthesByMouthColorId(mouthColorId) {
+      this.avatarCatalogStore.mouthes = []
       try {
-        await this.avatarCatalogStore.fetchMouthesByMouthColorId(mouthColorId)
+        const data = await $fetch(
+          `/api/avatar/mouth-colors/${mouthColorId}/mouths`
+        )
+        this.avatarCatalogStore.mouthes = Array.isArray(data?.items)
+          ? data.items
+          : []
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(
@@ -119,12 +142,28 @@ export default {
     },
     async fetchMouthColors() {
       try {
-        await this.avatarCatalogStore.fetchMouthColors()
+        this.colorsError = ''
+        const data = await $fetch('/api/avatar/mouth-colors')
+        const colors = data?.mouthColors || data?.mouthcolors || data?.items || []
+
+        this.avatarCatalogStore.mouthcolors = colors.map((color) => ({
+          ...color,
+          colorValue: color.hexa
+            ? `#${String(color.hexa).replace(/^#/, '')}`
+            : color.colorValue || '',
+        }))
+
+        if (this.avatarCatalogStore.mouthcolors.length === 0) {
+          this.colorsError = 'Aucune couleur de bouche disponible'
+        }
       } catch (error) {
+        this.colorsError = 'Impossible de charger les couleurs de bouche'
         console.error(
           "Une erreur s'est produite lors de la récupération des couleurs de bouche :",
           error
         )
+      } finally {
+        this.colorsLoading = false
       }
     },
     selectMouth(mouth) {
