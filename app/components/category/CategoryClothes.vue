@@ -86,14 +86,15 @@
                 </template>
               </div>
               <div class="category_container_box_clothes_card_text">
+                <p
+                  v-if="clothing.price !== undefined && clothing.price !== null"
+                  class="category_container_box_clothes_card_text_price"
+                >
+                  {{ formatPrice(clothing.price) }}
+                </p>
                 <p class="category_container_box_clothes_card_text_title">
                   {{ clothing.name }}
                 </p>
-                <div v-if="clothing.price !== undefined" class="category_container_box_clothes_card_text_price">
-                  <p class="category_container_box_clothes_card_text_price">
-                    {{ clothing.price }} €
-                  </p>
-                </div>
               </div>
             </nuxt-link>
           </div>
@@ -244,6 +245,13 @@ export default {
       const key = this.clothingKey(clothing)
       const nextIndex = (this.currentImageIndex(clothing) + direction + images.length) % images.length
       this.imageIndexes = { ...this.imageIndexes, [key]: nextIndex }
+    },
+
+    formatPrice(price) {
+      return new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'EUR',
+      }).format(price)
     },
 
     initializeFromCategoryData(data) {

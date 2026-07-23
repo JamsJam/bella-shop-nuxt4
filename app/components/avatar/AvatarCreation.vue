@@ -254,54 +254,80 @@
             :src="avatarBody"
             alt=""
             class="avatar_creation_container_preview_image_body"
+            @error="handleImageError($event, avatarFallbacks.body)"
           />
           <!-- <img v-else-if="avatarPreview.avatarClothing" :src="avatarPreview.avatarClothing.image" alt="" class="avatar_creation_container_preview_image_body"> -->
           <div class="avatar_creation_container_preview_image_face">
             <img
               class="avatar_creation_container_preview_image_face_shadow"
-              :src="avatarPreview.face.image"
+              :src="avatarImage(avatarPreview.face, 'image', avatarFallbacks.face)"
               alt=""
+              @error="handleImageError($event, avatarFallbacks.face)"
             />
             <div class="avatar_creation_container_preview_image_face_hair">
               <img
-                v-if="avatarPreview.hairFrontImage !== ''"
                 class="avatar_creation_container_preview_image_face_hair_front"
-                :src="avatarPreview.hair.frontImage"
+                :src="
+                  avatarImage(
+                    avatarPreview.hair,
+                    'frontImage',
+                    avatarFallbacks.hairFront
+                  )
+                "
                 alt=""
+                @error="handleImageError($event, avatarFallbacks.hairFront)"
               />
               <img
-                v-if="avatarPreview.hairBackImage !== ''"
                 class="avatar_creation_container_preview_image_face_hair_back"
-                :src="avatarPreview.hair.backImage"
+                :src="
+                  avatarImage(
+                    avatarPreview.hair,
+                    'backImage',
+                    avatarFallbacks.hairBack
+                  )
+                "
                 alt=""
+                @error="handleImageError($event, avatarFallbacks.hairBack)"
               />
             </div>
             <div class="avatar_creation_container_preview_image_face_eyebrow">
               <img
                 class="avatar_creation_container_preview_image_face_eyebrow_shadow"
-                :src="avatarPreview.eyebrow.image"
+                :src="
+                  avatarImage(
+                    avatarPreview.eyebrow,
+                    'image',
+                    avatarFallbacks.eyebrow
+                  )
+                "
                 alt=""
+                @error="handleImageError($event, avatarFallbacks.eyebrow)"
               />
             </div>
             <div class="avatar_creation_container_preview_image_face_eyes">
               <img
                 class="avatar_creation_container_preview_image_face_eyes_shadow"
-                :src="avatarPreview.eyes.image"
+                :src="avatarImage(avatarPreview.eyes, 'image', avatarFallbacks.eyes)"
                 alt=""
+                @error="handleImageError($event, avatarFallbacks.eyes)"
               />
             </div>
             <div class="avatar_creation_container_preview_image_face_nose">
               <img
                 class="avatar_creation_container_preview_image_face_nose_shadow"
-                :src="avatarPreview.nose.image"
+                :src="avatarImage(avatarPreview.nose, 'image', avatarFallbacks.nose)"
                 alt=""
+                @error="handleImageError($event, avatarFallbacks.nose)"
               />
             </div>
             <div class="avatar_creation_container_preview_image_face_mouth">
               <img
                 class="avatar_creation_container_preview_image_face_mouth_shadow"
-                :src="avatarPreview.mouth.image"
+                :src="
+                  avatarImage(avatarPreview.mouth, 'image', avatarFallbacks.mouth)
+                "
                 alt=""
+                @error="handleImageError($event, avatarFallbacks.mouth)"
               />
             </div>
           </div>
@@ -449,6 +475,16 @@ export default {
   data() {
     return {
       currentCustomizationComponent: '',
+      avatarFallbacks: {
+        body: '/images/avatar/template_avatar_morphology.webp',
+        face: '/images/avatar/template_avatar_face.webp',
+        hairFront: '/images/avatar/template_avatar_hair_front.webp',
+        hairBack: '/images/avatar/template_avatar_hair_back.webp',
+        eyes: '/images/avatar/template_avatar_eyes.webp',
+        eyebrow: '/images/avatar/template_avatar_eyebrow.webp',
+        nose: '/images/avatar/template_avatar_nose.webp',
+        mouth: '/images/avatar/template_avatar_mouth.webp',
+      },
     }
   },
   setup(props) {
@@ -486,6 +522,25 @@ export default {
     await this.avatarCatalogStore.hydrateFromAvatarModel(this.avatarPreview)
   },
   methods: {
+    avatarImage(part, property, fallback) {
+      return part?.[property] || fallback
+    },
+    handleImageError(event, fallback) {
+      const image = event.currentTarget
+
+      if (!(image instanceof HTMLImageElement)) {
+        return
+      }
+
+      const failedSource = image.currentSrc || image.src
+
+      if (image.dataset.failedSource === failedSource) {
+        return
+      }
+
+      image.dataset.failedSource = failedSource
+      image.src = fallback
+    },
     closeCustomisationComponent() {
       this.currentCustomizationComponent = ''
     },

@@ -66,12 +66,21 @@ export const useAvatarStore = defineStore('avatar', {
   getters: {
     avatarBody(state) {
       if (state.model.avatarClothing) {
-        return state.model.avatarClothing.image
+        return (
+          state.model.avatarClothing.image ||
+          '/images/avatar/template_avatar_morphology.webp'
+        )
       }
       if (state.model.body) {
-        return state.model.body.image
+        return (
+          state.model.body.image ||
+          '/images/avatar/template_avatar_morphology.webp'
+        )
       }
-      return state.model.morphology.image
+      return (
+        state.model.morphology?.image ||
+        '/images/avatar/template_avatar_morphology.webp'
+      )
     },
   },
   actions: {

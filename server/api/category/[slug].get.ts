@@ -7,6 +7,7 @@ interface PlatformCategoryClotheDTO {
   image: string | null
   images: string[]
   colors: string[]
+  price?: number
 }
 
 const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']
@@ -49,6 +50,7 @@ export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => 
     image: clothe.image || undefined,
     images: Array.isArray(clothe.images) ? clothe.images : [],
     colors: Array.isArray(clothe.colors) ? clothe.colors : [],
+    price: clothe.price,
   }))
 
   const colors = [
