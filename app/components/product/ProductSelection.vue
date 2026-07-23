@@ -40,6 +40,42 @@
       :rows="sizeGuide.rows"
     />
 
+    <div class="product_selection_quantity">
+      <p class="product_selection_label">Quantité</p>
+
+      <div
+        class="product_selection_quantity_counter"
+        role="group"
+        aria-label="Quantité du produit"
+      >
+        <button
+          type="button"
+          aria-label="Diminuer la quantité"
+          :disabled="quantity <= 1 || stockLoading"
+          @click="$emit('change-quantity', quantity - 1)"
+        >
+          −
+        </button>
+        <output aria-live="polite">{{ quantity }}</output>
+        <button
+          type="button"
+          aria-label="Augmenter la quantité"
+          :disabled="!canIncreaseQuantity"
+          @click="$emit('change-quantity', quantity + 1)"
+        >
+          +
+        </button>
+      </div>
+
+      <p
+        class="product_selection_availability"
+        :class="{ product_selection_availability_unavailable: !stockAvailable }"
+        aria-live="polite"
+      >
+        {{ availabilityMessage }}
+      </p>
+    </div>
+
     <div class="product_selection_actions">
       <button
         type="button"
@@ -95,8 +131,34 @@ export default {
         rows: [],
       }),
     },
+    quantity: {
+      type: Number,
+      default: 1,
+    },
+    stock: {
+      type: Number,
+      default: null,
+    },
+    stockAvailable: {
+      type: Boolean,
+      default: false,
+    },
+    stockLoading: {
+      type: Boolean,
+      default: false,
+    },
+    stockError: {
+      type: String,
+      default: '',
+    },
   },
-  emits: ['select-color', 'select-size', 'add-to-cart', 'add-to-avatar'],
+  emits: [
+    'select-color',
+    'select-size',
+    'change-quantity',
+    'add-to-cart',
+    'add-to-avatar',
+  ],
   computed: {
     selectedColorName() {
       return this.selectedColor?.name || 'Aucune'
@@ -105,7 +167,45 @@ export default {
       return this.selectedSize?.name || this.selectedSize || 'Aucune'
     },
     canSubmit() {
-      return Boolean(this.selectedColor && this.selectedSize)
+      return Boolean(
+        this.selectedColor &&
+          this.selectedSize &&
+          this.stockAvailable &&
+          !this.stockLoading
+      )
+    },
+    canIncreaseQuantity() {
+      return Boolean(
+        this.stockAvailable &&
+          !this.stockLoading &&
+          this.stock !== null &&
+          this.quantity < this.stock
+      )
+    },
+    availabilityMessage() {
+      if (this.stockLoading) {
+        return 'Vérification du stock…'
+      }
+
+      if (this.stockError) {
+        return this.stockError
+      }
+
+      if (!this.selectedSize) {
+        return 'Sélectionnez une taille pour vérifier la disponibilité.'
+      }
+
+      if (!this.stockAvailable || this.stock === 0) {
+        return 'Rupture de stock.'
+      }
+
+      if (this.stock <= 5) {
+        return this.stock === 1
+          ? 'Plus qu’un disponible.'
+          : `Plus que ${this.stock} disponibles.`
+      }
+
+      return 'En stock.'
     },
   },
   methods: {

@@ -8,35 +8,6 @@
 
         <div class="category_container_box_filter">
           <div class="category_container_box_filter_container">
-            <div
-              class="category_container_box_filter_container_type"
-              :class="{ 'is-open': categoriesFilterOpen }"
-            >
-              <button
-                type="button"
-                :aria-expanded="categoriesFilterOpen"
-                @click="categoriesFilterOpen = !categoriesFilterOpen"
-              >
-                <p>Vêtements</p>
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                  viewBox="0 0 21 21">
-                  <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                    d="m14.5 8.5l-4 4l-4-4" />
-                </svg>
-              </button>
-
-              <div class="category_container_box_filter_container_type_box">
-                <div v-for="(category, index) in categories" :key="index"
-                  class="category_container_box_filter_container_type_box_item">
-                  <nuxt-link :to="{
-                    path: `/category/${category.name.toLowerCase()}`,
-                    query: { category_id: category.id },
-                  }">{{ category.name }}</nuxt-link>
-                </div>
-              </div>
-
-            </div>
-
             <FilterComponent v-for="(filter, index) in filters" :key="'filter_' + index" :label="filter.label"
               :filterItems="filter.filterItems" @filter-change="updateFilters($event)" />
 
@@ -176,7 +147,6 @@ export default {
       loaderStatus: false,
       totalClothes: 0,
       itemsPerPage: 20,
-      categories: [],
       filters: [
         {
           label: 'Prix',
@@ -194,7 +164,6 @@ export default {
       imageIndexes: {},
       appliedFilters: [],
       pageNumber: 1,
-      categoriesFilterOpen: false,
     }
   },
   computed: {
@@ -211,7 +180,6 @@ export default {
   },
   async mounted() {
     this.loaderStatus = true
-    await this.fetchCategories()
     if (this.categoryData) {
       this.initializeFromCategoryData(this.categoryData)
     }
@@ -271,18 +239,6 @@ export default {
       }
 
       this.loaderStatus = false
-    },
-
-    async fetchCategories() {
-      try {
-        const response = await fetch(
-          `${this.$store.state.apiUrl}/categories/get-all-categories`
-        )
-        const data = await response.json()
-        this.categories = data.categories
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-      }
     },
 
     async fetchClothesColorVariants() {

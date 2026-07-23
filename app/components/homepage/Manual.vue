@@ -1,6 +1,6 @@
 <template>
   <div class="manual">
-    <h2>Mode d'emploi</h2>
+    <h2>{{ sectionTitle }}</h2>
 
     <div class="manual_container">
       <div
@@ -18,6 +18,7 @@
           />
         </div>
         <div class="manual_container_item_title">
+          <h3>{{ item.title || `Étape ${index + 1}` }}</h3>
           <p>{{ item.text }}</p>
         </div>
       </div>
@@ -73,6 +74,9 @@ export default {
     },
   },
   computed: {
+    sectionTitle() {
+      return this.section?.title?.trim() || "Mode d'emploi"
+    },
     sectionList() {
       return this.section?.list && this.section.list.length
         ? this.section.list

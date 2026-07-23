@@ -70,13 +70,21 @@
 
       &_title {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        gap: 0.35rem;
 
+        h3,
         p {
+          margin: 0;
           text-align: center;
           font-family: 'Dancing Script';
           font-size: clamp(1.25rem, 0.3929rem + 1.3393vw, 2rem);
+        }
+
+        h3 {
+          font-weight: 700;
         }
       }
       &_step {
