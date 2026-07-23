@@ -12,6 +12,13 @@ interface PlatformCategoryClotheDTO {
 
 const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']
 
+const deslugify = (slug: string) =>
+  slug
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
+
 export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => {
   const slug = getRouterParam(event, 'slug')
 
@@ -26,7 +33,7 @@ export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => 
   const APIPlatform = config.platformApiBase || 'http://localhost:8000'
 
   const platformClothes = await $fetch<PlatformCategoryClotheDTO[]>(
-    `/catalogue/${encodeURIComponent(slug)}`,
+    `/category/${encodeURIComponent(slug)}`,
     {
       baseURL: APIPlatform,
       method: 'GET',
@@ -38,7 +45,7 @@ export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => 
   )
 
   const clothes: ClotheCarteDTO[] = platformClothes.map((clothe) => ({
-    name: clothe.name,
+    name: deslugify(clothe.slug),
     slug: clothe.slug,
     price: clothe.price,
     image: clothe.image,

@@ -251,7 +251,7 @@ export default {
       return new Intl.NumberFormat('fr-FR', {
         style: 'currency',
         currency: 'EUR',
-      }).format(price)
+      }).format(price / 100)
     },
 
     initializeFromCategoryData(data) {

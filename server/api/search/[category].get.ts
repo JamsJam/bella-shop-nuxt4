@@ -9,6 +9,13 @@ interface PlatformSearchClotheDTO {
   price?: number
 }
 
+const deslugify = (slug: string) =>
+  slug
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
+
 export default defineEventHandler(async (event): Promise<ClotheCarteDTO[]> => {
   const category = getRouterParam(event, 'category')
 
@@ -35,7 +42,7 @@ export default defineEventHandler(async (event): Promise<ClotheCarteDTO[]> => {
   )
 
   return platformClothes.map((clothe) => ({
-    name: clothe.name,
+    name: deslugify(clothe.slug),
     slug: clothe.slug,
     image: clothe.image || undefined,
     images: Array.isArray(clothe.images) ? clothe.images : [],
