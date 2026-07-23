@@ -4,20 +4,13 @@ import type { ClotheCarteDTO } from '#shared/dto/clotheCard.dto'
 interface PlatformCategoryClotheDTO {
   name: string
   slug: string
-  image: string | null
+  price: number
+  image: string
   images: string[]
   colors: string[]
-  price?: number
 }
 
 const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']
-
-const deslugify = (slug: string) =>
-  slug
-    .replace(/[-_]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
 
 export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => {
   const slug = getRouterParam(event, 'slug')
@@ -33,7 +26,7 @@ export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => 
   const APIPlatform = config.platformApiBase || 'http://localhost:8000'
 
   const platformClothes = await $fetch<PlatformCategoryClotheDTO[]>(
-    `/category/${encodeURIComponent(slug)}`,
+    `/catalogue/${encodeURIComponent(slug)}`,
     {
       baseURL: APIPlatform,
       method: 'GET',
@@ -45,12 +38,12 @@ export default defineEventHandler(async (event): Promise<CategoryDetailsDTO> => 
   )
 
   const clothes: ClotheCarteDTO[] = platformClothes.map((clothe) => ({
-    name: deslugify(clothe.slug),
+    name: clothe.name,
     slug: clothe.slug,
-    image: clothe.image || undefined,
+    price: clothe.price,
+    image: clothe.image,
     images: Array.isArray(clothe.images) ? clothe.images : [],
     colors: Array.isArray(clothe.colors) ? clothe.colors : [],
-    price: clothe.price,
   }))
 
   const colors = [
