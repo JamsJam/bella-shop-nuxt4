@@ -91,12 +91,9 @@ export default {
       this.facesError = ''
 
       try {
-        const data = await $fetch(
-          `/api/avatar/skin-colors/${selectedSkinColorId}/faces`
+        await this.avatarCatalogStore.fetchFacesBySkinColorId(
+          selectedSkinColorId
         )
-        this.avatarCatalogStore.faces = Array.isArray(data?.items)
-          ? data.items
-          : []
       } catch (err) {
         this.avatarCatalogStore.faces = []
         this.facesError = 'Impossible de charger les visages'

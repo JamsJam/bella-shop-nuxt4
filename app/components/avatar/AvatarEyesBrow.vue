@@ -77,6 +77,7 @@
 
 <script>
 import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
+import { normalizeAvatarColors } from '~/utils/avatarColors'
 
 export default {
   components: {
@@ -140,14 +141,13 @@ export default {
       try {
         const data = await $fetch('/api/avatar/eyebrow-colors')
         const colors =
-          data?.eyebrowColors || data?.eyebrowcolors || data?.items || []
+          data?.colors ||
+          data?.eyebrowColors ||
+          data?.eyebrowcolors ||
+          data?.items ||
+          []
 
-        this.avatarCatalogStore.eyebrowcolors = colors.map((color) => ({
-          ...color,
-          colorValue: color.hexa
-            ? `#${String(color.hexa).replace(/^#/, '')}`
-            : color.colorValue || '',
-        }))
+        this.avatarCatalogStore.eyebrowcolors = normalizeAvatarColors(colors)
       } catch (error) {
         this.avatarCatalogStore.eyebrowcolors = []
         console.error(
@@ -168,14 +168,10 @@ export default {
       if (this.selectedEyebrow && this.selectedEyebrow.id) {
         const currentEyebrow = this.selectedEyebrow
         const foundEyebrow = this.eyesbrow.find(
-          (el) =>
-            el.eyebrowcolor_id === eyebrowcolor.id &&
-            el.eyebrow_variant === currentEyebrow.eyebrow_variant
+          (eyebrow) => eyebrow.name === currentEyebrow.name
         )
 
-        if (foundEyebrow) {
-          this.$emit('select-eyebrow', foundEyebrow)
-        }
+        this.$emit('select-eyebrow', foundEyebrow || this.eyesbrow[0] || null)
       }
     },
   },

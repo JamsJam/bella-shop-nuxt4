@@ -82,6 +82,7 @@
 
 <script>
 import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
+import { normalizeAvatarColors } from '~/utils/avatarColors'
 
 export default {
   components: {
@@ -152,14 +153,9 @@ export default {
       try {
         this.colorsError = ''
         const data = await $fetch('/api/avatar/eye-colors')
-        const colors = data?.eyeColors || data?.eyecolors || data?.items || []
+        const colors = Array.isArray(data?.colors) ? data.colors : []
 
-        this.avatarCatalogStore.eyecolors = colors.map((color) => ({
-          ...color,
-          colorValue: color.hexa
-            ? `#${String(color.hexa).replace(/^#/, '')}`
-            : color.colorValue || '',
-        }))
+        this.avatarCatalogStore.eyecolors = normalizeAvatarColors(colors)
 
         if (this.avatarCatalogStore.eyecolors.length === 0) {
           this.colorsError = 'Aucune couleur des yeux disponible'

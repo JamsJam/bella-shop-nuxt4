@@ -579,16 +579,19 @@ export default {
     },
     handleFaceSelection(face) {
       this.avatarPreview.face = face
+      this.avatarPreview.accessory = null
       this.saveAvatarModel()
     },
     handleAccessoryFaceSelection(face) {
-      const accessory =
-        this.avatarCatalogStore.accessories.find(
-          (item) => item.id === face.accessory_id
-        ) || { id: face.accessory_id, name: 'Accessoire' }
-
       this.avatarPreview.face = face
-      this.avatarPreview.accessory = accessory
+      this.avatarPreview.accessory = {
+        id: face.accessoryId || face.accessory_id || face.id,
+        name:
+          face.accessory?.name ||
+          face.accessoryName ||
+          face.name ||
+          'Accessoire',
+      }
       this.saveAvatarModel()
     },
     handleEyeBrowSelection(eyebrow) {

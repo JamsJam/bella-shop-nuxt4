@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: apiUrl ? 400 : 500 })
   }
 
-  const response = await $fetch.raw(`/avatar/eye-colors/${colorId}/eyes`, {
+  const response = await $fetch.raw(`/avatar/eyes-colors/${colorId}/eyes`, {
     baseURL: apiUrl,
     headers: { accept: 'application/json' },
     ignoreResponseError: true,

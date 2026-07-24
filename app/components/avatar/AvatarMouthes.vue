@@ -76,6 +76,7 @@
 
 <script>
 import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
+import { normalizeAvatarColors } from '~/utils/avatarColors'
 
 export default {
   components: {
@@ -144,14 +145,9 @@ export default {
       try {
         this.colorsError = ''
         const data = await $fetch('/api/avatar/mouth-colors')
-        const colors = data?.mouthColors || data?.mouthcolors || data?.items || []
+        const colors = Array.isArray(data?.colors) ? data.colors : []
 
-        this.avatarCatalogStore.mouthcolors = colors.map((color) => ({
-          ...color,
-          colorValue: color.hexa
-            ? `#${String(color.hexa).replace(/^#/, '')}`
-            : color.colorValue || '',
-        }))
+        this.avatarCatalogStore.mouthcolors = normalizeAvatarColors(colors)
 
         if (this.avatarCatalogStore.mouthcolors.length === 0) {
           this.colorsError = 'Aucune couleur de bouche disponible'
@@ -176,14 +172,10 @@ export default {
       if (this.selectedMouth && this.selectedMouth.id) {
         const currentMouth = this.selectedMouth
         const foundMouth = this.mouthes.find(
-          (el) =>
-            el.mouthcolor_id === mouthcolor.id &&
-            el.mouth_variant === currentMouth.mouth_variant
+          (mouth) => mouth.name === currentMouth.name
         )
 
-        if (foundMouth) {
-          this.$emit('select-mouth', foundMouth)
-        }
+        this.$emit('select-mouth', foundMouth || this.mouthes[0] || null)
       }
     },
   },

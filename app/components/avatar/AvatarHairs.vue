@@ -89,6 +89,7 @@
 
 <script>
 import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
+import { normalizeAvatarColors } from '~/utils/avatarColors'
 
 export default {
   components: {
@@ -171,14 +172,14 @@ export default {
       try {
         this.colorsError = ''
         const data = await $fetch('/api/avatar/hair-colors')
-        const colors = data?.hairColors || data?.haircolors || data?.items || []
+        const colors =
+          data?.colors ||
+          data?.hairColors ||
+          data?.haircolors ||
+          data?.items ||
+          []
 
-        this.avatarCatalogStore.haircolors = colors.map((color) => ({
-          ...color,
-          colorValue: color.hexa
-            ? `#${String(color.hexa).replace(/^#/, '')}`
-            : color.colorValue || '',
-        }))
+        this.avatarCatalogStore.haircolors = normalizeAvatarColors(colors)
 
         if (this.avatarCatalogStore.haircolors.length === 0) {
           this.colorsError = 'Aucune couleur de cheveux disponible'

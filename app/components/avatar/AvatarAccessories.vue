@@ -5,7 +5,7 @@
         <h2>Accessoires</h2>
       </div>
       <div
-        v-if="canFetchAccessoryFaces && accessoryFaces.length > 0"
+        v-if="accessoryFaces.length > 0"
         class="avatar_creation_container_choices_container_item_list"
       >
         <button
@@ -22,16 +22,17 @@
         </button>
       </div>
       <div
-        v-else-if="canFetchAccessoryFaces"
+        v-else
         class="avatar_creation_container_choices_container_item_list empty"
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Aucun accessoir disponible</p>
-        </div>
-      </div>
-      <div v-else class="avatar_creation_container_choices_container_item_list">
-        <div class="avatar_creation_container_choices_container_item_list_text">
-          <p>Choisissez une couleur de peau et une forme de visage</p>
+          <p v-if="accessoriesLoading">Chargement des accessoires...</p>
+          <p v-else-if="!selectedSkinColor">
+            Choisissez une couleur de peau
+          </p>
+          <p v-else>
+            {{ accessoriesError || 'Aucun accessoire disponible' }}
+          </p>
         </div>
       </div>
     </div>
@@ -43,12 +44,19 @@ import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
 
 export default {
   props: {
-    selectedSkinColor: {
-      type: Object,
-    },
     selectedFace: {
       type: Object,
     },
+    selectedSkinColor: {
+      type: Object,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      accessoriesLoading: false,
+      accessoriesError: '',
+    }
   },
   setup() {
     return {
@@ -59,35 +67,40 @@ export default {
     accessoryFaces() {
       return this.avatarCatalogStore.accessoryFaces
     },
-    canFetchAccessoryFaces() {
-      return (
-        this.selectedSkinColor &&
-        this.selectedSkinColor.id &&
-        this.selectedFace &&
-        this.selectedFace.face_variant
-      )
-    },
   },
   async mounted() {
-    if (this.canFetchAccessoryFaces) {
-      await this.fetchAccessoryFacesBySkinColorId(
-        this.selectedSkinColor.id,
-        this.selectedFace.face_variant
-      )
+    if (this.selectedSkinColor?.id) {
+      await this.fetchAccessoryFaces(this.selectedSkinColor.id)
     }
   },
+  watch: {
+    selectedSkinColor: {
+      async handler(skinColor) {
+        if (!skinColor?.id) {
+          this.avatarCatalogStore.accessoryFaces = []
+          return
+        }
+
+        await this.fetchAccessoryFaces(skinColor.id)
+      },
+    },
+  },
   methods: {
-    async fetchAccessoryFacesBySkinColorId(skincolorId, faceVariant) {
+    async fetchAccessoryFaces(skinColorId) {
+      this.accessoriesLoading = true
+      this.accessoriesError = ''
+
       try {
-        await this.avatarCatalogStore.fetchAccessoryFacesBySkinColorId(
-          skincolorId,
-          faceVariant
-        )
+        await this.avatarCatalogStore.fetchAccessoryFaces(skinColorId)
       } catch (error) {
+        this.avatarCatalogStore.accessoryFaces = []
+        this.accessoriesError = 'Impossible de charger les accessoires'
         console.error(
           "Une erreur s'est produite lors de la récupération des visages avec accessoires :",
           error
         )
+      } finally {
+        this.accessoriesLoading = false
       }
     },
     selectAccessoryFace(face) {

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { $fetch } from 'ofetch'
+import { sortAvatarColorsByHex } from '~/utils/avatarColors'
 
 const fetchJson = async (path) => {
   return await $fetch(path)
@@ -22,7 +23,6 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
     bodies: [],
     faces: [],
     accessoryFaces: [],
-    accessories: [],
     hairs: [],
     haircolors: [],
     eyes: [],
@@ -37,7 +37,6 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
     async hydrateBaseCatalog() {
       await Promise.all([
         this.skincolors.length === 0 ? this.fetchSkinColors() : null,
-        this.accessories.length === 0 ? this.fetchAccessories() : null,
       ])
     },
     async hydrateFromAvatarModel(model) {
@@ -58,7 +57,9 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
     },
     hydrateSkinColors(skinColors) {
       this.skincolors = Array.isArray(skinColors)
-        ? skinColors.map((skinColor) => normalizeSkinColor(skinColor))
+        ? sortAvatarColorsByHex(skinColors).map((skinColor) =>
+            normalizeSkinColor(skinColor)
+          )
         : []
     },
     async fetchMorphologiesBySkinColorId(skincolorId) {
@@ -81,22 +82,17 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
     },
     async fetchFacesBySkinColorId(skincolorId) {
       const data = await fetchJson(`/api/avatar/skin-colors/${skincolorId}/faces`)
-      this.faces = Array.isArray(data?.items) ? data.items : []
+      this.faces = (Array.isArray(data?.items) ? data.items : []).filter(
+        (face) => /-none-?$/i.test(String(face?.name || ''))
+      )
       return this.faces
     },
-    async fetchAccessoryFacesBySkinColorId(skincolorId, faceVariant) {
-      const faceVariantQuery = faceVariant
-        ? `&faceVariant=${encodeURIComponent(faceVariant)}`
-        : ''
-      const data = await fetchJson(
-        `/api/avatar/faces/getByColor?colorId=${skincolorId}&accessoryOnly=true${faceVariantQuery}`
-      )
-      this.accessoryFaces = data.faces || []
+    async fetchAccessoryFaces(skinColorId) {
+      const data = await $fetch('/api/avatar/faces/accessories', {
+        query: { skinColorId },
+      })
+      this.accessoryFaces = Array.isArray(data?.items) ? data.items : []
       return this.accessoryFaces
-    },
-    async fetchAccessories() {
-      const data = await fetchJson('/api/avatar/accessories/getAll')
-      this.accessories = data.accessories || []
     },
     async fetchHairsByHairColorId(haircolorId) {
       const data = await fetchJson(`/api/avatar/hairs/getByColor?colorId=${haircolorId}`)

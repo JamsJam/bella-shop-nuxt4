@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const response = await $fetch.raw('/avatar/eye-colors', {
+  const response = await $fetch.raw('/avatar/eyes-colors', {
     baseURL: apiUrl,
     headers: { accept: 'application/json' },
     ignoreResponseError: true,
