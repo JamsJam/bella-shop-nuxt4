@@ -145,6 +145,7 @@
 
 <script>
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
 
 import inputValidations from '~/utils/inputValidations'
 
@@ -319,7 +320,7 @@ export default {
         this.popupMessage = {
           type: 'valid',
           message:
-            'Votre message à bien été envoyé. Nous vous répondrons rapidement.',
+            'Votre message a bien été envoyé. Nous vous répondrons rapidement.',
         }
 
         // Réinitialiser les champs après l'envoi réussi
@@ -339,7 +340,10 @@ export default {
         console.error('Erreur:', error.message)
         this.popupMessage = {
           type: 'error',
-          message: error.message,
+          message: humanizeErrorMessage(
+            error,
+            'Impossible d’envoyer votre message. Veuillez réessayer.'
+          ),
         }
 
         setTimeout(() => {

@@ -105,6 +105,7 @@
 
 <script>
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
 
 import inputValidations from '~/utils/inputValidations'
 
@@ -130,19 +131,7 @@ export default {
 
   methods: {
     getErrorMessage(error) {
-      if (!error) {
-        return 'Une erreur est survenue.'
-      }
-
-      if (typeof error === 'string') {
-        return error
-      }
-
-      if (Array.isArray(error)) {
-        return error[0] || 'Une erreur est survenue.'
-      }
-
-      return error.message || error.error || 'Une erreur est survenue.'
+      return humanizeErrorMessage(error)
     },
     async readResponseData(response) {
       try {
@@ -212,7 +201,7 @@ export default {
     async waitingUpdatePassword() {
       try {
         if (this.resendCodeTimeout) {
-          throw new Error('Reessayer dans quelques secondes')
+          throw new Error('Veuillez patienter quelques secondes avant de renvoyer un code.')
         }
 
         this.validateUserEmail(this.userEmail)
@@ -240,7 +229,9 @@ export default {
         this.awaitingConfirmAccount = true
         this.popupMessage = {
           type: 'valid',
-          message: data.message || 'Code de confirmation envoyé.',
+          message:
+            data.message ||
+            'Un code de confirmation vient de vous être envoyé par e-mail.',
         }
         this.resendCodeTimeout = true
         setTimeout(() => {
@@ -259,7 +250,9 @@ export default {
     async resendConfirmationCode() {
       try {
         if (this.resendCodeTimeout) {
-          throw new Error('Reessayer dans quelques secondes')
+          throw new Error(
+            'Veuillez patienter quelques secondes avant de renvoyer un code.'
+          )
         }
 
         if (!this.userId) {
@@ -285,7 +278,9 @@ export default {
         this.userId = data.userId
         this.popupMessage = {
           type: 'valid',
-          message: data.message || 'Code de confirmation renvoyé.',
+          message:
+            data.message ||
+            'Un nouveau code de confirmation vient de vous être envoyé.',
         }
         this.resendCodeTimeout = true
         setTimeout(() => {
@@ -346,7 +341,7 @@ export default {
 
         this.popupMessage = {
           type: 'valid',
-          message: data?.message || 'Mot de passe modifié.',
+          message: data?.message || 'Votre mot de passe a bien été modifié.',
         }
 
         setTimeout(() => {

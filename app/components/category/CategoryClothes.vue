@@ -116,7 +116,7 @@
       </div>
     </div>
 
-
+    <PopupComponent :popup_message="popupMessage" />
   </div>
 </template>
 
@@ -124,13 +124,14 @@
 import ClothesCategoryHeader from '~/components/attachable/ClothesCategoryHeader.vue'
 
 import FilterComponent from '~/components/category/filter/FilterComponent.vue'
+import PopupComponent from '~/components/attachable/PopupComponent.vue'
 
 
 export default {
   components: {
     FilterComponent,
     ClothesCategoryHeader,
-
+    PopupComponent,
   },
   props: {
     categoryData: {
@@ -164,6 +165,7 @@ export default {
       imageIndexes: {},
       appliedFilters: [],
       pageNumber: 1,
+      popupMessage: null,
     }
   },
   computed: {
@@ -451,6 +453,11 @@ export default {
         this.pageNumber = 1
       } catch (error) {
         console.error("Une erreur s'est produite lors du filtrage :", error)
+        this.popupMessage = {
+          type: 'error',
+          message:
+            'Impossible d’appliquer les filtres pour le moment. Veuillez réessayer.',
+        }
       } finally {
         this.loaderStatus = false
       }

@@ -381,6 +381,7 @@
 <script>
 import inputValidations from '~/utils/inputValidations'
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
 
 export default {
   components: {
@@ -562,7 +563,7 @@ export default {
 
           this.popupMessage = {
             type: 'valid',
-            message: data.message,
+            message: data?.message || 'Votre mot de passe a bien été modifié.',
           }
 
           this.newPassword = ''
@@ -572,7 +573,10 @@ export default {
         } catch (error) {
           this.popupMessage = {
             type: 'error',
-            message: error.message,
+            message: humanizeErrorMessage(
+              error,
+              'Impossible de modifier votre mot de passe.'
+            ),
           }
           console.error(error.message)
         }
@@ -582,7 +586,7 @@ export default {
 
           if (this.email === this.profil.email) {
             throw new Error(
-              "Vous devez modifier votre prénom pour l'enregistrer"
+              "Vous devez modifier votre adresse e-mail pour l'enregistrer"
             )
           }
 
@@ -606,7 +610,7 @@ export default {
 
           this.popupMessage = {
             type: 'valid',
-            message: data.message,
+            message: data?.message || 'Votre adresse e-mail a bien été modifiée.',
           }
 
           this.profil.email = this.email
@@ -614,7 +618,10 @@ export default {
         } catch (error) {
           this.popupMessage = {
             type: 'error',
-            message: error.message,
+            message: humanizeErrorMessage(
+              error,
+              'Impossible de modifier votre adresse e-mail.'
+            ),
           }
           console.error(error.message)
         }
@@ -648,7 +655,7 @@ export default {
 
           this.popupMessage = {
             type: 'valid',
-            message: data.message,
+            message: data?.message || 'Votre prénom a bien été modifié.',
           }
 
           this.profil.surname = this.surname
@@ -656,7 +663,10 @@ export default {
         } catch (error) {
           this.popupMessage = {
             type: 'error',
-            message: error.message,
+            message: humanizeErrorMessage(
+              error,
+              'Impossible de modifier votre prénom.'
+            ),
           }
           console.error(error.message)
         }
@@ -688,14 +698,17 @@ export default {
 
           this.popupMessage = {
             type: 'valid',
-            message: data.message,
+            message: data?.message || 'Votre nom a bien été modifié.',
           }
           this.profil.name = name
           this.editing[field] = false
         } catch (error) {
           this.popupMessage = {
             type: 'error',
-            message: error.message,
+            message: humanizeErrorMessage(
+              error,
+              'Impossible de modifier votre nom.'
+            ),
           }
           console.error(error.message)
         }
@@ -781,13 +794,13 @@ export default {
 
       if (!inputValidations.validateAlphabeticDash(input)) {
         throw new Error(
-          'Le prénom ne doit contenir que des lettres et des tirets.'
+          'Le mot de passe contient des caractères non autorisés.'
         )
       }
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Le prénom contient des mots-clés SQL. Veuillez saisir un prénom valide.'
+          'Le mot de passe contient une suite de caractères non autorisée.'
         )
       }
     },
@@ -805,7 +818,7 @@ export default {
         if (response.ok) {
           this.popupMessage = {
             type: 'valid',
-            message: 'Vous avez été déconnecté',
+            message: 'Vous avez bien été déconnecté.',
           }
           setTimeout(() => {
             this.$router.push('/')
@@ -814,7 +827,10 @@ export default {
       } catch (error) {
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: humanizeErrorMessage(
+            error,
+            'Impossible de vous déconnecter pour le moment.'
+          ),
         }
         console.error('Erreur lors de la déconnexion:', error)
       }
@@ -833,7 +849,7 @@ export default {
         if (response.ok) {
           this.popupMessage = {
             type: 'valid',
-            message: 'Votre compte a bien été supprimé',
+            message: 'Votre compte a bien été supprimé.',
           }
           setTimeout(() => {
             this.$router.push('/')
@@ -843,7 +859,10 @@ export default {
         console.error('Erreur lors de la suppression:', error)
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: humanizeErrorMessage(
+            error,
+            'Impossible de supprimer votre compte pour le moment.'
+          ),
         }
       }
     },

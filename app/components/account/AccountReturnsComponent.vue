@@ -91,6 +91,7 @@
 <script>
 import inputValidations from '~/utils/inputValidations'
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
 
 export default {
   components: {
@@ -207,7 +208,8 @@ export default {
         if (response.ok) {
           this.popupMessage = {
             type: 'valid',
-            message: 'Nous attendons vos articles !',
+            message:
+              'Votre demande de retour a bien été enregistrée. Nous attendons vos articles.',
           }
 
           data.return.status = 'En attente de la reception de vos produits'
@@ -219,7 +221,10 @@ export default {
         console.error(error)
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: humanizeErrorMessage(
+            error,
+            'Impossible d’enregistrer votre demande de retour.'
+          ),
         }
       }
     },
@@ -253,7 +258,7 @@ export default {
 
           this.popupMessage = {
             type: 'valid',
-            message: 'Votre retour à été annulé',
+            message: 'Votre demande de retour a bien été annulée.',
           }
 
           this.returns = this.returns.filter(
@@ -264,7 +269,10 @@ export default {
         console.error(error)
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: humanizeErrorMessage(
+            error,
+            'Impossible d’annuler cette demande de retour.'
+          ),
         }
       }
     },
@@ -274,4 +282,3 @@ export default {
   },
 }
 </script>
-

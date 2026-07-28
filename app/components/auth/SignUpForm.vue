@@ -141,15 +141,18 @@
       </div>
     </div>
 
-   
+    <PopupComponent :popup_message="popupMessage" />
   </div>
 </template>
 
 <script>
+import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
+
 export default {
   name: 'SignUpForm',
   components: {
-    // PopupComponent,
+    PopupComponent,
   },
 
   data() {
@@ -187,13 +190,20 @@ export default {
 
         this.awaitingConfirmAccount = true
         this.userId = data.id ?? data.userId
+        this.popupMessage = {
+          type: 'valid',
+          message: 'Votre compte a été créé. Saisissez le code reçu par e-mail.',
+        }
 
         return data
       } catch (error) {
-        // this.popupMessage = {
-        //   type: 'error',
-        //   message: error,
-        // }
+        this.popupMessage = {
+          type: 'error',
+          message: this.getErrorMessage(
+            error,
+            'Impossible de créer votre compte.'
+          ),
+        }
         return error
       }
     },
@@ -228,7 +238,10 @@ export default {
         console.error('Erreur lors de la confirmation du code :', error)
         this.popupMessage = {
           type: 'error',
-          message: 'Erreur lors de la confirmation du code',
+          message: this.getErrorMessage(
+            error,
+            'Le code de confirmation est invalide ou a expiré.'
+          ),
         }
         return error
       }
@@ -261,7 +274,10 @@ export default {
 
         this.popupMessage = {
           type: 'error',
-          message: data?.error ?? error?.message ?? error,
+          message: this.getErrorMessage(
+            error,
+            'Votre compte a été confirmé, mais la connexion a échoué.'
+          ),
         }
       }
     },
@@ -273,7 +289,9 @@ export default {
 
       try {
         if (this.resendCodeTimeout) {
-          throw new Error('Reessayer dans quelques secondes')
+          throw new Error(
+            'Veuillez patienter quelques secondes avant de renvoyer un code.'
+          )
         }
 
         const data = await $fetch('/api/auth/resend-confirmation-code', {
@@ -283,7 +301,7 @@ export default {
 
         this.popupMessage = {
           type: 'valid',
-          message: data.message,
+          message: data?.message || 'Un nouveau code vient de vous être envoyé.',
         }
         this.resendCodeTimeout = true
         setTimeout(() => {
@@ -293,9 +311,15 @@ export default {
         console.error(error)
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: this.getErrorMessage(
+            error,
+            'Impossible de renvoyer le code pour le moment.'
+          ),
         }
       }
+    },
+    getErrorMessage(error, fallback) {
+      return humanizeErrorMessage(error, fallback)
     },
   },
 }

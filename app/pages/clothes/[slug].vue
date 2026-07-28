@@ -42,6 +42,7 @@
       </div>
     </main>
 
+    <PopupComponent :popup_message="popupMessage" />
     <Footer />
   </div>
 </template>
@@ -53,6 +54,7 @@ import ProductHeader from '~/components/product/ProductHeader.vue'
 import ProductImages from '~/components/product/ProductImages.vue'
 import ProductSelection from '~/components/product/ProductSelection.vue'
 import ProductRecommendations from '~/components/product/ProductRecommendations.vue'
+import PopupComponent from '~/components/attachable/PopupComponent.vue'
 import { useAvatarStore } from '~/stores/avatar'
 import { useCartStore } from '~/stores/cart'
 import Footer from '~/components/attachable/Footer.vue'
@@ -93,6 +95,7 @@ const stock = ref(null)
 const stockAvailable = ref(false)
 const stockLoading = ref(false)
 const stockError = ref('')
+const popupMessage = ref(null)
 let stockRequestId = 0
 
 cartStore.load()
@@ -213,20 +216,42 @@ async function addToCart() {
   }
 
   cartStore.addItem(buildSelectionPayload())
+  popupMessage.value = {
+    type: 'valid',
+    message: `${product.value.name} a été ajouté à votre panier.`,
+  }
 }
 
-function addToAvatarClothes() {
+async function addToAvatarClothes() {
   if (!selectedColor.value || !selectedSize.value) {
     return
   }
 
-  const variantId = selectedColor.value.variantId || selectedColor.value.id
+  const variantId = selectedSize.value.id
 
   if (!variantId) {
+    popupMessage.value = {
+      type: 'error',
+      message: 'Impossible d’ajouter cette variante à votre avatar.',
+    }
     return
   }
 
-  const currentIds = Array.isArray(avatarStore.clothesId) ? avatarStore.clothesId : []
-  void avatarStore.setClothesId([...new Set([...currentIds, variantId])])
+  try {
+    const currentIds = Array.isArray(avatarStore.clothesId)
+      ? avatarStore.clothesId
+      : []
+    await avatarStore.setClothesId([...new Set([...currentIds, variantId])])
+    popupMessage.value = {
+      type: 'valid',
+      message: `${product.value.name} a été ajouté à votre avatar.`,
+    }
+  } catch (error) {
+    console.error('Erreur lors de l’ajout du vêtement à l’avatar :', error)
+    popupMessage.value = {
+      type: 'error',
+      message: 'Impossible d’ajouter ce vêtement à votre avatar.',
+    }
+  }
 }
 </script>

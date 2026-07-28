@@ -4,7 +4,7 @@
       <input type="checkbox" id="cgvCheckbox" v-model="cgvAccepted" />
       <label for="cgvCheckbox">
         J'accepte les
-        <NuxtLink to="/legals">conditions générales de ventes</NuxtLink>
+        <NuxtLink to="/legals">conditions générales de vente</NuxtLink>
         de Bella
       </label>
     </div>
@@ -35,6 +35,7 @@
 
 <script>
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
 import { useShippingStore } from '~/stores/shipping'
 
 export default {
@@ -80,19 +81,10 @@ export default {
   },
   methods: {
     getErrorMessage(error) {
-      if (!error) {
-        return 'Une erreur est survenue.'
-      }
-
-      if (typeof error === 'string') {
-        return error
-      }
-
-      if (Array.isArray(error)) {
-        return error[0] || 'Une erreur est survenue.'
-      }
-
-      return error.message || error.error || 'Une erreur est survenue.'
+      return humanizeErrorMessage(
+        error,
+        'Impossible de préparer le paiement. Veuillez réessayer.'
+      )
     },
     getCheckoutSessionUrl(data) {
       return (
@@ -161,7 +153,7 @@ export default {
       event.preventDefault()
       this.popupMessage = {
         type: 'error',
-        message: 'Vous devez accepter les conditions générales de ventes.',
+        message: 'Vous devez accepter les conditions générales de vente.',
       }
     },
   },

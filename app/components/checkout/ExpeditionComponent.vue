@@ -411,6 +411,7 @@ import inputValidations from '~/utils/inputValidations'
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
 import { useCartStore } from '~/stores/cart'
 import { useShippingStore } from '~/stores/shipping'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
 
 export default {
   components: {
@@ -1292,18 +1293,16 @@ export default {
 
         //  this.selectAddress = response
       } catch (error) {
-        const backendError = error?.data?.error || error?.data?.message
-        const message = Array.isArray(backendError)
-          ? backendError[0]
-          : backendError || error?.statusMessage || error?.message
+        const message = humanizeErrorMessage(
+          error,
+          'Impossible de préparer le paiement. Veuillez réessayer.'
+        )
 
-        // Si une erreur est attrapée, affichez le message d'erreur ou effectuez une action appropriée
         this.popupMessage = {
           type: 'error',
-          message: message || 'Impossible de préparer le paiement.',
+          message,
         }
-        console.error(message || error)
-        // Ou vous pouvez également lancer l'erreur à un niveau supérieur pour qu'elle soit gérée là où handlePaiement est appelée
+        console.error(message)
       } finally {
         this.paymentLoading = false
       }

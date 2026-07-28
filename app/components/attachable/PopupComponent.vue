@@ -1,15 +1,22 @@
 <template>
-  <div class="popup">
+  <Teleport to="body">
     <div
-      v-if="popup_message && popup_message.type === 'error' && displayPopup"
-      class="popup_error"
+      v-if="popup_message && displayPopup"
+      class="popup"
+      :class="`popup_${popup_message.type}`"
+      :role="popup_message.type === 'error' ? 'alert' : 'status'"
+      aria-live="polite"
     >
       <p>{{ popup_message.message }}</p>
-      <div class="popup_icon">
+      <button
+        type="button"
+        class="popup_icon"
+        aria-label="Fermer le message"
+        @click="closePopup"
+      >
         <svg
+          v-if="popup_message.type === 'error'"
           xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
           viewBox="0 0 21 21"
         >
           <path
@@ -20,19 +27,9 @@
             d="m15.5 15.5l-10-10zm0-10l-10 10"
           />
         </svg>
-      </div>
-    </div>
-
-    <div
-      v-if="popup_message && popup_message.type === 'valid' && displayPopup"
-      class="popup_valid"
-    >
-      <p>{{ popup_message.message }}</p>
-      <div class="popup_icon">
         <svg
+          v-else
           xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
           viewBox="0 0 21 21"
         >
           <path
@@ -43,9 +40,9 @@
             d="m5.5 11.5l3 3l8.028-8"
           />
         </svg>
-      </div>
+      </button>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script>
@@ -60,86 +57,42 @@ export default {
   data() {
     return {
       displayPopup: false,
+      popupTimeout: null,
     }
   },
   computed: {},
   watch: {
-    popup_message(newPopup) {
-      if (newPopup) {
+    popup_message: {
+      immediate: true,
+      handler(newPopup) {
+        if (!newPopup) return
+
         this.displayPopup = true
-        // Si un timeout est déjà en cours, le clear
-        if (this.popupTimeout) {
-          clearTimeout(this.popupTimeout)
-        }
-        // Lance un nouveau timeout et stocke son ID
-        this.popupTimeout = setTimeout(() => {
-          this.displayPopup = false
-        }, 5000)
-      }
+        this.clearPopupTimeout()
+        this.popupTimeout = setTimeout(this.closePopup, 5000)
+      },
     },
   },
-  mounted() {},
-  methods: {},
+  beforeUnmount() {
+    this.clearPopupTimeout()
+  },
+  methods: {
+    clearPopupTimeout() {
+      if (this.popupTimeout) {
+        clearTimeout(this.popupTimeout)
+        this.popupTimeout = null
+      }
+    },
+    closePopup() {
+      this.displayPopup = false
+      this.clearPopupTimeout()
+    },
+  },
 }
 </script>
 
-<style scoped lang="scss">
-
-
-// .popup {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   position: fixed;
-//   z-index: 35;
-//   top: 5.4vh;
-//   right: 5.4vh;
-//   width: fit-content;
-//   height: fit-content;
-//   background-color: $white;
-//   box-shadow: 0.5vh 0.5vh 1vh darken($color: $white, $amount: 30);
-
-//   &_error {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     padding: 2.2vh 3.2vh;
-//     p {
-//       color: $red;
-//     }
-//     svg {
-//       color: $red;
-//     }
-//   }
-
-//   &_valid {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     padding: 2.2vh 3.2vh;
-//     p {
-//       color: $green;
-//     }
-//     svg {
-//       color: $green;
-//     }
-//   }
-
-//   p {
-//     display: flex;
-//     font-size: 1.5vh;
-//     font-weight: 500;
-//     margin-right: 2.2vh;
-//   }
-
-//   &_icon {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     svg {
-//       width: 2.7vh;
-//       height: 2.7vh;
-//     }
-//   }
-// }
-</style>
+<style
+  scoped
+  lang="scss"
+  src="../../../assets/styles/components/_popup.scss"
+></style>
