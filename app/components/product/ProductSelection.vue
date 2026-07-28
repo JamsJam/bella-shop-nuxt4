@@ -40,7 +40,7 @@
       :rows="sizeGuide.rows"
     />
 
-    <div class="product_selection_quantity">
+    <div v-if="selectedSize" class="product_selection_quantity">
       <p class="product_selection_label">Quantité</p>
 
       <div

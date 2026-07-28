@@ -107,7 +107,7 @@ watch(
     selectedColor.value = nextProduct.colors?.find((color) => color.slug === route.params.slug)
       || nextProduct.colors?.[0]
       || null
-    selectedSize.value = nextProduct.sizes?.[0] || null
+    selectedSize.value = null
   },
   { immediate: true }
 )

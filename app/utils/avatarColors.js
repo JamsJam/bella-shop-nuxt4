@@ -19,7 +19,7 @@ const hexToNumber = (hexa) => {
 export const sortAvatarColorsByHex = (colors) =>
   [...(Array.isArray(colors) ? colors : [])].sort(
     (firstColor, secondColor) =>
-      hexToNumber(secondColor?.hexa) - hexToNumber(firstColor?.hexa)
+      hexToNumber(firstColor?.hexa) - hexToNumber(secondColor?.hexa)
   )
 
 export const normalizeAvatarColors = (colors) =>

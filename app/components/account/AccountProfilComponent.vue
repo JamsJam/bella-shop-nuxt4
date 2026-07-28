@@ -2,7 +2,7 @@
   <div class="account_container_profil_page">
     <div class="account_container_title">
       <h1>Informations personnelles</h1>
-      <p>Bonjour, {{ surname }}</p>
+      <p v-if="surname">Bonjour, {{ surname }}</p>
     </div>
 
     <div class="account_container_profil">
@@ -141,7 +141,7 @@
         </div>
       </div>
 
-      <div class="account_container_profil_item">
+      <div v-if="email" class="account_container_profil_item">
         <div class="account_container_profil_item_label">
           <label for="email">Email</label>
           <p>Modifier votre adresse mail</p>
@@ -288,13 +288,22 @@
     <div class="account_container_profil">
       <div class="account_container_profil_address">
         <div class="account_container_profil_address_title">
-          <h4>Votre adresse enregistrée</h4>
+          <h4>Vos adresses</h4>
         </div>
-        <div v-if="addressBook" class="account_container_profil_address_item">
-          <p>{{ addressBook.fullAddress.display_name }}</p>
-          <div class="account_container_profil_address_item_button">
-            <button @click="deleteSaveAddress()">Supprimer</button>
-          </div>
+        <div
+          v-if="addresses.length"
+          class="account_container_profil_address_list"
+        >
+          <button
+            v-for="(address, index) in addresses"
+            :key="address.id || index"
+            type="button"
+            class="account_container_profil_address_item"
+            @click="selectedAddress = address"
+          >
+            <span>{{ address.street }}</span>
+            <span aria-hidden="true">›</span>
+          </button>
         </div>
         <div v-else class="account_container_profil_address_item">
           <p>Vous n'avez aucune adresse d'enregistrée</p>
@@ -342,12 +351,34 @@
       <button class="cancel-button" @click="cancelDialogBox()">Non</button>
     </div>
 
+    <div
+      v-if="selectedAddress"
+      class="account_dialog_backdrop"
+      @click.self="selectedAddress = null"
+    >
+      <div
+        class="account_dialog_box account_address_dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="address-dialog-title"
+      >
+        <h2 id="address-dialog-title">{{ selectedAddress.street }}</h2>
+        <p>{{ selectedAddress.full }}</p>
+        <button
+          type="button"
+          class="cancel-button"
+          @click="selectedAddress = null"
+        >
+          Fermer
+        </button>
+      </div>
+    </div>
+
     <PopupComponent :popup_message="popupMessage" />
   </div>
 </template>
 
 <script>
-import { decryptData } from '~/utils/crypto'
 import inputValidations from '~/utils/inputValidations'
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
 
@@ -385,17 +416,17 @@ export default {
         password: false,
       },
 
-      addressBook: null,
+      addresses: [],
+      selectedAddress: null,
 
       confirmationDialogBox: '',
     }
   },
   computed: {},
   mounted() {
-    if (!this.initialProfile) {
-      this.fetchProfile()
+    if (this.initialProfile) {
+      this.applyProfile(this.initialProfile)
     }
-    this.retrieveAddressBook()
   },
   directives: {
     focus: {
@@ -409,46 +440,75 @@ export default {
   },
 
   methods: {
-    async fetchProfile() {
-      try {
-        const response = await fetch('/api/account/profile', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+    extractProfile(data) {
+      if (Array.isArray(data?.userProfil)) return data.userProfil[0]
+      if (Array.isArray(data?.member)) return data.member[0]
+      if (Array.isArray(data?.['hydra:member'])) return data['hydra:member'][0]
+      return data
+    },
+
+    applyProfile(data) {
+      const profile = this.extractProfile(data) || {}
+
+      this.profil = profile
+      this.surname = profile.surname || profile.firstName || ''
+      this.name = profile.name || profile.lastName || ''
+      this.email = profile.email || ''
+      this.addresses = this.normalizeAddresses(
+        profile.addresses || profile.address || []
+      )
+    },
+
+    normalizeAddresses(addresses) {
+      const list = Array.isArray(addresses)
+        ? addresses
+        : addresses
+          ? [addresses]
+          : []
+
+      return list.map((address, index) => {
+        if (typeof address === 'string') {
+          return {
+            id: index,
+            street: address,
+            full: address,
+          }
         }
-        const data = await response.json()
 
-        const userProfil = data.userProfil[0]
-        this.profil = userProfil
-        this.surname = userProfil.surname
-        this.name = userProfil.name
-        this.email = userProfil.email
-      } catch (error) {
-        this.error = error.message
-        console.error('An error occurred while fetching the profile:', error)
-      }
-    },
+        const fullAddress = address?.fullAddress || {}
+        const detailedAddress = fullAddress?.address || {}
+        const street =
+          address?.street ||
+          address?.streetName ||
+          address?.shippingAddress ||
+          address?.address ||
+          detailedAddress?.road ||
+          fullAddress?.display_name ||
+          `Adresse ${index + 1}`
+        const country =
+          address?.country?.name ||
+          address?.country?.label ||
+          address?.country ||
+          detailedAddress?.country
+        const full =
+          fullAddress?.display_name ||
+          [
+            address?.shippingAddress || address?.address || address?.street,
+            address?.shippingAddress2 || address?.addressComplement,
+            address?.postalCode || address?.zipCode,
+            address?.city,
+            country,
+          ]
+            .filter(Boolean)
+            .join(', ') ||
+          street
 
-    async retrieveAddressBook() {
-      const addressBook = localStorage.getItem('addressBook')
-      if (addressBook) {
-        const decryptedAddress = await decryptData(addressBook)
-        this.addressBook = decryptedAddress
-      }
-    },
-
-    deleteSaveAddress() {
-      localStorage.removeItem('addressBook')
-      this.addressBook = null
-      this.popupMessage = {
-        type: 'valid',
-        message: 'Votre adresse à bien été supprimée',
-      }
+        return {
+          id: address?.id ?? index,
+          street,
+          full,
+        }
+      })
     },
 
     cancelEditing(field) {

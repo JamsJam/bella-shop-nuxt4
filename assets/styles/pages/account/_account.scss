@@ -8,6 +8,11 @@
   background-color: $neutral-50;
 }
 
+.account_page {
+  display: flex;
+  flex-direction: column;
+}
+
 .account,
 .contact {
   width: 100%;
@@ -15,6 +20,10 @@
   background-color: $neutral-50;
   color: $neutral-900;
   font-family: 'Montserrat', sans-serif;
+}
+
+.account {
+  flex: 1 0 auto;
 }
 
 .account_container,
@@ -242,6 +251,30 @@
   }
 }
 
+.account_container_profil_address_list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+button.account_container_profil_address_item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  color: $neutral-800;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $principal-300;
+    background-color: $principal-50;
+  }
+}
+
 .account_container_profil_address_item_button,
 .account_container_profil_logout_buttons,
 .account_container_returns_form_button {
@@ -275,13 +308,89 @@
 .account_container_orders_item,
 .account_container_returns_item {
   padding: 1rem;
-  cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:hover,
-  &.current_orders_item {
+  &[open] {
     border-color: $accent-300;
     box-shadow: 0 8px 16px oklch(0% 0 0 / 0.08);
+  }
+}
+
+.account_container_orders_item_summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 1rem;
+  align-items: center;
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $principal-300;
+    outline-offset: 0.4rem;
+    border-radius: 4px;
+  }
+}
+
+.account_container_orders_item_summary_identity {
+  display: grid;
+  gap: 0.35rem;
+
+  strong {
+    color: $neutral-900;
+    font-size: 1.05rem;
+  }
+
+  time {
+    color: $neutral-500;
+    font-size: 0.9rem;
+  }
+}
+
+.account_container_orders_item_summary_status {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background-color: $principal-50;
+  color: $principal-900;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.account_container_orders_item_summary_chevron {
+  color: $neutral-500;
+  font-size: 1.75rem;
+  line-height: 1;
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.account_container_orders_item[open]
+  .account_container_orders_item_summary_chevron {
+  transform: rotate(-90deg);
+}
+
+.account_container_orders_item_details {
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .account_container_orders_item_summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .account_container_orders_item_summary_status {
+    grid-column: 1;
+    width: fit-content;
+  }
+
+  .account_container_orders_item_summary_chevron {
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 }
 
@@ -347,6 +456,25 @@
   padding-top: 1rem;
   border-top: 1px solid $neutral-200;
   color: $neutral-600;
+}
+
+.account_container_orders_item_invoice a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  background-color: $principal-700;
+  color: $nuance-0;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $principal-900;
+  }
 }
 
 .account_container_returns_form {
@@ -428,6 +556,26 @@
   .cancel-button {
     background-color: $neutral-50;
     color: $neutral-800;
+  }
+}
+
+.account_dialog_backdrop {
+  position: fixed;
+  z-index: 29;
+  inset: 0;
+  background-color: oklch(0% 0 0 / 0.45);
+}
+
+.account_address_dialog {
+  h2 {
+    margin-bottom: 0.75rem;
+    color: $neutral-900;
+    font-size: 1.2rem;
+  }
+
+  p {
+    font-weight: 400;
+    line-height: 1.6;
   }
 }
 

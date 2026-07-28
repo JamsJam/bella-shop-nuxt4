@@ -2,7 +2,13 @@
   <div class="account_page">
     <NavigationBar />
 
-    <AccountComponent :initial-profile="initialProfile" />
+    <AccountComponent
+      :initial-profile="initialProfile"
+      :initial-orders="initialOrders"
+      :orders-loading="ordersPending"
+      :orders-error="ordersErrorMessage"
+      @retry-orders="handleRetryOrders"
+    />
 
     <Footer />
   </div>
@@ -12,23 +18,11 @@
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import AccountComponent from '~/components/account/AccountComponent.vue'
 import Footer from '~/components/attachable/Footer.vue'
+import type CustomerDTO from '#shared/dto/customer.dto'
+import type { CustomerOrderListDTO } from '#shared/dto/customer.dto'
 
 defineOptions({
   name: 'AccountPage',
-})
-
-type AccountProfile = {
-  surname: string
-  name: string
-  email: string
-}
-
-type AccountProfileResponse = {
-  userProfil?: AccountProfile[]
-}
-
-definePageMeta({
-  middleware: 'auth',
 })
 
 useSeoMeta({
@@ -36,14 +30,31 @@ useSeoMeta({
   robots: 'noindex, nofollow',
 })
 
-const { data: profileResponse } = await useFetch<AccountProfileResponse>(
-  '/api/account/profile',
+const profileRequest = useFetch<CustomerDTO>('/api/account/profile')
+const ordersRequest = useFetch<CustomerOrderListDTO>('/api/account/orders')
+const [
+  { data: profile, error: profileError },
   {
-    credentials: 'include',
-  }
-)
+    data: ordersResponse,
+    pending: ordersPending,
+    error: ordersError,
+    refresh: refreshOrders,
+  },
+] = await Promise.all([profileRequest, ordersRequest])
 
-const initialProfile = computed<AccountProfile | undefined>(
-  () => profileResponse.value?.userProfil?.[0]
+if (profileError.value?.statusCode === 401) {
+  await navigateTo({
+    path: '/login',
+    query: { redirect: '/account' },
+  })
+}
+
+const initialProfile = computed<CustomerDTO | undefined>(
+  () => profile.value ?? undefined
 )
+const initialOrders = computed(() => ordersResponse.value?.orders ?? [])
+const ordersErrorMessage = computed(() =>
+  ordersError.value ? 'Impossible de récupérer vos commandes.' : ''
+)
+const handleRetryOrders = () => refreshOrders()
 </script>

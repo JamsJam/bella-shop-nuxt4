@@ -14,6 +14,9 @@
             v-for="item in cartItems"
             :key="item.id"
             class="cart_page_item"
+            :class="{
+              cart_page_item_unavailable: isItemUnavailable(item),
+            }"
           >
             <NuxtLink
               :to="`/clothes/${item.productSlug}`"
@@ -31,13 +34,23 @@
               </NuxtLink>
               <p>{{ item.color?.name || 'Couleur non selectionnee' }}</p>
               <p>Taille {{ item.size?.name || item.size }}</p>
+              <p
+                class="cart_page_item_stock"
+                :class="{
+                  cart_page_item_stock_error: isItemUnavailable(item),
+                }"
+                aria-live="polite"
+              >
+                {{ getStockMessage(item) }}
+              </p>
             </div>
 
             <div class="cart_page_item_quantity">
               <button
                 type="button"
                 aria-label="Retirer une quantite"
-                @click="cartStore.decrementItem(item.id)"
+                :disabled="isStockLoading(item)"
+                @click="changeItemQuantity(item, -1)"
               >
                 -
               </button>
@@ -45,7 +58,15 @@
               <button
                 type="button"
                 aria-label="Ajouter une quantite"
-                @click="cartStore.incrementItem(item.id)"
+                :class="{
+                  cart_page_item_quantity_max: isMaximumReached(item),
+                }"
+                :disabled="
+                  isStockLoading(item) ||
+                  !isItemAvailable(item) ||
+                  item.quantity >= getItemStock(item)
+                "
+                @click="changeItemQuantity(item, 1)"
               >
                 +
               </button>
@@ -76,9 +97,21 @@
             <strong>{{ formatPrice(cartStore.subtotal) }}</strong>
           </div>
 
-          <NuxtLink to="/expedition" class="button--primary cart_page_checkout">
+          <NuxtLink
+            v-if="canCheckout"
+            to="/expedition"
+            class="button--primary cart_page_checkout"
+          >
             Commander
           </NuxtLink>
+          <button
+            v-else
+            type="button"
+            class="button--primary cart_page_checkout"
+            disabled
+          >
+            Stock indisponible
+          </button>
 
           <button
             type="button"
@@ -101,15 +134,186 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import NavigationBar from '~/components/attachable/NavigationBar.vue'
 import { useCartStore } from '~/stores/cart'
 
 const cartStore = useCartStore()
+const requestFetch = useRequestFetch()
+const stockByItem = ref({})
 
 cartStore.load()
 
 const cartItems = computed(() => cartStore.items)
+const canCheckout = computed(
+  () =>
+    cartItems.value.length > 0 &&
+    cartItems.value.every(
+      (item) =>
+        isItemAvailable(item) &&
+        !isStockLoading(item) &&
+        item.quantity <= getItemStock(item)
+    )
+)
+
+await Promise.all(cartItems.value.map((item) => refreshItemStock(item)))
+
+function getVariantId(item) {
+  const variantId = Number(item.size?.id || item.variantId)
+  return Number.isInteger(variantId) && variantId > 0 ? variantId : null
+}
+
+function getStockState(item) {
+  return stockByItem.value[item.id] || {
+    stock: 0,
+    available: false,
+    loading: true,
+    checked: false,
+    error: '',
+  }
+}
+
+function getItemStock(item) {
+  return getStockState(item).stock
+}
+
+function isStockLoading(item) {
+  return getStockState(item).loading
+}
+
+function isItemAvailable(item) {
+  const state = getStockState(item)
+  return (
+    !state.loading &&
+    !state.error &&
+    state.available &&
+    item.quantity <= state.stock
+  )
+}
+
+function isItemUnavailable(item) {
+  const state = getStockState(item)
+
+  return (
+    state.checked &&
+    Boolean(
+      state.error ||
+        !state.available ||
+        state.stock === 0 ||
+        item.quantity > state.stock
+    )
+  )
+}
+
+function isMaximumReached(item) {
+  const state = getStockState(item)
+
+  return (
+    state.checked &&
+    !state.error &&
+    state.available &&
+    item.quantity >= state.stock
+  )
+}
+
+function getStockMessage(item) {
+  const state = getStockState(item)
+
+  if (state.loading) {
+    return 'Vérification du stock…'
+  }
+
+  if (state.error) {
+    return state.error
+  }
+
+  if (!state.available || state.stock === 0) {
+    return 'Rupture de stock.'
+  }
+
+  if (item.quantity > state.stock) {
+    return `Stock insuffisant : ${state.stock} disponible${state.stock > 1 ? 's' : ''}.`
+  }
+
+  if (state.stock <= 5) {
+    return `Plus que ${state.stock} disponible${state.stock > 1 ? 's' : ''}.`
+  }
+
+  return 'En stock.'
+}
+
+async function refreshItemStock(item) {
+  const variantId = getVariantId(item)
+
+  if (!variantId) {
+    stockByItem.value = {
+      ...stockByItem.value,
+      [item.id]: {
+        stock: 0,
+        available: false,
+        loading: false,
+        checked: true,
+        error: 'Impossible de vérifier le stock de cette taille.',
+      },
+    }
+    return false
+  }
+
+  stockByItem.value = {
+    ...stockByItem.value,
+    [item.id]: {
+      ...getStockState(item),
+      loading: true,
+      error: '',
+    },
+  }
+
+  try {
+    const response = await requestFetch(`/api/variants/${variantId}/stock`)
+    const stock = Math.max(0, Number(response.stock) || 0)
+    const available = Boolean(response.available) && stock > 0
+
+    stockByItem.value = {
+      ...stockByItem.value,
+      [item.id]: {
+        stock,
+        available,
+        loading: false,
+        checked: true,
+        error: '',
+      },
+    }
+
+    return available && item.quantity <= stock
+  } catch (error) {
+    stockByItem.value = {
+      ...stockByItem.value,
+      [item.id]: {
+        stock: 0,
+        available: false,
+        loading: false,
+        checked: true,
+        error: 'Disponibilité momentanément indisponible.',
+      },
+    }
+
+    console.error('Erreur lors de la vérification du stock :', error)
+    return false
+  }
+}
+
+async function changeItemQuantity(item, delta) {
+  await refreshItemStock(item)
+
+  if (delta < 0) {
+    cartStore.decrementItem(item.id)
+    return
+  }
+
+  if (isItemAvailable(item) && item.quantity < getItemStock(item)) {
+    cartStore.incrementItem(item.id)
+  }
+}
 
 function formatPrice(price) {
   return new Intl.NumberFormat('fr-FR', {

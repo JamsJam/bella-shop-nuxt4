@@ -63,6 +63,10 @@
       />
       <AccountOrdersComponent
         v-else-if="currentAccountPage === 'orders'"
+        :initial-orders="initialOrders"
+        :orders-loading="ordersLoading"
+        :orders-error="ordersError"
+        @retry-orders="$emit('retry-orders')"
         @request-clothing-return="handleRequestClothingReturn"
       />
       <AccountReturnsComponent
@@ -89,6 +93,18 @@ export default {
     initialProfile: {
       type: Object,
       default: null,
+    },
+    initialOrders: {
+      type: Array,
+      default: () => [],
+    },
+    ordersLoading: {
+      type: Boolean,
+      default: false,
+    },
+    ordersError: {
+      type: String,
+      default: '',
     },
   },
   data() {
