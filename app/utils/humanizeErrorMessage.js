@@ -1,5 +1,5 @@
 const technicalMessagePattern =
-  /(?:failed to fetch|fetch failed|network error|request failed|internal server error|unexpected token|json|cors|stack trace|status code|http error)/i
+  /(?:failed to fetch|fetch failed|network error|request failed|internal server error|unexpected token|json|cors|stack trace|status code|http error|api base|not configured|exception|traceback)/i
 
 const knownMessages = [
   {
@@ -17,6 +17,34 @@ const knownMessages = [
   {
     pattern: /user not found|customer not found/i,
     message: 'Aucun compte ne correspond aux informations renseignées.',
+  },
+  {
+    pattern: /e-?mail.*(?:already|exist|used)|(?:already|exist|used).*e-?mail/i,
+    message: 'Cette adresse e-mail est déjà associée à un compte.',
+  },
+  {
+    pattern: /authentication request could not be processed/i,
+    message: 'La connexion est momentanément indisponible. Veuillez réessayer.',
+  },
+  {
+    pattern: /jwt.*expired|expired.*jwt|token.*expired/i,
+    message: 'Votre session a expiré. Veuillez vous reconnecter.',
+  },
+  {
+    pattern: /access denied|forbidden/i,
+    message: 'Vous n’êtes pas autorisé à effectuer cette action.',
+  },
+  {
+    pattern: /not acceptable/i,
+    message: 'La demande n’a pas pu être traitée. Veuillez réessayer.',
+  },
+  {
+    pattern: /insufficient.*stock|not enough.*stock/i,
+    message: 'Le stock disponible ne permet pas de valider cette quantité.',
+  },
+  {
+    pattern: /cart.*empty|empty.*cart/i,
+    message: 'Votre panier est vide.',
   },
 ]
 
@@ -38,6 +66,13 @@ export const humanizeErrorMessage = (
   error,
   fallback = 'Une erreur est survenue. Veuillez réessayer.'
 ) => {
+  const comesFromApi = Boolean(
+    error?.data ||
+      error?.response ||
+      error?.statusCode ||
+      error?.status ||
+      error?.statusMessage
+  )
   const extractedMessage = extractMessage(error)
   const message =
     typeof extractedMessage === 'string' ? extractedMessage.trim() : ''
@@ -50,7 +85,8 @@ export const humanizeErrorMessage = (
   if (
     technicalMessagePattern.test(message) ||
     /<[^>]+>/.test(message) ||
-    message.length > 180
+    message.length > 180 ||
+    (comesFromApi && !knownMessage)
   ) {
     return fallback
   }

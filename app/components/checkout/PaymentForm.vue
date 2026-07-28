@@ -124,7 +124,9 @@ export default {
         const data = await this.readResponseData(response)
 
         if (!response.ok || data?.error || data?.success === false) {
-          throw new Error(this.getErrorMessage(data?.error || data?.message))
+          throw new Error(
+            'Impossible de préparer le paiement. Veuillez réessayer.'
+          )
         }
 
         const sessionUrl = this.getCheckoutSessionUrl(data)

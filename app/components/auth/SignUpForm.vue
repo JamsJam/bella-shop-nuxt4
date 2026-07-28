@@ -301,7 +301,7 @@ export default {
 
         this.popupMessage = {
           type: 'valid',
-          message: data?.message || 'Un nouveau code vient de vous être envoyé.',
+          message: 'Un nouveau code vient de vous être envoyé par e-mail.',
         }
         this.resendCodeTimeout = true
         setTimeout(() => {

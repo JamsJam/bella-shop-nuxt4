@@ -555,15 +555,12 @@ export default {
           const response = await fetch('/api/account/profile/password', requestOptions)
 
           if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(errorResponse.message)
+            throw new Error('Impossible de modifier votre mot de passe.')
           }
-
-          const data = await response.json()
 
           this.popupMessage = {
             type: 'valid',
-            message: data?.message || 'Votre mot de passe a bien été modifié.',
+            message: 'Votre mot de passe a bien été modifié.',
           }
 
           this.newPassword = ''
@@ -602,15 +599,12 @@ export default {
           const response = await fetch('/api/account/profile/email', requestOptions)
 
           if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(errorResponse.message)
+            throw new Error('Impossible de modifier votre adresse e-mail.')
           }
-
-          const data = await response.json()
 
           this.popupMessage = {
             type: 'valid',
-            message: data?.message || 'Votre adresse e-mail a bien été modifiée.',
+            message: 'Votre adresse e-mail a bien été modifiée.',
           }
 
           this.profil.email = this.email
@@ -647,15 +641,12 @@ export default {
           const response = await fetch('/api/account/profile/surname', requestOptions)
 
           if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(errorResponse.message)
+            throw new Error('Impossible de modifier votre prénom.')
           }
-
-          const data = await response.json()
 
           this.popupMessage = {
             type: 'valid',
-            message: data?.message || 'Votre prénom a bien été modifié.',
+            message: 'Votre prénom a bien été modifié.',
           }
 
           this.profil.surname = this.surname
@@ -690,15 +681,12 @@ export default {
           const response = await fetch('/api/account/profile/name', requestOptions)
 
           if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(errorResponse.message)
+            throw new Error('Impossible de modifier votre nom.')
           }
-
-          const data = await response.json()
 
           this.popupMessage = {
             type: 'valid',
-            message: data?.message || 'Votre nom a bien été modifié.',
+            message: 'Votre nom a bien été modifié.',
           }
           this.profil.name = name
           this.editing[field] = false

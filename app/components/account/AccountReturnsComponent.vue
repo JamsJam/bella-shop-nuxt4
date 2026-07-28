@@ -202,7 +202,7 @@ export default {
         const data = await response.json()
 
         if (!response.ok) {
-          throw data.error
+          throw new Error('Impossible d’enregistrer votre demande de retour.')
         }
 
         if (response.ok) {
@@ -250,7 +250,7 @@ export default {
         const data = await response.json()
 
         if (!response.ok) {
-          throw data.error
+          throw new Error('Impossible d’annuler cette demande de retour.')
         }
 
         if (response.ok) {

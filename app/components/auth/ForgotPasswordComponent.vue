@@ -142,19 +142,20 @@ export default {
     },
     assertResetCodeRequested(response, data) {
       if (!response.ok) {
-        throw new Error(this.getErrorMessage(data?.error || data?.message))
+        throw new Error(
+          'Impossible d’envoyer le code de réinitialisation. Veuillez réessayer.'
+        )
       }
 
       if (data?.error || data?.success === false) {
-        throw new Error(this.getErrorMessage(data.error || data.message))
+        throw new Error(
+          'Impossible d’envoyer le code de réinitialisation. Veuillez réessayer.'
+        )
       }
 
       if (!data?.userId) {
         throw new Error(
-          this.getErrorMessage(
-            data?.message ||
-              "Le serveur n'a pas confirmé l'envoi du code de réinitialisation."
-          )
+          'La demande de réinitialisation n’a pas pu être confirmée. Veuillez réessayer.'
         )
       }
     },
@@ -230,7 +231,6 @@ export default {
         this.popupMessage = {
           type: 'valid',
           message:
-            data.message ||
             'Un code de confirmation vient de vous être envoyé par e-mail.',
         }
         this.resendCodeTimeout = true
@@ -279,7 +279,6 @@ export default {
         this.popupMessage = {
           type: 'valid',
           message:
-            data.message ||
             'Un nouveau code de confirmation vient de vous être envoyé.',
         }
         this.resendCodeTimeout = true
@@ -336,12 +335,14 @@ export default {
         const data = await this.readResponseData(response)
 
         if (!response.ok || data?.error || data?.success === false) {
-          throw new Error(this.getErrorMessage(data?.error || data?.message))
+          throw new Error(
+            'Impossible de modifier votre mot de passe. Vérifiez le code renseigné.'
+          )
         }
 
         this.popupMessage = {
           type: 'valid',
-          message: data?.message || 'Votre mot de passe a bien été modifié.',
+          message: 'Votre mot de passe a bien été modifié.',
         }
 
         setTimeout(() => {
