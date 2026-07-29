@@ -29,9 +29,9 @@
                     <!--! grid component-->
                     <nuxt-link v-for="(category, index) in categories" :key="index" :to="{
                         path: `/category/${category.slug.toLowerCase()}`
-                    }" class="clothes_selection_container_grid_item">
+                        }" class="clothes_selection_container_grid_item">
                         <div class="clothes_selection_container_grid_item_image">
-                            <img :src="`${category.image}`" alt="" />
+                            <img :src="`${category.image}`" :alt="category.name" />
                         </div>
                         <div class="clothes_selection_container_grid_item_title">
                             <h2>{{ category.name }}</h2>
