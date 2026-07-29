@@ -1,14 +1,6 @@
 <template>
   <header class="category_page_header">
-    <NuxtLink to="/category" class="category_page_header_back">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 19">
-        <path
-          d="M12.4998 15.0416L6.6665 9.49992L12.4998 3.95825"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+    <NuxtLink to="/category" class="back_link category_page_header_back">
       Retour aux catégories
     </NuxtLink>
     <h1 class="category_page_header_title">{{ categoryName }}</h1>
@@ -43,20 +35,7 @@ export default {
 }
 
 .category_page_header_back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   margin-bottom: 1.25rem;
-  color: inherit;
-  font-size: 0.95rem;
-  text-decoration: none;
-}
-
-.category_page_header_back svg {
-  width: 1rem;
-  height: 1rem;
-  fill: none;
-  stroke: currentColor;
 }
 
 .category_page_header_title {

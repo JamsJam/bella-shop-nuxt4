@@ -1,5 +1,5 @@
 const technicalMessagePattern =
-  /(?:failed to fetch|fetch failed|network error|request failed|internal server error|unexpected token|json|cors|stack trace|status code|http error|api base|not configured|exception|traceback)/i
+  /(?:failed to fetch|fetch failed|network error|request failed|internal server error|unexpected token|stack trace|status code|not configured|traceback|something went wrong|an error occurred|unable to|could not|cannot|\/api\/|https?:\/\/|\b(?:sql|jwt|json|cors|stripe|api|http|token|serveur|server|route|exception|undefined|null)\b|\b[45]\d{2}\b)/i
 
 const knownMessages = [
   {

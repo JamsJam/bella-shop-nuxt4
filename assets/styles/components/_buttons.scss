@@ -63,3 +63,35 @@
     background-color: $principal-400;
   }
 }
+
+.back_link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 4px;
+  color: $neutral-900;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    flex: 0 0 auto;
+    border-bottom: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  &:hover {
+    color: $principal-700;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $principal-700;
+    outline-offset: 4px;
+  }
+}

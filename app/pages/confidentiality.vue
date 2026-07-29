@@ -1,6 +1,7 @@
 <template>
   <div class="clothes_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <ConfidentialityComponent :blocks="confidentiality?.blocks" />
 
@@ -42,4 +43,3 @@ export default {
   },
 }
 </script>
-

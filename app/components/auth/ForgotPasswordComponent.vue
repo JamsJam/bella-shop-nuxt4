@@ -170,7 +170,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          "L'addresse e-mail contient des mots-clés SQL. Veuillez saisir une adresse valide."
+          "L’adresse e-mail contient une valeur non autorisée. Veuillez la vérifier."
         )
       }
     },

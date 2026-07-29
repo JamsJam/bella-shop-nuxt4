@@ -1,6 +1,7 @@
 <template>
   <div class="login_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <LoginForms />
   </div>

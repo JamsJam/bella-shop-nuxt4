@@ -1,6 +1,7 @@
 <template>
     <div class="clothes_page">
         <NavigationBar />
+        <AttachableBreadcrumb />
 
 
         <div class="clothes_selection">
@@ -49,8 +50,17 @@
                         : { background: 'url(../images/clothes/category_banniere.jpg) 50%/cover no-repeat' }"
                 >
                     <div class="clothes_selection_container_hero_container" >
-                        <h2 v-html="categoryPage?.bandeau?.title || 'Quel vêtement <strong> te convient</strong> le mieux ?'"></h2>
-                        <NuxtLink to="/avatar" class="button--primary" > {{ categoryPage?.bandeau?.cta || 'Crée ton avatar' }} </NuxtLink>
+                        <h2
+                            v-if="categoryPage?.bandeau?.title?.trim()"
+                            v-html="categoryPage.bandeau.title"
+                        ></h2>
+                        <NuxtLink
+                            v-if="categoryPage?.bandeau?.cta?.trim()"
+                            to="/avatar"
+                            class="button--primary"
+                        >
+                            {{ categoryPage.bandeau.cta }}
+                        </NuxtLink>
                     </div>
                 </div>
             </div>
@@ -107,4 +117,3 @@ useHead(() => {
     overflow: hidden;
 }
 </style>
-

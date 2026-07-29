@@ -132,7 +132,9 @@ export default {
         const sessionUrl = this.getCheckoutSessionUrl(data)
 
         if (!sessionUrl) {
-          throw new Error("La session Stripe n'a pas retourné de lien.")
+          throw new Error(
+            'Le paiement est momentanément indisponible. Veuillez réessayer.'
+          )
         }
 
         this.checkoutSessionUrl = sessionUrl

@@ -25,15 +25,7 @@
 }
 
 .cart_page_back {
-  color: #111;
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.cart_page_back::before {
-  content: '<';
-  margin-right: 0.6rem;
+  margin: 0;
 }
 
 .cart_page_content {

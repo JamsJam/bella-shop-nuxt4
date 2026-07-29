@@ -1,11 +1,20 @@
 <template>
   <div class="clothes_product">
     <NavigationBar />
+    <AttachableBreadcrumb
+      :page-data="{
+        name: product.name,
+        category: product.category,
+      }"
+    />
 
     <main class="clothes_product_page">
       <div class="clothes_product_page_inner">
-        <NuxtLink :to="`/category/${product.category.slug}`" class="clothes_product_page_back">
-          Retour
+        <NuxtLink
+          :to="`/category/${product.category.slug}`"
+          class="back_link clothes_product_page_back"
+        >
+          Retour à la catégorie
         </NuxtLink>
 
         <div class="clothes_product_page_layout">

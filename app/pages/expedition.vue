@@ -1,6 +1,7 @@
 <template>
   <div class="expedition_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <ExpeditionComponent
       :initial-countries="countries || []"

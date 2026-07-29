@@ -1,6 +1,18 @@
 <template>
   <div>
-    <h1>About page</h1>
-    <NuxtLink to="/">Home page</NuxtLink>
+    <NavigationBar />
+    <AttachableBreadcrumb />
+
+    <main>
+      <h1>À propos</h1>
+      <NuxtLink to="/">Accueil</NuxtLink>
+    </main>
+
+    <Footer />
   </div>
 </template>
+
+<script setup lang="ts">
+import NavigationBar from '~/components/attachable/NavigationBar.vue'
+import Footer from '~/components/attachable/Footer.vue'
+</script>

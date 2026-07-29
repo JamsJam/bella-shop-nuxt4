@@ -1,6 +1,7 @@
 <template>
   <div class="contact_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <ContactComponent />
 

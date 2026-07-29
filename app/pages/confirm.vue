@@ -1,6 +1,7 @@
 <template>
   <div class="confirm_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <main class="confirm_page_main">
       <section class="confirm_page_card" aria-labelledby="confirmation-title">

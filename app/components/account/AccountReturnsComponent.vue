@@ -177,7 +177,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'La note contient des mots-clés SQL. Veuillez saisir un message valide.'
+          'La note contient une valeur non autorisée. Veuillez la vérifier.'
         )
       }
     },

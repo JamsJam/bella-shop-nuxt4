@@ -1,6 +1,7 @@
 <template>
   <div class="signup_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <SignUpForm />
   </div>

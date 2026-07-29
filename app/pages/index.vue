@@ -1,6 +1,7 @@
 <template>
   <div class="main">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <WelcomePage :section="homepage?.sections?.landing" />
     <BestSellers :section="homepage?.sections?.bestseller" />

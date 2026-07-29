@@ -1,10 +1,13 @@
 <template>
   <div class="cart_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <main class="cart_page_container">
       <div class="cart_page_header">
-        <NuxtLink to="/category" class="cart_page_back">Retour</NuxtLink>
+        <NuxtLink to="/category" class="back_link cart_page_back">
+          Retour aux catégories
+        </NuxtLink>
         <h1>Panier</h1>
       </div>
 

@@ -7,7 +7,7 @@
       :role="popup_message.type === 'error' ? 'alert' : 'status'"
       aria-live="polite"
     >
-      <p>{{ popup_message.message }}</p>
+      <p>{{ displayedMessage }}</p>
       <button
         type="button"
         class="popup_icon"
@@ -46,6 +46,8 @@
 </template>
 
 <script>
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
+
 export default {
   components: {},
   props: {
@@ -60,7 +62,17 @@ export default {
       popupTimeout: null,
     }
   },
-  computed: {},
+  computed: {
+    displayedMessage() {
+      if (this.popup_message?.type === 'error') {
+        return humanizeErrorMessage(this.popup_message?.message)
+      }
+
+      return typeof this.popup_message?.message === 'string'
+        ? this.popup_message.message
+        : 'L’action a bien été effectuée.'
+    },
+  },
   watch: {
     popup_message: {
       immediate: true,

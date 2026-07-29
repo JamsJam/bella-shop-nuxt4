@@ -1,6 +1,7 @@
 <template>
   <div class="account_page">
     <NavigationBar />
+    <AttachableBreadcrumb />
 
     <AccountComponent
       :initial-profile="initialProfile"

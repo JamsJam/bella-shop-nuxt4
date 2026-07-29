@@ -1049,7 +1049,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Votre nom contient des mots-clés SQL. Veuillez saisir un titre valide.'
+          'Votre nom contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
@@ -1073,7 +1073,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Votre prénom contient des mots-clés SQL. Veuillez saisir un titre valide.'
+          'Votre prénom contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
@@ -1099,7 +1099,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          "Le titre de l'adresse de livraison contient des mots-clés SQL. Veuillez saisir un titre valide."
+          "Le nom de l’adresse contient une valeur non autorisée. Veuillez le vérifier."
         )
       }
     },
@@ -1123,7 +1123,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          "L'adresse de livraison contient des mots-clés SQL. Veuillez saisir une adresse valide."
+          "L’adresse de livraison contient une valeur non autorisée. Veuillez la vérifier."
         )
       }
     },
@@ -1143,7 +1143,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          "Le complément d'adresse de livraison contient des mots-clés SQL. Veuillez saisir un complément d'adresse valide."
+          "Le complément d’adresse contient une valeur non autorisée. Veuillez le vérifier."
         )
       }
     },
@@ -1163,7 +1163,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Le lieu-dit de livraison contient des mots-clés SQL. Veuillez saisir un nom de lieu-dit valide.'
+          'Le lieu-dit contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
@@ -1205,7 +1205,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'La ville de livraison contient des mots-clés SQL. Veuillez saisir un nom de ville valide.'
+          'La ville contient une valeur non autorisée. Veuillez la vérifier.'
         )
       }
     },
@@ -1282,7 +1282,9 @@ export default {
         const checkoutUrl = checkout?.checkoutUrl
 
         if (!checkoutUrl) {
-          throw new Error("La session Stripe n'a pas retourné de lien.")
+          throw new Error(
+            'Le paiement est momentanément indisponible. Veuillez réessayer.'
+          )
         }
 
         await navigateTo(checkoutUrl, { external: true })

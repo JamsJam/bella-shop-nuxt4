@@ -191,7 +191,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Votre nom contient des mots-clés SQL. Veuillez saisir un titre valide.'
+          'Votre nom contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
@@ -215,7 +215,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Votre prénom contient des mots-clés SQL. Veuillez saisir un titre valide.'
+          'Votre prénom contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
@@ -231,7 +231,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          "L'addresse e-mail contient des mots-clés SQL. Veuillez saisir une adresse valide."
+          "L’adresse e-mail contient une valeur non autorisée. Veuillez la vérifier."
         )
       }
     },
@@ -255,7 +255,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Le numéro de téléphone contient des mots-clés SQL. Veuillez saisir un numéro valide.'
+          'Le numéro de téléphone contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
@@ -279,7 +279,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Le message contient des mots-clés SQL. Veuillez saisir un message valide.'
+          'Le message contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },

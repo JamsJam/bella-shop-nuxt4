@@ -724,7 +724,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Le mot de passe contient des mots-clés SQL. Veuillez saisir un mot de passe valide.'
+          'Le mot de passe contient une suite de caractères non autorisée.'
         )
       }
     },
@@ -740,7 +740,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          "L'addresse e-mail contient des mots-clés SQL. Veuillez saisir une adresse valide."
+          "L’adresse e-mail contient une valeur non autorisée. Veuillez la vérifier."
         )
       }
     },
@@ -764,7 +764,7 @@ export default {
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Le nom contient des mots-clés SQL. Veuillez saisir un nom valide.'
+          'Le nom contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
@@ -782,13 +782,13 @@ export default {
 
       if (!inputValidations.validateAlphabeticDash(input)) {
         throw new Error(
-          'Le mot de passe contient des caractères non autorisés.'
+          'Le prénom ne doit contenir que des lettres et des tirets.'
         )
       }
 
       if (inputValidations.containsSQLKeywords(input)) {
         throw new Error(
-          'Le mot de passe contient une suite de caractères non autorisée.'
+          'Le prénom contient une valeur non autorisée. Veuillez le vérifier.'
         )
       }
     },
