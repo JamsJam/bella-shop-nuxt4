@@ -20,8 +20,61 @@ interface CheckoutItemDTO {
   quantity: number
 }
 
+interface ShippingInfoDTO {
+  name?: string
+  surname?: string
+  shippingTitle?: string
+  shippingAddress?: string
+  shippingAddress2?: string
+  lieuDit?: string
+  postalCode?: string
+  city?: string
+  selectedTel?: string
+  tel?: string
+  country?: string
+  deliveryDate?: string
+  selectedDelivery?: number | string
+}
+
 interface CreateCheckoutSessionBody {
   shippingDestination?: string
+  shippingInfo?: ShippingInfoDTO
+}
+
+const normalizeText = (value: unknown) =>
+  typeof value === 'string' ? value.trim() : ''
+
+const normalizeShippingInfo = (
+  shippingInfo?: ShippingInfoDTO
+): ShippingInfoDTO | null => {
+  if (!shippingInfo) return null
+
+  const normalizedShippingInfo: ShippingInfoDTO = {
+    name: normalizeText(shippingInfo.name),
+    surname: normalizeText(shippingInfo.surname),
+    shippingTitle: normalizeText(shippingInfo.shippingTitle),
+    shippingAddress: normalizeText(shippingInfo.shippingAddress),
+    shippingAddress2: normalizeText(shippingInfo.shippingAddress2),
+    lieuDit: normalizeText(shippingInfo.lieuDit),
+    postalCode: normalizeText(shippingInfo.postalCode),
+    city: normalizeText(shippingInfo.city),
+    selectedTel: normalizeText(shippingInfo.selectedTel),
+    tel: normalizeText(shippingInfo.tel),
+    country: normalizeText(shippingInfo.country),
+    deliveryDate: normalizeText(shippingInfo.deliveryDate),
+    selectedDelivery: Number(shippingInfo.selectedDelivery) || 0,
+  }
+
+  if (
+    !normalizedShippingInfo.shippingAddress
+    || !normalizedShippingInfo.postalCode
+    || !normalizedShippingInfo.city
+    || !normalizedShippingInfo.country
+  ) {
+    return null
+  }
+
+  return normalizedShippingInfo
 }
 
 const parseCartCookie = (cartCookie: string): CartItemDTO[] => {
@@ -60,6 +113,7 @@ export default defineEventHandler(async (event) => {
   const apiUrl = config.platformApiBase
   const body = await readBody<CreateCheckoutSessionBody>(event)
   const shippingDestination = body?.shippingDestination?.trim()
+  const shippingInfo = normalizeShippingInfo(body?.shippingInfo)
 
   if (!apiUrl) {
     throw createError({
@@ -72,6 +126,13 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'La destination de livraison est requise.',
+    })
+  }
+
+  if (!shippingInfo) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'L’adresse de livraison est incomplète.',
     })
   }
 
@@ -102,6 +163,7 @@ export default defineEventHandler(async (event) => {
       items,
       currency: 'EUR',
       shippingDestination,
+      shippingInfo,
     },
     headers: {
       ...(cookie ? { cookie } : {}),

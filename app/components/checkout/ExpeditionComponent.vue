@@ -1275,6 +1275,7 @@ export default {
           method: 'POST',
           body: {
             shippingDestination: this.shippingStore.selectedCountry?.name,
+            shippingInfo: this.shippingInfo,
           },
           credentials: 'include',
         })
