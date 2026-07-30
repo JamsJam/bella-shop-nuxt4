@@ -17,12 +17,9 @@ const standalonePages: Record<string, string> = {
   delivery: 'Livraison',
   expedition: 'Livraison',
   faq: 'FAQ',
-  'forgot-password': 'Mot de passe oublié',
   legals: 'Mentions légales',
-  login: 'Connexion',
   returns: 'Retours',
   sav: 'Service après-vente',
-  signup: 'Inscription',
 }
 
 const homeItem: BreadcrumbItemDTO = {

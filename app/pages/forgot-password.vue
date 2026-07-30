@@ -1,7 +1,6 @@
 <template>
   <div class="clothes_page">
     <NavigationBar  />
-    <AttachableBreadcrumb />
 
     <ForgotPasswordComponent  />
 
