@@ -17,7 +17,7 @@
 
             <div class="signup_page_forms_inputs">
               <div class="inputWrapper">
-                <label for="user-email">E-mail</label>
+                <label for="user-email">Adresse e-mail</label>
                 <input
                   id="user-email"
                   type="email"
@@ -28,7 +28,7 @@
               </div>
 
               <div class="inputWrapper">
-                <label for="user-password">Crée ton mot de passe</label>
+                <label for="user-password">Mot de passe</label>
                 <input
                   id="user-password"
                   type="password"
@@ -39,9 +39,9 @@
               </div>
 
               <div class="inputWrapper">
-                <label for="user-repeatpassword"
-                  >Confirmer ton mot de passe</label
-                >
+                <label for="user-repeatpassword">
+                  Confirmation du mot de passe
+                </label>
                 <input
                   id="user-repeatpassword"
                   type="password"
