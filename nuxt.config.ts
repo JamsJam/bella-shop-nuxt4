@@ -15,7 +15,20 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { prerender: false },
   },
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt', '@nuxtjs/sitemap'],
+  sitemap: {
+    sources: ['/api/__sitemap__/urls'],
+    exclude: [
+      '/account',
+      '/avis/**',
+      '/cart',
+      '/confirm',
+      '/expedition',
+      '/forgot-password',
+      '/login',
+      '/signup',
+    ],
+  },
   runtimeConfig: {
     platformApiBase: "platform_api_base",
     cryptoSecretKey: "crypto_secret_key",
