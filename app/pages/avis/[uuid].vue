@@ -253,8 +253,5 @@ async function submitReviews() {
 
 useHead({
   title: 'Donner mon avis | Bella',
-  meta: [
-    { name: 'robots', content: 'noindex, nofollow' },
-  ],
 })
 </script>

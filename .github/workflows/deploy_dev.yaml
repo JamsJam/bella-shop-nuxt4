@@ -54,7 +54,7 @@ jobs:
 
             NUXT_PLATFORM_API_BASE_VALUE="$(dotenv_quote "$API_URL")"
             NUXT_PUBLIC_PLATFORM_API_BASE_VALUE="$(dotenv_quote "$PUBLIC_API_URL")"
-            NUXT_PUBLIC_SITE_URL_VALUE="$(dotenv_quote "$PUBLIC_SITE_URL")"
+            NUXT_SITE_URL_VALUE="$(dotenv_quote "$PUBLIC_SITE_URL")"
             NUXT_CRYPTO_SECRET_KEY_VALUE="$(dotenv_quote "$CRYPT_KEY")"
             NUXT_STRIPE_MODE_VALUE="$(dotenv_quote "$STRIPE_MODE")"
             NUXT_STRIPE_SUCCESS_URL_VALUE="$(dotenv_quote "$SUCCESS_URL")"
@@ -65,7 +65,8 @@ jobs:
             # Configuration de l'application
             NUXT_PLATFORM_API_BASE=${NUXT_PLATFORM_API_BASE_VALUE}
             NUXT_PUBLIC_PLATFORM_API_BASE=${NUXT_PUBLIC_PLATFORM_API_BASE_VALUE}
-            NUXT_PUBLIC_SITE_URL=${NUXT_PUBLIC_SITE_URL_VALUE}
+            NUXT_SITE_URL=${NUXT_SITE_URL_VALUE}
+            NUXT_SITE_ENV=staging
 
             # Configuration de la clé secrète pour le chiffrement
             NUXT_CRYPTO_SECRET_KEY=${NUXT_CRYPTO_SECRET_KEY_VALUE}

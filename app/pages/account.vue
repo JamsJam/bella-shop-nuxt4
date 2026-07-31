@@ -28,7 +28,6 @@ defineOptions({
 
 useSeoMeta({
   title: 'Mon compte | Bella',
-  robots: 'noindex, nofollow',
 })
 
 const profileRequest = useFetch<CustomerDTO>('/api/account/profile')

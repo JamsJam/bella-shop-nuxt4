@@ -14,19 +14,40 @@ export default defineNuxtConfig({
   // cors: false,
   routeRules: {
     '/': { prerender: false },
+    '/account': { robots: false },
+    '/avis/**': { robots: false },
+    '/cart': { robots: false },
+    '/confirm': { robots: false },
+    '/expedition': { robots: false },
+    '/forgot-password': { robots: false },
+    '/login': { robots: false },
+    '/signup': { robots: false },
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/sitemap'],
+  modules: ['@pinia/nuxt', '@nuxtjs/sitemap', '@nuxtjs/robots'],
+  site: {
+    url: 'url_to_site',
+  },
   sitemap: {
     sources: ['/api/__sitemap__/urls'],
-    exclude: [
-      '/account',
-      '/avis/**',
-      '/cart',
-      '/confirm',
-      '/expedition',
-      '/forgot-password',
-      '/login',
-      '/signup',
+  },
+  robots: {
+    groups: [
+      {
+        userAgent: ['*'],
+        allow: ['/'],
+        disallow: [
+          '/__robots__/',
+          '/__sitemap__/',
+          '/account',
+          '/avis/',
+          '/cart',
+          '/confirm',
+          '/expedition',
+          '/forgot-password',
+          '/login',
+          '/signup',
+        ],
+      },
     ],
   },
   runtimeConfig: {
@@ -37,7 +58,6 @@ export default defineNuxtConfig({
     stripeCancelUrl: "url_to_stripe_cancel_page",
     public: {
       platformApiBase: "platform_api_base",
-      siteUrl: "url_to_site",
       stripePublicKey: "stripe_public_key"
     }
   },

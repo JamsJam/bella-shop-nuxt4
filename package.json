@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/robots": "^6.1.3",
     "@nuxtjs/sitemap": "^8.3.2",
     "@pinia/nuxt": "^0.11.3",
     "crypto-js": "^4.2.0",

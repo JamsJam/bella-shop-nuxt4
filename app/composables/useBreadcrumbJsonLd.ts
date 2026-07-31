@@ -21,7 +21,7 @@ export const useBreadcrumbJsonLd = (
   items: MaybeRefOrGetter<BreadcrumbItemDTO[]>,
   baseUrl?: MaybeRefOrGetter<string | undefined>
 ): ComputedRef<BreadcrumbJsonLdDTO | null> => {
-  const runtimeConfig = useRuntimeConfig()
+  const siteConfig = useSiteConfig()
 
   return computed(() => {
     const resolvedItems = toValue(items) || []
@@ -30,8 +30,7 @@ export const useBreadcrumbJsonLd = (
       return null
     }
 
-    const resolvedBaseUrl =
-      toValue(baseUrl) || String(runtimeConfig.public.siteUrl || '')
+    const resolvedBaseUrl = toValue(baseUrl) || siteConfig.url
 
     return {
       '@context': 'https://schema.org',
