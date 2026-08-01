@@ -52,6 +52,14 @@ interface PlatformCategoryDTO {
   slug: string
 }
 
+interface PlatformReviewDTO {
+  rating: number
+  comment: string
+  createdAt: string
+  reply: string | null
+  repliedAt: string | null
+}
+
 interface PlatformVariantDTO {
   name: string
   slug: string
@@ -66,6 +74,7 @@ interface PlatformVariantDTO {
   sizeGuide: PlatformSizeGuideDTO | null
   colors: PlatformColorDTO[]
   relatedProducts: PlatformRelatedProductDTO[]
+  reviews: PlatformReviewDTO[]
 }
 
 const deslugify = (slug: string) =>
@@ -198,6 +207,13 @@ export default defineEventHandler(async (event): Promise<ClotheDetailsDTO> => {
       slug: clothe.slug,
       image: clothe.image || undefined,
       images: Array.isArray(clothe.images) ? clothe.images : [],
+    })),
+    reviews: (Array.isArray(variant.reviews) ? variant.reviews : []).map((review) => ({
+      rating: Math.min(5, Math.max(1, Number(review.rating) || 1)),
+      comment: review.comment,
+      createdAt: review.createdAt,
+      reply: review.reply || undefined,
+      repliedAt: review.repliedAt || undefined,
     })),
   }
 })

@@ -36,6 +36,14 @@ export interface ClotheCategoryDTO {
   slug: string
 }
 
+export interface ClotheReviewDTO {
+  rating: number
+  comment: string
+  createdAt: string
+  reply?: string
+  repliedAt?: string
+}
+
 export default interface ClotheDetailsDTO {
   id?: number
   slug: string
@@ -49,4 +57,5 @@ export default interface ClotheDetailsDTO {
   sizes: ClotheSizeDTO[]
   sizeGuide: ClotheSizeGuideDTO
   relatedClothes: ClotheCarteDTO[]
+  reviews: ClotheReviewDTO[]
 }

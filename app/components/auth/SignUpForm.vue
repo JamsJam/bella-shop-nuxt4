@@ -77,6 +77,9 @@
               <input
                 ref="codeInput1"
                 type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                pattern="[0-9]*"
                 maxlength="1"
                 v-model="code[0]"
                 @input="focusNextInput($event, 1)"
@@ -84,6 +87,8 @@
               <input
                 ref="codeInput2"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
                 maxlength="1"
                 v-model="code[1]"
                 @input="focusNextInput($event, 2)"
@@ -91,6 +96,8 @@
               <input
                 ref="codeInput3"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
                 maxlength="1"
                 v-model="code[2]"
                 @input="focusNextInput($event, 3)"
@@ -98,6 +105,8 @@
               <input
                 ref="codeInput4"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
                 maxlength="1"
                 v-model="code[3]"
                 @input="focusNextInput($event, 4)"
@@ -105,6 +114,8 @@
               <input
                 ref="codeInput5"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
                 maxlength="1"
                 v-model="code[4]"
                 @input="focusNextInput($event, 5)"
@@ -112,6 +123,8 @@
               <input
                 ref="codeInput6"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
                 maxlength="1"
                 v-model="code[5]"
                 @input="focusNextInput($event, 6)"

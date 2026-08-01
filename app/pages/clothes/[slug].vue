@@ -47,6 +47,7 @@
           </div>
         </div>
 
+        <ProductReviews :reviews="product.reviews" />
         <ProductRecommendations :clothes="product.relatedClothes" />
       </div>
     </main>
@@ -63,6 +64,7 @@ import ProductHeader from '~/components/product/ProductHeader.vue'
 import ProductImages from '~/components/product/ProductImages.vue'
 import ProductSelection from '~/components/product/ProductSelection.vue'
 import ProductRecommendations from '~/components/product/ProductRecommendations.vue'
+import ProductReviews from '~/components/product/ProductReviews.vue'
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
 import { useAvatarStore } from '~/stores/avatar'
 import { useCartStore } from '~/stores/cart'
@@ -94,6 +96,7 @@ const fallbackProduct = {
     rows: [],
   },
   relatedClothes: [],
+  reviews: [],
 }
 
 const product = computed(() => data.value || fallbackProduct)
