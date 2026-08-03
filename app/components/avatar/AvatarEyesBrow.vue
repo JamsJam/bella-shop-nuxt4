@@ -123,12 +123,9 @@ export default {
     async fetchEyesBrowByEyebrowColorId(eyebrowColorId) {
       this.avatarCatalogStore.eyesbrow = []
       try {
-        const data = await $fetch(
-          `/api/avatar/eyebrow-colors/${eyebrowColorId}/eyebrows`
+        await this.avatarCatalogStore.fetchEyesBrowByEyebrowColorId(
+          eyebrowColorId
         )
-        this.avatarCatalogStore.eyesbrow = Array.isArray(data?.items)
-          ? data.items
-          : []
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(
@@ -162,17 +159,21 @@ export default {
       this.$emit('select-eyebrow', eyebrow)
     },
     async selectEyebrowColor(eyebrowcolor) {
+      const currentEyebrowShape = this.selectedEyebrow?.name
+        ?.split('__')
+        .at(-1)
+
       this.$emit('select-eyebrowcolor', eyebrowcolor)
       await this.fetchEyesBrowByEyebrowColorId(eyebrowcolor.id)
 
-      if (this.selectedEyebrow && this.selectedEyebrow.id) {
-        const currentEyebrow = this.selectedEyebrow
-        const foundEyebrow = this.eyesbrow.find(
-          (eyebrow) => eyebrow.name === currentEyebrow.name
-        )
+      const matchingEyebrow = currentEyebrowShape
+        ? this.eyesbrow.find(
+            (eyebrow) =>
+              eyebrow.name?.split('__').at(-1) === currentEyebrowShape
+          )
+        : null
 
-        this.$emit('select-eyebrow', foundEyebrow || this.eyesbrow[0] || null)
-      }
+      this.$emit('select-eyebrow', matchingEyebrow || this.eyesbrow[0] || null)
     },
   },
 }

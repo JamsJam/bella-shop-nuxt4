@@ -95,29 +95,40 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       return this.accessoryFaces
     },
     async fetchHairsByHairColorId(haircolorId) {
-      const data = await fetchJson(`/api/avatar/hairs/getByColor?colorId=${haircolorId}`)
-      this.hairs = data.hairs || []
+      const data = await fetchJson(
+        `/api/avatar/hair-colors/${haircolorId}/hairs`
+      )
+      const hairs = Array.isArray(data?.hairs)
+        ? data.hairs
+        : Array.isArray(data?.items)
+          ? data.items
+          : []
+
+      this.hairs = hairs.map((hair) => ({
+        ...hair,
+        frontImage: hair.frontImage || hair.images?.[0] || '',
+        backImage: hair.backImage || hair.images?.[1] || '',
+      }))
       return this.hairs
     },
     async fetchEyesByEyeColorId(eyecolorId) {
-      const data = await fetchJson(`/api/avatar/eyes/getByColor?colorId=${eyecolorId}`)
-      this.eyes = data.eyes || []
+      const data = await fetchJson(
+        `/api/avatar/eye-colors/${eyecolorId}/eyes`
+      )
+      this.eyes = Array.isArray(data?.items) ? data.items : []
       return this.eyes
-    },
-    async fetchEyesBrow() {
-      const data = await fetchJson('/api/avatar/eyebrows/getAll')
-      this.eyesbrow = data.eyesbrow || []
     },
     async fetchEyesBrowByEyebrowColorId(eyebrowColorId) {
       const data = await fetchJson(
-        `/api/avatar/eyebrows/getByColor?colorId=${eyebrowColorId}`
+        `/api/avatar/eyebrow-colors/${eyebrowColorId}/eyebrows`
       )
-      this.eyesbrow = data.eyesbrow || []
+      this.eyesbrow = Array.isArray(data?.items) ? data.items : []
       return this.eyesbrow
     },
     async fetchEyebrowColors() {
-      const data = await fetchJson('/api/avatar/eyebrowcolors/getAll')
-      this.eyebrowcolors = data.eyebrowcolors || []
+      const data = await fetchJson('/api/avatar/eyebrow-colors')
+      this.eyebrowcolors = Array.isArray(data?.colors) ? data.colors : []
+      return this.eyebrowcolors
     },
     async fetchNosesBySkinColorId(skincolorId) {
       const data = await fetchJson(`/api/avatar/skin-colors/${skincolorId}/noses`)
@@ -131,13 +142,11 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       this.bodies = Array.isArray(data?.items) ? data.items : []
       return this.bodies
     },
-    async fetchMouthes() {
-      const data = await fetchJson('/api/avatar/mouths/getAll')
-      this.mouthes = data.mouthes || []
-    },
     async fetchMouthesByMouthColorId(mouthColorId) {
-      const data = await fetchJson(`/api/avatar/mouths/getByColor?colorId=${mouthColorId}`)
-      this.mouthes = data.mouthes || []
+      const data = await fetchJson(
+        `/api/avatar/mouth-colors/${mouthColorId}/mouths`
+      )
+      this.mouthes = Array.isArray(data?.items) ? data.items : []
       return this.mouthes
     },
     async fetchClothesByIds(clothesId) {

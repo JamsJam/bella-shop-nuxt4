@@ -150,12 +150,9 @@ export default {
       this.avatarCatalogStore.hairs = []
 
       try {
-        const data = await $fetch(
-          `/api/avatar/hair-colors/${selectedHairColorId}/hairs`
+        await this.avatarCatalogStore.fetchHairsByHairColorId(
+          selectedHairColorId
         )
-        this.avatarCatalogStore.hairs = Array.isArray(data?.items)
-          ? data.items
-          : []
 
         if (this.hairs.length === 0) {
           this.hairsError =
@@ -200,26 +197,22 @@ export default {
     },
     async selectHairColor(haircolor) {
       try {
+        const currentHairShape = this.selectedHair?.name
+          ?.split('__')
+          .at(-1)
+
         this.$emit('select-haircolor', haircolor)
         await this.fetchHairsByHairColorId(haircolor.id)
 
-        if (this.selectedHair?.id) {
-          const currentHair = this.selectedHair
-          const foundHair = this.hairs.find(
-            (el) =>
-              el.haircolor_id === haircolor.id &&
-              el.hair_variant === currentHair.hair_variant
-          )
-
-          if (foundHair) {
-            this.$emit('select-hair', foundHair)
-          } else {
-            throw new Error(
-              "La forme des cheveux de cette couleur n'existe pas"
+        const matchingHair = currentHairShape
+          ? this.hairs.find(
+              (hair) => hair.name?.split('__').at(-1) === currentHairShape
             )
-          }
-        }
+          : null
+
+        this.$emit('select-hair', matchingHair || this.hairs[0] || null)
       } catch (err) {
+        this.$emit('select-hair', null)
         console.error(err)
       }
     },

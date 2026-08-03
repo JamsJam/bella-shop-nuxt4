@@ -139,10 +139,9 @@ export default {
       this.eyesLoading = true
       this.avatarCatalogStore.eyes = []
       try {
-        const data = await $fetch(
-          `/api/avatar/eye-colors/${selectedEyesColorId}/eyes`
+        await this.avatarCatalogStore.fetchEyesByEyeColorId(
+          selectedEyesColorId
         )
-        this.avatarCatalogStore.eyes = Array.isArray(data?.items) ? data.items : []
       } catch (err) {
         console.error(err)
       } finally {
@@ -175,24 +174,20 @@ export default {
     },
     async selectEyeColor(eyecolor) {
       try {
+        const currentEyeShape = this.selectedEyes?.name?.split('__').at(-1)
+
         this.$emit('select-eyecolor', eyecolor)
         await this.fetchEyesByEyesColorId(eyecolor.id)
 
-        if (this.selectedEyes?.id) {
-          const currentEyes = this.selectedEyes
-          const foundEyes = this.eyes.find(
-            (el) =>
-              el.eyecolor.id === eyecolor.id &&
-              el.eye_variant === currentEyes.eye_variant
-          )
+        const matchingEyes = currentEyeShape
+          ? this.eyes.find(
+              (eye) => eye.name?.split('__').at(-1) === currentEyeShape
+            )
+          : null
 
-          if (foundEyes) {
-            this.$emit('select-eye', foundEyes)
-          } else {
-            throw new Error("La forme des yeux de cette couleur n'existe pas")
-          }
-        }
+        this.$emit('select-eye', matchingEyes || this.eyes[0] || null)
       } catch (err) {
+        this.$emit('select-eye', null)
         console.error(err)
       }
     },

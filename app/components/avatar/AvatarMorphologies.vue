@@ -33,7 +33,6 @@
           }"
           @click="selectMorphology(morphology)"
         >
-          <img :src="morphology.image" alt="" />
           <div
             class="avatar_creation_container_choices_container_item_list_element_name"
           >
@@ -65,11 +64,10 @@
           }"
           @click="selectMorphotype(morphotype)"
         >
-          <img :src="morphotype.image" alt="" />
           <div
             class="avatar_creation_container_choices_container_item_list_element_name"
           >
-            <p>{{ morphotype.size_name }}</p>
+            <p>{{ morphotype.size }}</p>
           </div>
         </button>
       </div>

@@ -127,12 +127,7 @@ export default {
     async fetchMouthesByMouthColorId(mouthColorId) {
       this.avatarCatalogStore.mouthes = []
       try {
-        const data = await $fetch(
-          `/api/avatar/mouth-colors/${mouthColorId}/mouths`
-        )
-        this.avatarCatalogStore.mouthes = Array.isArray(data?.items)
-          ? data.items
-          : []
+        await this.avatarCatalogStore.fetchMouthesByMouthColorId(mouthColorId)
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error(
@@ -166,17 +161,18 @@ export default {
       this.$emit('select-mouth', mouth)
     },
     async selectMouthColor(mouthcolor) {
+      const currentMouthShape = this.selectedMouth?.name?.split('__').at(-1)
+
       this.$emit('select-mouthcolor', mouthcolor)
       await this.fetchMouthesByMouthColorId(mouthcolor.id)
 
-      if (this.selectedMouth && this.selectedMouth.id) {
-        const currentMouth = this.selectedMouth
-        const foundMouth = this.mouthes.find(
-          (mouth) => mouth.name === currentMouth.name
-        )
+      const matchingMouth = currentMouthShape
+        ? this.mouthes.find(
+            (mouth) => mouth.name?.split('__').at(-1) === currentMouthShape
+          )
+        : null
 
-        this.$emit('select-mouth', foundMouth || this.mouthes[0] || null)
-      }
+      this.$emit('select-mouth', matchingMouth || this.mouthes[0] || null)
     },
   },
 }
