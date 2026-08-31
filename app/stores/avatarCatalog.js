@@ -87,10 +87,8 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       )
       return this.faces
     },
-    async fetchAccessoryFaces(skinColorId) {
-      const data = await $fetch('/api/avatar/faces/accessories', {
-        query: { skinColorId },
-      })
+    async fetchAccessoryFaces(faceId) {
+      const data = await $fetch(`/api/avatar/faces/${faceId}/accessories`)
       this.accessoryFaces = Array.isArray(data?.items) ? data.items : []
       return this.accessoryFaces
     },
@@ -135,11 +133,22 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       this.noses = Array.isArray(data?.items) ? data.items : []
       return this.noses
     },
-    async fetchBodiesBySkinColorAndMorphotype(skincolorId, morphotypeId) {
-      const data = await fetchJson(
-        `/api/avatar/skin-colors/${skincolorId}/morphotypes/${morphotypeId}/bodies`
+    async fetchBodiesByAvatarAttributes(
+      skincolorId,
+      morphologyId,
+      morphotypeId,
+      clothingSlug = null
+    ) {
+      const data = await $fetch(
+        `/api/avatar/skin-colors/${skincolorId}/morphologies/${morphologyId}/morphotypes/${morphotypeId}/bodies`,
+        {
+          query: clothingSlug ? { clothes: clothingSlug } : undefined,
+        }
       )
       this.bodies = Array.isArray(data?.items) ? data.items : []
+      if (Array.isArray(data?.bodies)) {
+        this.bodies = data.bodies
+      }
       return this.bodies
     },
     async fetchMouthesByMouthColorId(mouthColorId) {
@@ -148,19 +157,6 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       )
       this.mouthes = Array.isArray(data?.items) ? data.items : []
       return this.mouthes
-    },
-    async fetchClothesByIds(clothesId) {
-      const variantIds = JSON.stringify(clothesId)
-      const data = await fetchJson(
-        `/api/clothes-color-variant/get-color-variants-by-ids?variantIds=${variantIds}`
-      )
-      return data.variants || []
-    },
-    async fetchAvatarClothingByAttributes(payload) {
-      return await $fetch('/api/avatar/get-avatarclothing-by-attributes', {
-        method: 'POST',
-        body: payload,
-      })
     },
   },
 })

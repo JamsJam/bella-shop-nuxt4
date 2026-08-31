@@ -89,7 +89,7 @@
       <button
         type="button"
         class="product_selection_button button--secondary"
-        :disabled="!canSubmit"
+        :disabled="!selectedColor"
         @click="$emit('add-to-avatar')"
       >
         Essayer sur votre avatar

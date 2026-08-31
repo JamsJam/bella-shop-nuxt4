@@ -235,25 +235,40 @@ async function addToCart() {
 }
 
 async function addToAvatarClothes() {
-  if (!selectedColor.value || !selectedSize.value) {
+  if (!selectedColor.value) {
     return
   }
 
-  const variantId = selectedSize.value.id
+  const clothingSlug = selectedColor.value.slug
+  await avatarStore.load()
+  const { skincolor, morphology, morphotype } = avatarStore.model
 
-  if (!variantId) {
+  if (!clothingSlug || !skincolor?.id || !morphology?.id || !morphotype?.id) {
     popupMessage.value = {
       type: 'error',
-      message: 'Impossible d’ajouter cette variante à votre avatar.',
+      message: 'Créez d’abord votre avatar avant d’essayer ce vêtement.',
     }
     return
   }
 
   try {
-    const currentIds = Array.isArray(avatarStore.clothesId)
-      ? avatarStore.clothesId
-      : []
-    await avatarStore.setClothesId([...new Set([...currentIds, variantId])])
+    const data = await $fetch(
+      `/api/avatar/skin-colors/${skincolor.id}/morphologies/${morphology.id}/morphotypes/${morphotype.id}/bodies`,
+      { query: { clothes: clothingSlug } }
+    )
+    const body = Array.isArray(data?.bodies) ? data.bodies[0] : null
+
+    if (!body) {
+      throw new Error('Aucun corps ne correspond à ce vêtement')
+    }
+
+    await avatarStore.setModel({
+      ...avatarStore.model,
+      body,
+      clothingSlug,
+      avatarClothing: null,
+      selectedClothing: null,
+    })
     popupMessage.value = {
       type: 'valid',
       message: `${product.value.name} a été ajouté à votre avatar.`,

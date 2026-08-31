@@ -7,6 +7,7 @@ const defaultAvatarModel = () => ({
   },
   morphotype: null,
   body: null,
+  clothingSlug: null,
   face: {
     image: '/images/avatar/template_avatar_face.webp',
   },
@@ -42,6 +43,7 @@ const normalizeAvatarModel = (model = {}) => ({
   morphology: model.morphology || defaultAvatarModel().morphology,
   morphotype: model.morphotype || null,
   body: model.body || null,
+  clothingSlug: model.clothingSlug || null,
   face: model.face || defaultAvatarModel().face,
   accessory: model.accessory || null,
   hair: model.hair || defaultAvatarModel().hair,
@@ -54,8 +56,8 @@ const normalizeAvatarModel = (model = {}) => ({
   eyecolor: model.eyecolor || null,
   mouthcolor: model.mouthcolor || null,
   eyebrowcolor: model.eyebrowcolor || null,
-  selectedClothing: model.selectedClothing || null,
-  avatarClothing: model.avatarClothing || null,
+  selectedClothing: null,
+  avatarClothing: null,
 })
 
 export const useAvatarStore = defineStore('avatar', {
@@ -65,12 +67,6 @@ export const useAvatarStore = defineStore('avatar', {
   }),
   getters: {
     avatarBody(state) {
-      if (state.model.avatarClothing) {
-        return (
-          state.model.avatarClothing.image ||
-          '/images/avatar/template_avatar_morphology.webp'
-        )
-      }
       if (state.model.body) {
         return (
           state.model.body.image ||

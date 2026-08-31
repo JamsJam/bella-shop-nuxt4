@@ -21,28 +21,23 @@
         <h2>Vêtements enregistrés</h2>
       </div>
       <div
-        v-if="clothes.length > 0"
+        v-if="clothingSlug && body"
         class="avatar_creation_container_choices_container_item_list clothes"
       >
         <div
-          v-for="(clothing, index) in clothes"
-          :key="index"
           class="avatar_creation_container_choices_container_item_list_box"
         >
-          <button
-            class="avatar_creation_container_choices_container_item_list_element"
-            @click="selectClothing(clothing)"
-          >
-            <img :src="clothing.preview_image" alt="" />
+          <div class="avatar_creation_container_choices_container_item_list_element">
+            <img :src="body.image" alt="" />
             <div
               class="avatar_creation_container_choices_container_item_list_element_name"
             >
-              <p>{{ clothing.name }}</p>
+              <p>{{ clothingSlug }}</p>
             </div>
-          </button>
+          </div>
           <button
             class="avatar_creation_container_choices_container_item_list_delete_clothing"
-            @click="deleteAvatarClothing(clothing)"
+            @click="$emit('remove-clothing')"
           >
             Supprimer
           </button>
@@ -61,71 +56,19 @@
 </template>
 
 <script>
-import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
-
 export default {
-  components: {
-  },
+  emits: ['remove-clothing'],
   props: {
-    auth: {
-      type: Boolean,
-      default: false,
+    body: {
+      type: Object,
+      default: null,
     },
-    clothesId: {
-      type: Array,
-      return: [],
+    clothingSlug: {
+      type: String,
+      default: null,
     },
     morphotype: {
       type: Object,
-    },
-  },
-  data() {
-    return {
-      selectedClothing: null,
-      localClothes: [],
-    }
-  },
-  setup() {
-    return {
-      avatarCatalogStore: useAvatarCatalogStore(),
-    }
-  },
-  computed: {
-    clothes() {
-      return this.localClothes
-    },
-  },
-  mounted() {
-    if (this.clothesId.length > 0) {
-      this.fetchAvatarClothes()
-    }
-  },
-
-  methods: {
-    async fetchAvatarClothes() {
-      try {
-        this.localClothes = await this.avatarCatalogStore.fetchClothesByIds(
-          this.clothesId
-        )
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(
-          "Une erreur s'est produite lors de la récupération des vêtements :",
-          error
-        )
-      }
-    },
-    selectClothing(clothing) {
-      this.selectedClothing = clothing
-      this.$emit('select-clothing', clothing)
-    },
-    deleteAvatarClothing(clothing) {
-      this.$emit('delete-avatar-clothing', clothing)
-      // this.selectedClothing = null;
-      this.localClothes = this.localClothes.filter(
-        (el) => el.id !== clothing.id
-      )
-      console.log(this.localClothes)
     },
   },
 }

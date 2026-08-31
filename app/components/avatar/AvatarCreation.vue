@@ -350,7 +350,6 @@
         <AvatarAccessories
           v-if="currentCustomizationComponent === 'accessories'"
           :selected-face="avatarPreview.face"
-          :selected-skin-color="avatarPreview.skincolor"
           @select-accessory-face="handleAccessoryFaceSelection"
         />
         <AvatarMorphologies
@@ -397,10 +396,10 @@
         />
         <AvatarClothes
           v-if="currentCustomizationComponent === 'clothes'"
-          :clothes-id="clothesId"
+          :body="avatarPreview.body"
+          :clothing-slug="avatarPreview.clothingSlug"
           :morphotype="avatarPreview.morphotype"
-          @select-clothing="handleClothingSelection"
-          @delete-avatar-clothing="handleDeleteAvatarClothing"
+          @remove-clothing="handleRemoveClothing"
         />
         <div
           v-if="currentCustomizationComponent !== ''"
@@ -724,16 +723,22 @@ export default {
     async fetchAndSelectBody(skincolor, morphotype, currentBody = null) {
       this.avatarCatalogStore.bodies = []
 
-      if (!skincolor?.id || !morphotype?.id) {
+      if (
+        !skincolor?.id ||
+        !this.avatarPreview.morphology?.id ||
+        !morphotype?.id
+      ) {
         this.avatarPreview.body = null
         return null
       }
 
       try {
         const bodies =
-          await this.avatarCatalogStore.fetchBodiesBySkinColorAndMorphotype(
+          await this.avatarCatalogStore.fetchBodiesByAvatarAttributes(
             skincolor.id,
-            morphotype.id
+            this.avatarPreview.morphology?.id,
+            morphotype.id,
+            this.avatarPreview.clothingSlug
           )
 
         this.avatarPreview.body =
@@ -1024,6 +1029,17 @@ export default {
         this.clothesId = newClothesId
         this.saveAvatarModel()
       }
+    },
+    async handleRemoveClothing() {
+      this.avatarPreview.clothingSlug = null
+      this.avatarPreview.avatarClothing = null
+      this.avatarPreview.selectedClothing = null
+
+      await this.fetchAndSelectBody(
+        this.avatarPreview.skincolor,
+        this.avatarPreview.morphotype
+      )
+      this.saveAvatarModel()
     },
   },
 }

@@ -20,25 +20,39 @@
       </div>
 
       <div
-        v-if="skincolor"
+        v-if="skincolor && morphologies.length > 0"
         class="avatar_creation_container_choices_container_item_list"
       >
         <button
           v-for="(morphology, index) in morphologies"
           :key="index"
-          class="avatar_creation_container_choices_container_item_list_element"
+          class="avatar_creation_container_choices_container_item_list_element avatar_morphology_choice"
           :class="{
             avatar_creation_container_choices_container_item_list_element_selected:
               selectedMorphology && morphology.id === selectedMorphology.id,
           }"
           @click="selectMorphology(morphology)"
         >
+          <img
+            v-if="morphology.image"
+            :src="morphology.image"
+            :alt="morphology.name || 'Morphologie'"
+          />
           <div
             class="avatar_creation_container_choices_container_item_list_element_name"
           >
             <p>{{ morphology.name }}</p>
           </div>
         </button>
+      </div>
+
+      <div
+        v-else-if="skincolor"
+        class="avatar_creation_container_choices_container_item_list empty"
+      >
+        <div class="avatar_creation_container_choices_container_item_list_text">
+          <p>Aucune morphologie disponible pour cette couleur de peau</p>
+        </div>
       </div>
     </div>
 
@@ -57,13 +71,18 @@
         <button
           v-for="(morphotype, index) in morphotypes"
           :key="index"
-          class="avatar_creation_container_choices_container_item_list_element"
+          class="avatar_creation_container_choices_container_item_list_element avatar_morphology_choice"
           :class="{
             avatar_creation_container_choices_container_item_list_element_selected:
               selectedMorphotype && morphotype.id === selectedMorphotype.id,
           }"
           @click="selectMorphotype(morphotype)"
         >
+          <img
+            v-if="morphotype.image"
+            :src="morphotype.image"
+            :alt="morphotype.size || 'Morphotype'"
+          />
           <div
             class="avatar_creation_container_choices_container_item_list_element_name"
           >
@@ -146,9 +165,7 @@ export default {
     if (selectedMorphologyIsAvailable) {
       this.fetchMorphotypesBySkinColorAndMorphology()
     } else {
-      const fallbackMorphology = this.morphologies.find(
-        (morphology) => morphology.id === 53
-      )
+      const fallbackMorphology = this.morphologies[0]
 
       if (fallbackMorphology) {
         await this.selectMorphology(fallbackMorphology)
@@ -204,3 +221,24 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.avatar_morphology_choice {
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 6rem;
+  height: auto;
+}
+
+.avatar_morphology_choice img {
+  flex: 0 0 auto;
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+}
+
+.avatar_morphology_choice p {
+  margin: 0;
+  text-align: center;
+}
+</style>

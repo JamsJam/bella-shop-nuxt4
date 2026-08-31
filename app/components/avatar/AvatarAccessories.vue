@@ -27,8 +27,8 @@
       >
         <div class="avatar_creation_container_choices_container_item_list_text">
           <p v-if="accessoriesLoading">Chargement des accessoires...</p>
-          <p v-else-if="!selectedSkinColor">
-            Choisissez une couleur de peau
+          <p v-else-if="!selectedFace">
+            Choisissez une forme de tête
           </p>
           <p v-else>
             {{ accessoriesError || 'Aucun accessoire disponible' }}
@@ -46,10 +46,6 @@ export default {
   props: {
     selectedFace: {
       type: Object,
-    },
-    selectedSkinColor: {
-      type: Object,
-      default: null,
     },
   },
   data() {
@@ -69,29 +65,29 @@ export default {
     },
   },
   async mounted() {
-    if (this.selectedSkinColor?.id) {
-      await this.fetchAccessoryFaces(this.selectedSkinColor.id)
+    if (this.selectedFace?.id) {
+      await this.fetchAccessoryFaces(this.selectedFace.id)
     }
   },
   watch: {
-    selectedSkinColor: {
-      async handler(skinColor) {
-        if (!skinColor?.id) {
+    selectedFace: {
+      async handler(face) {
+        if (!face?.id) {
           this.avatarCatalogStore.accessoryFaces = []
           return
         }
 
-        await this.fetchAccessoryFaces(skinColor.id)
+        await this.fetchAccessoryFaces(face.id)
       },
     },
   },
   methods: {
-    async fetchAccessoryFaces(skinColorId) {
+    async fetchAccessoryFaces(faceId) {
       this.accessoriesLoading = true
       this.accessoriesError = ''
 
       try {
-        await this.avatarCatalogStore.fetchAccessoryFaces(skinColorId)
+        await this.avatarCatalogStore.fetchAccessoryFaces(faceId)
       } catch (error) {
         this.avatarCatalogStore.accessoryFaces = []
         this.accessoriesError = 'Impossible de charger les accessoires'
