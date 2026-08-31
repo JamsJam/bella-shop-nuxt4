@@ -357,6 +357,7 @@
           :selected-morphotype="avatarPreview.morphotype"
           :selected-morphology="avatarPreview.morphology"
           :skincolor="avatarPreview.skincolor"
+          :clothing-slug="avatarPreview.clothingSlug"
           @select-morphology="handleMorphologySelection"
           @select-morphotype="handleMorphotypeSelection"
         />

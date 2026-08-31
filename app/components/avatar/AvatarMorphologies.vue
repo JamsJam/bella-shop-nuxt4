@@ -34,8 +34,8 @@
           @click="selectMorphology(morphology)"
         >
           <img
-            v-if="morphology.image"
-            :src="morphology.image"
+            v-if="morphologyImage(morphology)"
+            :src="morphologyImage(morphology)"
             :alt="morphology.name || 'Morphologie'"
           />
           <div
@@ -79,8 +79,8 @@
           @click="selectMorphotype(morphotype)"
         >
           <img
-            v-if="morphotype.image"
-            :src="morphotype.image"
+            v-if="morphotypeImage(morphotype)"
+            :src="morphotypeImage(morphotype)"
             :alt="morphotype.size || 'Morphotype'"
           />
           <div
@@ -132,9 +132,15 @@ export default {
     selectedMorphotype: {
       type: Object,
     },
+    clothingSlug: {
+      type: String,
+      default: null,
+    },
   },
   data() {
-    return {}
+    return {
+      clothingBodies: [],
+    }
   },
   setup() {
     return {
@@ -152,6 +158,12 @@ export default {
   watch: {
     skincolor() {
       this.fetchMorphologies()
+    },
+    clothingSlug: {
+      async handler() {
+        await this.fetchClothingBodies()
+      },
+      immediate: true,
     },
   },
   async mounted() {
@@ -174,6 +186,50 @@ export default {
   },
 
   methods: {
+    async fetchClothingBodies() {
+      if (!this.clothingSlug) {
+        this.clothingBodies = []
+        return
+      }
+
+      try {
+        this.clothingBodies = [
+          ...(await this.avatarCatalogStore.fetchBodiesByClothingSlug(
+            this.clothingSlug
+          )),
+        ]
+      } catch (error) {
+        this.clothingBodies = []
+        console.error(error)
+      }
+    },
+    morphologyImage(morphology) {
+      if (!this.clothingSlug) return morphology.image
+
+      const body = this.clothingBodies.find(
+        (item) =>
+          Number(item.skinColorId) === Number(this.skincolor?.id) &&
+          Number(item.morphologyId) === Number(morphology.id) &&
+          (!this.selectedMorphotype?.id ||
+            Number(item.morphotypeId) ===
+              Number(this.selectedMorphotype.id))
+      )
+
+      return body?.image || morphology.image
+    },
+    morphotypeImage(morphotype) {
+      if (!this.clothingSlug) return morphotype.image
+
+      const body = this.clothingBodies.find(
+        (item) =>
+          Number(item.skinColorId) === Number(this.skincolor?.id) &&
+          Number(item.morphologyId) ===
+            Number(this.selectedMorphology?.id) &&
+          Number(item.morphotypeId) === Number(morphotype.id)
+      )
+
+      return body?.image || morphotype.image
+    },
     async fetchMorphologies() {
       this.avatarCatalogStore.morphologies = []
       this.avatarCatalogStore.morphotypes = []
