@@ -67,11 +67,13 @@ import ProductRecommendations from '~/components/product/ProductRecommendations.
 import ProductReviews from '~/components/product/ProductReviews.vue'
 import PopupComponent from '~/components/attachable/PopupComponent.vue'
 import { useAvatarStore } from '~/stores/avatar'
+import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
 import { useCartStore } from '~/stores/cart'
 import Footer from '~/components/attachable/Footer.vue'
 
 const route = useRoute()
 const avatarStore = useAvatarStore()
+const avatarCatalogStore = useAvatarCatalogStore()
 const cartStore = useCartStore()
 
 const { data } = await useFetch(() => `/api/clothes/${route.params.slug}`)
@@ -239,7 +241,7 @@ async function addToAvatarClothes() {
     return
   }
 
-  const clothingSlug = selectedColor.value.slug
+  const clothingSlug = product.value.slug || String(route.params.slug || '')
   await avatarStore.load()
   const { skincolor, morphology, morphotype } = avatarStore.model
 
@@ -252,14 +254,43 @@ async function addToAvatarClothes() {
   }
 
   try {
-    const data = await $fetch(
-      `/api/avatar/skin-colors/${skincolor.id}/morphologies/${morphology.id}/morphotypes/${morphotype.id}/bodies`,
-      { query: { clothes: clothingSlug } }
+    const bodies = await avatarCatalogStore.fetchBodiesByClothingSlug(
+      clothingSlug
     )
-    const body = Array.isArray(data?.bodies) ? data.bodies[0] : null
+    const normalizeCriterion = (value) =>
+      String(value || '').trim().toLowerCase().replace(/-/g, '_')
+    let body =
+      bodies.find(
+        (item) =>
+          Number(item.skinColorId) === Number(skincolor.id) &&
+          Number(item.morphologyId) === Number(morphology.id) &&
+          Number(item.morphotypeId) === Number(morphotype.id)
+      ) ||
+      bodies.find(
+        (item) =>
+          normalizeCriterion(item.skinColor) ===
+            normalizeCriterion(skincolor.name) &&
+          normalizeCriterion(item.morphology) ===
+            normalizeCriterion(morphology.name) &&
+          (normalizeCriterion(item.morphotype) ===
+            normalizeCriterion(morphotype.name) ||
+            normalizeCriterion(item.size) ===
+              normalizeCriterion(morphotype.size))
+      ) ||
+      null
 
     if (!body) {
-      throw new Error('Aucun corps ne correspond à ce vêtement')
+      const fallbackBodies =
+        await avatarCatalogStore.fetchBodiesByAvatarAttributes(
+          skincolor.id,
+          morphology.id,
+          morphotype.id
+        )
+      body = fallbackBodies[0] || null
+    }
+
+    if (!body) {
+      throw new Error('Aucun corps ne correspond à cet avatar')
     }
 
     await avatarStore.setModel({

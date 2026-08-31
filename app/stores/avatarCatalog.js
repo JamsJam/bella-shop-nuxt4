@@ -151,6 +151,19 @@ export const useAvatarCatalogStore = defineStore('avatarCatalog', {
       }
       return this.bodies
     },
+    async fetchBodiesByClothingSlug(clothingSlug) {
+      const data = await $fetch('/api/avatar/bodies', {
+        query: { clothes: clothingSlug },
+      })
+      this.bodies = Array.isArray(data?.bodies)
+        ? data.bodies.map((body) => ({
+            ...body,
+            id: body.id ?? body.bodyId,
+            name: body.name ?? body.bodyName,
+          }))
+        : []
+      return this.bodies
+    },
     async fetchMouthesByMouthColorId(mouthColorId) {
       const data = await fetchJson(
         `/api/avatar/mouth-colors/${mouthColorId}/mouths`

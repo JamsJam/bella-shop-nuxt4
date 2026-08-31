@@ -733,18 +733,52 @@ export default {
       }
 
       try {
-        const bodies =
-          await this.avatarCatalogStore.fetchBodiesByAvatarAttributes(
+        let bodies = this.avatarPreview.clothingSlug
+          ? await this.avatarCatalogStore.fetchBodiesByClothingSlug(
+              this.avatarPreview.clothingSlug
+            )
+          : await this.avatarCatalogStore.fetchBodiesByAvatarAttributes(
+              skincolor.id,
+              this.avatarPreview.morphology?.id,
+              morphotype.id
+            )
+
+        const normalizeCriterion = (value) =>
+          String(value || '').trim().toLowerCase().replace(/-/g, '_')
+        const matchingClothedBody = this.avatarPreview.clothingSlug
+          ? bodies.find(
+              (body) =>
+                Number(body.skinColorId) === Number(skincolor.id) &&
+                Number(body.morphologyId) ===
+                  Number(this.avatarPreview.morphology?.id) &&
+                Number(body.morphotypeId) === Number(morphotype.id)
+            ) ||
+            bodies.find(
+              (body) =>
+                normalizeCriterion(body.skinColor) ===
+                  normalizeCriterion(skincolor.name) &&
+                normalizeCriterion(body.morphology) ===
+                  normalizeCriterion(this.avatarPreview.morphology?.name) &&
+                (normalizeCriterion(body.morphotype) ===
+                  normalizeCriterion(morphotype.name) ||
+                  normalizeCriterion(body.size) ===
+                    normalizeCriterion(morphotype.size))
+            )
+          : null
+
+        if (this.avatarPreview.clothingSlug && !matchingClothedBody) {
+          bodies = await this.avatarCatalogStore.fetchBodiesByAvatarAttributes(
             skincolor.id,
             this.avatarPreview.morphology?.id,
-            morphotype.id,
-            this.avatarPreview.clothingSlug
+            morphotype.id
           )
+        }
 
-        this.avatarPreview.body =
-          bodies.find((body) => body.name === currentBody?.name) ||
-          bodies[0] ||
-          null
+        this.avatarPreview.body = this.avatarPreview.clothingSlug
+          ? matchingClothedBody || bodies[0] || null
+          : bodies.find((body) => body.name === currentBody?.name) ||
+            bodies[0] ||
+            null
 
         return this.avatarPreview.body
       } catch (error) {
