@@ -152,7 +152,15 @@ export default {
       return this.avatarCatalogStore.morphologies
     },
     morphotypes() {
-      return this.selectedMorphology ? this.avatarCatalogStore.morphotypes : []
+      if (!this.selectedMorphology) return []
+
+      const sizeOrder = { S: 0, M: 1, L: 2 }
+
+      return [...this.avatarCatalogStore.morphotypes].sort(
+        (first, second) =>
+          (sizeOrder[String(first.size).toUpperCase()] ?? 99) -
+          (sizeOrder[String(second.size).toUpperCase()] ?? 99)
+      )
     },
   },
   watch: {
