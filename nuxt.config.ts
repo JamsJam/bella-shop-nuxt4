@@ -53,12 +53,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     platformApiBase: "platform_api_base",
     cryptoSecretKey: "crypto_secret_key",
-    stripeMode: "test",
-    stripeSuccessUrl: "url_to_stripe_success_page",
-    stripeCancelUrl: "url_to_stripe_cancel_page",
+    // stripeMode: "test",
+    // stripeSuccessUrl: "url_to_stripe_success_page",
+    // stripeCancelUrl: "url_to_stripe_cancel_page",
     public: {
       platformApiBase: "platform_api_base",
-      stripePublicKey: "stripe_public_key"
+
     }
   },
   app: {
