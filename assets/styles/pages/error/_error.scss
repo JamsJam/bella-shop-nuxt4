@@ -1,0 +1,102 @@
+@use '../../utils' as *;
+
+.server_error_page {
+  min-height: 100dvh;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top left, $principal-200, transparent 42%),
+    $principal-50;
+  color: $neutral-900;
+
+  &_main {
+    display: grid;
+    min-height: calc(100dvh - 3rem);
+    place-items: center;
+  }
+
+  &_card {
+    display: flex;
+    width: min(100%, 38rem);
+    padding: clamp(2rem, 6vw, 4rem);
+    border: 1px solid $principal-200;
+    border-radius: 1.5rem;
+    background-color: $nuance-0;
+    box-shadow: 0 1rem 3rem hsla(17, 38%, 22%, 0.12);
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    h1 {
+      margin: 0.75rem 0 1rem;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      line-height: 1.05;
+    }
+
+    .button--primary {
+      margin-top: 2rem;
+      border: 0;
+      cursor: pointer;
+    }
+  }
+
+  &_brand {
+    margin-bottom: 2rem;
+    color: $principal-800;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  &_icon {
+    display: grid;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background-color: $principal-200;
+    color: $principal-900;
+    font-size: 2rem;
+    font-weight: 800;
+    place-items: center;
+  }
+
+  &_code {
+    margin: 1.5rem 0 0;
+    color: $principal-700;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  &_message {
+    max-width: 30rem;
+    margin: 0;
+    color: $neutral-600;
+    line-height: 1.65;
+  }
+
+  &_redirect {
+    margin: 1.5rem 0 0;
+    color: $neutral-500;
+    font-size: 0.9rem;
+
+    strong {
+      color: $neutral-800;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .server_error_page {
+    padding: 0.75rem;
+
+    &_main {
+      min-height: calc(100dvh - 1.5rem);
+    }
+
+    &_card {
+      padding: 2rem 1.25rem;
+    }
+  }
+}

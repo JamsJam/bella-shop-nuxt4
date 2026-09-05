@@ -85,6 +85,50 @@
     }
   }
 
+  @media screen and (min-width: 1025px) {
+    &--fullscreen {
+      .welcome_page_content {
+        padding-inline: 0;
+        min-height: clamp(31.625rem, -0.2321rem + 49.7768vw, 59.5rem);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        &_avatar {
+          position: relative;
+          z-index: 12;
+          justify-self: stretch;
+          place-content: initial;
+
+          &_image {
+            position: relative;
+            place-items: initial;
+            width: 90%;
+            height: 100%;
+            z-index: 12;
+          }
+        }
+
+        &_title {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: start;
+          gap: 4rem;
+          height: 100%;
+          padding-block-end: 2rem;
+          padding-inline-end: 2rem;
+
+          h1 {
+            font-size: clamp(2rem, -2.9231rem + 7.6923vw, 4rem);
+            line-height: clamp(2.4rem, -3.5077rem + 9.2308vw, 4.8rem);
+            letter-spacing: -2%;
+            text-transform: uppercase;
+          }
+        }
+      }
+    }
+  }
+
   @media screen and (max-width: 1024px) {
     & {
       &_content {

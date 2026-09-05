@@ -36,7 +36,9 @@ export interface HomepageBestsellerDTO {
 
 
 export interface HomepageManualDTO {
+    title?: string
     list: Array<{
+        title?: string
         text: string
         image: string
     }>

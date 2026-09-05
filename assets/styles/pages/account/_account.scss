@@ -1,89 +1,625 @@
 @use '../../utils/variables' as *;
 
-.account {
+.account_page,
+.contact_page {
+  position: relative;
+  overflow: clip;
+  min-height: 100dvh;
+  background-color: $neutral-50;
+}
+
+.account_page {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+}
+
+.account,
+.contact {
   width: 100%;
+  padding: clamp(2rem, 5vw, 4rem) 1rem;
+  background-color: $neutral-50;
+  color: $neutral-900;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.account {
+  flex: 1 0 auto;
+}
+
+.account_container,
+.contact_container {
+  width: min(100%, 68rem);
+  margin-inline: auto;
+  border: 1px solid $neutral-200;
+  border-radius: 8px;
   background-color: $nuance-0;
-  font-family: 'Montserrat';
+  box-shadow: 0 8px 16px oklch(0% 0 0 / 0.08);
+}
 
-  &_container {
-    position: relative;
-    margin-top: 10.8vh;
-    min-height: calc(100vh - 9.7vh - 10.8vh - 13vh);
-    width: calc(40% - 13vh);
-    background-color: $nuance-0;
-    box-shadow: 0 8px 16px 0 hsla(0, 0%, 0%, 0.12);
-    margin-bottom: calc(10.8vh + 21.7vh);
-    border-radius: 1.6vh;
-    padding: 5.9vh 7.6vh;
-    transition: all ease 0.3s;
+.account_container {
+  position: relative;
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
 
-    @media (max-width: 1500px) {
-      display: flex;
-      flex-direction: column-reverse;
-      width: 60%;
-    }
-
-    @media (max-width: 900px) {
-      margin-bottom: 10vh;
-      width: calc(100% - 15.2vh);
-    }
-
-    @media (max-width: 900px) {
-      padding: 5.9vh 3.2vh;
-      width: calc(100% - 6.5vh);
-    }
-
-    &_menu {
-      position: absolute;
-      top: 0;
-      left: -27.2vh;
-      box-shadow: 0 8px 16px 0 hsla(0, 0%, 0%, 0.12);
-      width: 22.8vh;
-      min-height: 16.3vh;
-      border-radius: 1.6vh;
-      padding: 3.2vh 0;
-
-      @media (max-width: 1500px) {
-        position: relative;
-        top: 0;
-        left: 0;
-        margin-bottom: 5vh;
-        width: 100%;
-        height: fit-content;
-      }
-
-      &_link {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        background-color: transparent;
-        border: none;
-        border-left: 0.5vh solid transparent;
-        padding: 0.7vh 0;
-        transition: all ease 0.2s;
-
-        &:hover {
-          border-left: 0.5vh solid $beige;
-        }
-
-        svg {
-          margin-left: 1.6vh;
-          width: 2.7vh;
-          height: 2.7vh;
-        }
-        p {
-          margin-left: 1vh;
-          font-size: 1.5vh;
-        }
-      }
-
-      .active_account_page {
-        border-left: 0.5vh solid lighten($color: $beige, $amount: 10);
-      }
-    }
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
   }
+}
+
+.account_container_menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  @media (max-width: 900px) {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}
+
+.account_container_menu_link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  color: $neutral-700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover,
+  &.active_account_page {
+    border-color: $principal-300;
+    background-color: $principal-50;
+    color: $principal-900;
+  }
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: 0 0 auto;
+  }
+
+  span {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+.account_container_title {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.1;
+    font-weight: 700;
+    color: $neutral-900;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    color: $neutral-500;
+    font-size: 1rem;
+  }
+}
+
+.account_container_profil_page,
+.account_container_orders_page,
+.account_container_returns_page {
+  min-width: 0;
+}
+
+.account_container_menu {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.account_container_profil_page,
+.account_container_orders_page,
+.account_container_returns_page {
+  grid-column: 2;
+  grid-row: 1;
+
+  @media (max-width: 900px) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+.account_container_profil,
+.account_container_orders,
+.account_container_returns {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.account_container_profil + .account_container_profil {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid $neutral-200;
+}
+
+.account_container_profil_item,
+.account_container_profil_address_item,
+.account_container_orders_item,
+.account_container_returns_item,
+.account_container_returns_form {
+  border: 1px solid $neutral-200;
+  border-radius: 8px;
+  background-color: $nuance-0;
+}
+
+.account_container_profil_item {
+  display: grid;
+  grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.account_container_profil_item_label {
+  label {
+    display: block;
+    font-weight: 700;
+    color: $neutral-900;
+  }
+
+  p {
+    margin-top: 0.25rem;
+    color: $neutral-500;
+    font-size: 0.9rem;
+  }
+}
+
+.account_container_profil_item_input {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  min-width: 0;
+
+  @media (max-width: 700px) {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  p {
+    overflow-wrap: anywhere;
+    color: $neutral-700;
+  }
+
+  input {
+    width: min(100%, 22rem);
+    border: 1px solid $neutral-300;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font: inherit;
+    color: $neutral-900;
+    background-color: $neutral-50;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid $neutral-200;
+    border-radius: 8px;
+    background-color: $principal-50;
+    color: $principal-900;
+    cursor: pointer;
+  }
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+.account_container_profil_item_input_password {
+  display: grid;
+  gap: 0.75rem;
+  width: min(100%, 22rem);
+}
+
+.account_container_profil_item_input_editing {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.account_container_profil_address_title h4 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.account_container_profil_address_item {
+  padding: 1rem;
+
+  p {
+    color: $neutral-700;
+  }
+}
+
+.account_container_profil_address_list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+button.account_container_profil_address_item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  color: $neutral-800;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $principal-300;
+    background-color: $principal-50;
+  }
+}
+
+.account_container_profil_address_item_button,
+.account_container_profil_logout_buttons,
+.account_container_returns_form_button {
+  margin-top: 1rem;
+
+  button {
+    min-height: 2.75rem;
+    padding-inline: 1.25rem;
+    border: 1px solid $principal-300;
+    border-radius: 8px;
+    background-color: $principal-300;
+    color: $principal-900;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.account_container_profil_logout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.account_container_profil_logout_buttons_delete,
+.account_container_returns_item button {
+  border-color: $red;
+  background-color: $red;
+  color: $nuance-0;
+}
+
+.account_container_orders_item,
+.account_container_returns_item {
+  padding: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover,
+  &[open] {
+    border-color: $accent-300;
+    box-shadow: 0 8px 16px oklch(0% 0 0 / 0.08);
+  }
+}
+
+.account_container_orders_item_summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 1rem;
+  align-items: center;
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $principal-300;
+    outline-offset: 0.4rem;
+    border-radius: 4px;
+  }
+}
+
+.account_container_orders_item_summary_identity {
+  display: grid;
+  gap: 0.35rem;
+
+  strong {
+    color: $neutral-900;
+    font-size: 1.05rem;
+  }
+
+  time {
+    color: $neutral-500;
+    font-size: 0.9rem;
+  }
+}
+
+.account_container_orders_item_summary_status {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background-color: $principal-50;
+  color: $principal-900;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.account_container_orders_item_summary_chevron {
+  color: $neutral-500;
+  font-size: 1.75rem;
+  line-height: 1;
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.account_container_orders_item[open]
+  .account_container_orders_item_summary_chevron {
+  transform: rotate(-90deg);
+}
+
+.account_container_orders_item_details {
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .account_container_orders_item_summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .account_container_orders_item_summary_status {
+    grid-column: 1;
+    width: fit-content;
+  }
+
+  .account_container_orders_item_summary_chevron {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+.account_container_orders_item_title,
+.account_container_returns_item_title,
+.account_container_returns_form_title {
+  display: grid;
+  gap: 0.35rem;
+
+  h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  p {
+    color: $neutral-500;
+    font-size: 0.95rem;
+  }
+}
+
+.account_container_orders_item_title_status,
+.account_container_returns_item_title_status_wrong {
+  color: $red;
+  font-weight: 700;
+}
+
+.account_container_orders_item_cart {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid $neutral-200;
+}
+
+.account_container_orders_item_cart_product {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  gap: 1rem;
+  align-items: center;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.account_container_orders_item_cart_product_title {
+  a {
+    color: $neutral-900;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  p {
+    margin-top: 0.25rem;
+    color: $neutral-500;
+    font-size: 0.9rem;
+  }
+}
+
+.account_container_orders_item_shipping,
+.account_container_orders_item_invoice {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid $neutral-200;
+  color: $neutral-600;
+}
+
+.account_container_orders_item_invoice a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  background-color: $principal-700;
+  color: $nuance-0;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $principal-900;
+  }
+}
+
+.account_container_returns_form {
+  padding: 1rem;
+}
+
+.account_container_returns_form_select select,
+.account_container_returns_form_note textarea,
+.contact_container_object_input,
+.contact_container_object_split_input,
+.contact_container_message textarea {
+  width: 100%;
+  border: 1px solid $neutral-300;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  background-color: $neutral-50;
+  color: $neutral-900;
+  font: inherit;
+}
+
+.account_container_returns_form_select,
+.account_container_returns_form_note {
+  margin-top: 1rem;
+}
+
+.account_container_returns_form_note textarea,
+.contact_container_message textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+.account_container_returns_form_button {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+
+  a {
+    color: $neutral-600;
+    font-weight: 600;
+  }
+}
+
+.account_dialog_box {
+  position: fixed;
+  z-index: 30;
+  top: 50%;
+  left: 50%;
+  width: min(calc(100% - 2rem), 24rem);
+  transform: translate(-50%, -50%);
+  padding: 1.5rem;
+  border: 1px solid $neutral-200;
+  border-radius: 8px;
+  background-color: $nuance-0;
+  box-shadow: 0 16px 32px oklch(0% 0 0 / 0.18);
+
+  p {
+    margin-bottom: 1rem;
+    color: $neutral-800;
+    font-weight: 700;
+  }
+
+  button {
+    min-height: 2.5rem;
+    margin-right: 0.5rem;
+    padding-inline: 1rem;
+    border: 1px solid $neutral-300;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .confirm-button {
+    border-color: $red;
+    background-color: $red;
+    color: $nuance-0;
+  }
+
+  .cancel-button {
+    background-color: $neutral-50;
+    color: $neutral-800;
+  }
+}
+
+.account_dialog_backdrop {
+  position: fixed;
+  z-index: 29;
+  inset: 0;
+  background-color: oklch(0% 0 0 / 0.45);
+}
+
+.account_address_dialog {
+  h2 {
+    margin-bottom: 0.75rem;
+    color: $neutral-900;
+    font-size: 1.2rem;
+  }
+
+  p {
+    font-weight: 400;
+    line-height: 1.6;
+  }
+}
+
+.contact_container {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.contact_container_title h2 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.contact_container_object_split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact_container_button {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  > button {
+    min-height: 2.75rem;
+    padding-inline: 1.5rem;
+    border: 1px solid $accent-300;
+    border-radius: 8px;
+    background-color: $accent-300;
+    color: $accent-900;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.contact_container_button_socials {
+  display: flex;
+  gap: 0.75rem;
 }

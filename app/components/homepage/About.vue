@@ -4,7 +4,7 @@
       <h2 v-html="section?.title || 'Bella'"></h2>
       <p v-html="section?.text" ></p>
 
-      <a href="/clothes" class="button--primary">
+      <nuxt-link to="/category" class="button--primary">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 19" fill="none">
           <path
             d="M4.1665 9.5H15.8332M15.8332 9.5L10.8332 4.75M15.8332 9.5L10.8332 14.25"
@@ -14,7 +14,7 @@
           />
         </svg>
         Commence ton shopping
-      </a>
+      </nuxt-link>
     </div>
 
     <div class="about_product_slider">
@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
-import type { HomepageAboutDTO, HomepageHighlightsDTO } from '#shared/dto/homepage.dto'
+import type {  HomepageAboutDTO, HomepageHighlightsDTO } from '#shared/dto/homepage.dto'
 
 interface ClothingVariant {
   id: number
@@ -58,6 +58,8 @@ interface ClothingVariant {
   promo?: number
   calcultedPriceTTC: string
 }
+
+
 
 export default {
   components: {},
@@ -69,6 +71,10 @@ export default {
     highlights: {
       type: Object as PropType<HomepageHighlightsDTO | null>,
       default: null,
+    },
+    vat: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
@@ -125,7 +131,10 @@ export default {
         const priceAfterDiscount = Number(
           this.calculatedPrice(priceNumber, product.promo)
         )
-        const priceWithTax = (priceAfterDiscount * 1.085).toFixed(2)
+        const priceWithTax = (
+          priceAfterDiscount *
+          (1 + this.vat / 100)
+        ).toFixed(2)
 
         return {
           id: product.id,

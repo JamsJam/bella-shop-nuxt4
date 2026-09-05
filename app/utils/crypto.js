@@ -1,16 +1,31 @@
-// Importer la bibliothèque CryptoJS
-import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js'
 
-// Clé secrète pour le chiffrement/déchiffrement (à remplacer par votre propre clé secrète)
-const SECRET_KEY = 'yD2Zin9,my#C5;3x8^C3j+=a5~{4HALE'
+let cryptoSecretKey = null
 
-// Fonction pour chiffrer les données avec CryptoJS
-export function encryptData(data) {
-  return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString()
+async function getCryptoSecretKey() {
+  if (cryptoSecretKey) {
+    return cryptoSecretKey
+  }
+
+  const response = await fetch('/api/crypto/key')
+
+  if (!response.ok) {
+    throw new Error('Impossible de récupérer la clé de chiffrement')
+  }
+
+  const data = await response.json()
+  cryptoSecretKey = data.key
+
+  return cryptoSecretKey
 }
 
-// Fonction pour déchiffrer les données avec CryptoJS
-export function decryptData(encryptedData) {
-  const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY)
+export async function encryptData(data) {
+  const secretKey = await getCryptoSecretKey()
+  return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString()
+}
+
+export async function decryptData(encryptedData) {
+  const secretKey = await getCryptoSecretKey()
+  const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey)
   return JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
 }

@@ -1,0 +1,40 @@
+.clothes_product {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+}
+
+.clothes_product_page {
+  width: 100%;
+  min-height: calc(100dvh - 112px);
+  padding: 1.25rem 2rem;
+  background: #fff;
+}
+
+.clothes_product_page_inner {
+  width: min(100%, 82rem);
+  margin: 0 auto;
+}
+
+.clothes_product_page_back {
+  margin: 0 0 0.75rem;
+}
+
+.clothes_product_page_layout {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.85fr) minmax(20rem, 0.8fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .clothes_product_page {
+    min-height: auto;
+    padding: 1.25rem;
+  }
+
+  .clothes_product_page_layout {
+    grid-template-columns: 1fr;
+  }
+
+}

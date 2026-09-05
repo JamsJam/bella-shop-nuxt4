@@ -1,0 +1,315 @@
+<template>
+  <div class="clothes_product">
+    <NavigationBar />
+    <AttachableBreadcrumb
+      :page-data="{
+        name: product.name,
+        category: product.category,
+      }"
+    />
+
+    <main class="clothes_product_page">
+      <div class="clothes_product_page_inner">
+        <NuxtLink
+          :to="`/category/${product.category.slug}`"
+          class="back_link clothes_product_page_back"
+        >
+          Retour à la catégorie
+        </NuxtLink>
+
+        <div class="clothes_product_page_layout">
+          <ProductImages :images="product.images" :product-name="product.name" />
+
+          <div class="clothes_product_page_content">
+            <ProductHeader
+              :name="product.name"
+              :price="product.price"
+              :description="product.description"
+            />
+
+            <ProductSelection
+              :colors="product.colors"
+              :sizes="product.sizes"
+              :size-guide="product.sizeGuide"
+              :selected-color="selectedColor"
+              :selected-size="selectedSize"
+              :quantity="quantity"
+              :stock="stock"
+              :stock-available="stockAvailable"
+              :stock-loading="stockLoading"
+              :stock-error="stockError"
+              @select-color="selectColor"
+              @select-size="selectSize"
+              @change-quantity="changeQuantity"
+              @add-to-cart="addToCart"
+              @add-to-avatar="addToAvatarClothes"
+            />
+          </div>
+        </div>
+
+        <ProductReviews :reviews="product.reviews" />
+        <ProductRecommendations :clothes="product.relatedClothes" />
+      </div>
+    </main>
+
+    <PopupComponent :popup_message="popupMessage" />
+    <Footer />
+  </div>
+</template>
+
+<script setup>
+import { computed, ref, watch } from 'vue'
+import NavigationBar from '~/components/attachable/NavigationBar.vue'
+import ProductHeader from '~/components/product/ProductHeader.vue'
+import ProductImages from '~/components/product/ProductImages.vue'
+import ProductSelection from '~/components/product/ProductSelection.vue'
+import ProductRecommendations from '~/components/product/ProductRecommendations.vue'
+import ProductReviews from '~/components/product/ProductReviews.vue'
+import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { useAvatarStore } from '~/stores/avatar'
+import { useAvatarCatalogStore } from '~/stores/avatarCatalog'
+import { useCartStore } from '~/stores/cart'
+import Footer from '~/components/attachable/Footer.vue'
+
+const route = useRoute()
+const avatarStore = useAvatarStore()
+const avatarCatalogStore = useAvatarCatalogStore()
+const cartStore = useCartStore()
+
+const { data } = await useFetch(() => `/api/clothes/${route.params.slug}`)
+
+const fallbackProduct = {
+  id: null,
+  slug: route.params.slug,
+  name: 'Produit',
+  price: 0,
+  description: '',
+  metadescription: '',
+  category: {
+    name: '',
+    slug: '',
+  },
+  images: [],
+  colors: [],
+  sizes: [],
+  sizeGuide: {
+    title: 'Guide des tailles',
+    columns: [],
+    rows: [],
+  },
+  relatedClothes: [],
+  reviews: [],
+}
+
+const product = computed(() => data.value || fallbackProduct)
+const selectedColor = ref(null)
+const selectedSize = ref(null)
+const quantity = ref(1)
+const stock = ref(null)
+const stockAvailable = ref(false)
+const stockLoading = ref(false)
+const stockError = ref('')
+const popupMessage = ref(null)
+let stockRequestId = 0
+
+cartStore.load()
+
+watch(
+  [product, () => route.params.slug],
+  (currentProduct) => {
+    const nextProduct = Array.isArray(currentProduct)
+      ? currentProduct[0]
+      : currentProduct
+
+    selectedColor.value = nextProduct.colors?.find((color) => color.slug === route.params.slug)
+      || nextProduct.colors?.[0]
+      || null
+    selectedSize.value = null
+  },
+  { immediate: true }
+)
+
+watch(
+  selectedSize,
+  async (size) => {
+    quantity.value = 1
+    await refreshStock(size?.id)
+  },
+  { immediate: true }
+)
+
+function buildSelectionPayload() {
+  return {
+    productId: product.value.id,
+    productSlug: product.value.slug,
+    productName: product.value.name,
+    image: product.value.images?.[0]?.src || '',
+    unitPrice: product.value.price,
+    color: selectedColor.value,
+    size: selectedSize.value,
+    quantity: quantity.value,
+  }
+}
+
+function selectColor(color) {
+  selectedColor.value = color
+}
+
+function selectSize(size) {
+  selectedSize.value = size
+}
+
+async function refreshStock(variantId = selectedSize.value?.id) {
+  const requestId = ++stockRequestId
+
+  if (!variantId) {
+    stock.value = null
+    stockAvailable.value = false
+    stockError.value = ''
+    return false
+  }
+
+  stockLoading.value = true
+  stockError.value = ''
+
+  try {
+    const response = await $fetch(`/api/variants/${variantId}/stock`)
+
+    if (requestId !== stockRequestId) {
+      return false
+    }
+
+    stock.value = Math.max(0, Number(response.stock) || 0)
+    stockAvailable.value = Boolean(response.available) && stock.value > 0
+
+    if (stockAvailable.value) {
+      quantity.value = Math.min(Math.max(1, quantity.value), stock.value)
+    } else {
+      quantity.value = 1
+    }
+
+    return stockAvailable.value
+  } catch (error) {
+    if (requestId === stockRequestId) {
+      stock.value = null
+      stockAvailable.value = false
+      stockError.value = 'Disponibilité momentanément indisponible.'
+    }
+
+    console.error('Erreur lors de la vérification du stock :', error)
+    return false
+  } finally {
+    if (requestId === stockRequestId) {
+      stockLoading.value = false
+    }
+  }
+}
+
+async function changeQuantity(nextQuantity) {
+  const isAvailable = await refreshStock()
+
+  if (!isAvailable || stock.value === null) {
+    return
+  }
+
+  quantity.value = Math.min(
+    Math.max(1, Number(nextQuantity) || 1),
+    stock.value
+  )
+}
+
+async function addToCart() {
+  if (!selectedColor.value || !selectedSize.value) {
+    return
+  }
+
+  const isAvailable = await refreshStock()
+
+  if (!isAvailable) {
+    return
+  }
+
+  cartStore.addItem(buildSelectionPayload())
+  popupMessage.value = {
+    type: 'valid',
+    message: `${product.value.name} a été ajouté à votre panier.`,
+  }
+}
+
+async function addToAvatarClothes() {
+  if (!selectedColor.value) {
+    return
+  }
+
+  const clothingSlug = product.value.slug || String(route.params.slug || '')
+  await avatarStore.load()
+  const { skincolor, morphology, morphotype } = avatarStore.model
+
+  if (!clothingSlug || !skincolor?.id || !morphology?.id || !morphotype?.id) {
+    popupMessage.value = {
+      type: 'error',
+      message: 'Créez d’abord votre avatar avant d’essayer ce vêtement.',
+    }
+    return
+  }
+
+  try {
+    const bodies = await avatarCatalogStore.fetchBodiesByClothingSlug(
+      clothingSlug
+    )
+    const normalizeCriterion = (value) =>
+      String(value || '').trim().toLowerCase().replace(/-/g, '_')
+    let body =
+      bodies.find(
+        (item) =>
+          Number(item.skinColorId) === Number(skincolor.id) &&
+          Number(item.morphologyId) === Number(morphology.id) &&
+          Number(item.morphotypeId) === Number(morphotype.id)
+      ) ||
+      bodies.find(
+        (item) =>
+          normalizeCriterion(item.skinColor) ===
+            normalizeCriterion(skincolor.name) &&
+          normalizeCriterion(item.morphology) ===
+            normalizeCriterion(morphology.name) &&
+          (normalizeCriterion(item.morphotype) ===
+            normalizeCriterion(morphotype.name) ||
+            normalizeCriterion(item.size) ===
+              normalizeCriterion(morphotype.size))
+      ) ||
+      null
+
+    if (!body) {
+      const fallbackBodies =
+        await avatarCatalogStore.fetchBodiesByAvatarAttributes(
+          skincolor.id,
+          morphology.id,
+          morphotype.id
+        )
+      body = fallbackBodies[0] || null
+    }
+
+    if (!body) {
+      throw new Error('Aucun corps ne correspond à cet avatar')
+    }
+
+    await avatarStore.setModel({
+      ...avatarStore.model,
+      body,
+      clothingSlug,
+      avatarClothing: null,
+      selectedClothing: null,
+    })
+    popupMessage.value = {
+      type: 'valid',
+      message: `${product.value.name} a été ajouté à votre avatar.`,
+    }
+  } catch (error) {
+    console.error('Erreur lors de l’ajout du vêtement à l’avatar :', error)
+    popupMessage.value = {
+      type: 'error',
+      message: 'Impossible d’ajouter ce vêtement à votre avatar.',
+    }
+  }
+}
+</script>

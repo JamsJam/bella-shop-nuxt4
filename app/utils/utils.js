@@ -10,3 +10,15 @@ export function formatName(name) {
     return ''
   }
 }
+
+export function deslugify(slug) {
+  if (!slug) {
+    return ''
+  }
+
+  return String(slug)
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
+}

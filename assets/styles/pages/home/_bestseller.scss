@@ -57,14 +57,37 @@
         display: flex;
         flex-direction: column;
         position: relative;
+        flex: 0 0 clamp(19.3125rem, 16.2411rem + 4.7991vw, 22rem);
 
-        height: clamp(23.5rem, 14rem + 14.8438vw, 31.8125rem);
         width: clamp(19.3125rem, 16.2411rem + 4.7991vw, 22rem);
-        // background-color: $grey;
+        min-height: clamp(28rem, 22rem + 9.375vw, 33.25rem);
+        background-color: $nuance-0;
         border-radius: 1.5rem;
-        transition: all ease 0.5s;
+        overflow: hidden;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
         color: $accent-900;
         box-shadow: 0 8px 16px 0 hsla(0, 0%, 0%, 0.15);
+
+        &:hover {
+          transform: translateY(-0.25rem);
+          box-shadow: 0 12px 24px 0 hsla(0, 0%, 0%, 0.2);
+        }
+
+        &_product_link {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          color: inherit;
+          text-decoration: none;
+
+          &:focus-visible {
+            outline: 3px solid $accent-700;
+            outline-offset: -3px;
+            border-radius: 1.5rem 1.5rem 0 0;
+          }
+        }
 
         &_image {
           position: relative;
@@ -84,6 +107,17 @@
             height: 100%;
             transition: all ease 0.2s;
           }
+
+          &_placeholder {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            place-items: center;
+            background-color: $principal-50;
+            color: $neutral-700;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+          }
         }
         &_text {
           display: flex;
@@ -93,43 +127,49 @@
           gap: 0.5rem;
 
           width: 100%;
-          height: clamp(9.375rem, 6.5893rem + 4.3527vw, 11.8125rem);
+          flex: 1;
+          min-height: 6.5rem;
 
           background-color: $nuance-0;
-          padding-inline: 1.5rem;
-          border-radius: 0 0 1.5rem 1.5rem;
-          // overflow: hidden;
+          padding: 1.25rem 1.5rem 0.75rem;
           transition: all ease 0.2s;
-          // visibility: hidden;
 
-          &_title h3,
-          &_price p {
-            font-family: 'Dancing Script';
-            font-size: clamp(1.25rem, 0.9643rem + 0.4464vw, 1.5rem);
-            line-height: 150%;
-            letter-spacing: -2%;
+          &_title,
+          &_price {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.5;
           }
 
-          &_title h3 {
+          &_title {
+            font-size: clamp(1.125rem, 0.9821rem + 0.2232vw, 1.25rem);
             font-weight: 600;
+            letter-spacing: 0;
           }
 
-          &_price p {
-            font-weight: 700;
+          &_price {
+            font-size: clamp(1rem, 0.8571rem + 0.2232vw, 1.125rem);
+            font-weight: 650;
+            letter-spacing: 0.01em;
           }
         }
 
-        & .button--secondary {
+        &_add_to_cart {
           align-self: center;
 
           //20 -> 14
           font-size: clamp(0.875rem, 0.4464rem + 0.6696vw, 1.25rem);
           line-height: 100%;
-          letter-spacing: 2%;
+          letter-spacing: 0.02em;
 
           padding: 16px 32px;
 
-          margin-top: 0.5rem;
+          width: calc(100% - 3rem);
+          margin: 0.5rem 1.5rem 1.5rem;
+
+          &:focus-visible {
+            outline: 3px solid $accent-700;
+            outline-offset: 3px;
+          }
 
           svg {
             //20 -> 16
@@ -145,6 +185,8 @@
       z-index: 20;
       top: 50%;
       height: clamp(2.5rem, -0.3571rem + 4.4643vw, 5rem);
+      min-height: 2.75rem;
+      min-width: 2.75rem;
       aspect-ratio: 1/1;
       background-color: $nuance-0;
       border: none;
@@ -159,6 +201,11 @@
 
       &:focus {
         background-color: $neutral-100;
+      }
+
+      &:focus-visible {
+        outline: 3px solid $accent-700;
+        outline-offset: 3px;
       }
 
       svg {
@@ -185,6 +232,14 @@
     }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    &_content_container,
+    &_content_container .card,
+    &_content_container .card_image img {
+      transition: none;
+    }
+  }
+
   @media screen and (max-width: 1024px) {
     & {
       h2 {
@@ -202,8 +257,9 @@
 
           width: max-content;
           .card {
-            height: clamp(29.1875rem, 31.7727rem + -12.9261vw, 23.5rem);
+            flex-basis: clamp(17rem, 15.9489rem + 5.2557vw, 19.3125rem);
             width: clamp(17rem, 15.9489rem + 5.2557vw, 19.3125rem);
+            min-height: 28rem;
 
             &_image {
               height: clamp(20rem, 22.5852rem + -12.9261vw, 14.3125rem);
@@ -223,14 +279,30 @@
         padding-inline: 1rem;
 
         &_dot {
-          height: 8px;
+          position: relative;
+          height: 2.75rem;
           width: 100%;
+          border: 0;
+          background: transparent;
 
-          border-radius: 8px;
+          &::before {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            left: 0;
+            height: 8px;
+            border-radius: 8px;
+            background-color: $nuance-0;
+            content: '';
+            transform: translateY(-50%);
+          }
 
-          background-color: $nuance-0;
+          &:focus-visible {
+            outline: 3px solid $accent-700;
+            outline-offset: 2px;
+          }
 
-          &.activ {
+          &.activ::before {
             background-color: $principal-900;
           }
         }

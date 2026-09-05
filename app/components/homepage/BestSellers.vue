@@ -16,8 +16,10 @@
 
       <button
         v-if="navIndexMax > 1 && navIndex < navIndexMax"
-        @click="navigateToCarouselPosition(navIndex + 1)"
+        type="button"
         class="best_sellers_content_button best_sellers_content_button--previous"
+        aria-label="Voir les produits suivants"
+        @click="navigateToCarouselPosition(navIndex + 1)"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
           <path
@@ -38,59 +40,45 @@
             ?=============================================================================
           -->
 
-        <article
-          v-for="item in bestSellersTemplate"
-          :key="item.id"
-          class="card"
-        >
-          <!--
-                ?--------  Image  --------
-              -->
-          <div class="card_image">
-            <img :src="item.preview_image" :alt="item.name" />
-          </div>
-
-          <!--
-                ?--------  infos  --------
-              -->
-          <div class="card_text">
-            <div class="card_text_title">
-              <h3>{{ item.name }}</h3>
+        <article v-for="item in bestSellersTemplate" :key="item.id" class="card">
+          <NuxtLink
+            :to="`/clothes/${item.slug}`"
+            class="card_product_link"
+            :aria-label="`Voir ${item.name}`"
+          >
+            <div class="card_image">
+              <img
+                v-if="item.preview_image"
+                :src="item.preview_image"
+                :alt="item.name"
+                loading="lazy"
+              />
+              <div v-else class="card_image_placeholder" aria-hidden="true">
+                Image indisponible
+              </div>
             </div>
 
-            <div class="card_text_price">
-              <p>{{ item.calcultedPriceTTC }} €</p>
+            <div class="card_text">
+              <h3 class="card_text_title">{{ item.name }}</h3>
+              <p class="card_text_price">{{ item.calcultedPriceTTC }} €</p>
             </div>
+          </NuxtLink>
 
-            <nuxt-link
-              :to="{
-                path: `/product/clothing`,
-                query: { product_id: item.id },
-              }"
-              class="button--secondary"
-            >
-              <!--svg cart here-->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 19"
-                fill="none"
-              >
-                <path
-                  d="M6.66683 6.33341H5.64795C4.56493 6.33341 4.02387 6.33341 3.63867 6.54332C3.30065 6.72752 3.04081 7.01848 2.90512 7.36552C2.7506 7.76074 2.83954 8.26772 3.01737 9.28132L3.01774 9.28322L3.79552 13.7166C3.92746 14.4686 3.99386 14.8448 4.19139 15.127C4.3655 15.3757 4.60992 15.5724 4.89681 15.6946C5.22227 15.8333 5.62339 15.8334 6.42594 15.8334H13.5746C14.3772 15.8334 14.778 15.8333 15.1035 15.6946C15.3904 15.5724 15.635 15.3757 15.8091 15.127C16.0066 14.8448 16.0727 14.4686 16.2046 13.7166L16.9824 9.28322L16.9831 9.28013C17.1608 8.26732 17.2497 7.76058 17.0953 7.36552C16.9596 7.01848 16.7003 6.72752 16.3623 6.54332C15.9771 6.33341 15.4352 6.33341 14.3522 6.33341H13.3335M6.66683 6.33341H13.3335M6.66683 6.33341C6.66683 4.58451 8.15921 3.16675 10.0002 3.16675C11.8411 3.16675 13.3335 4.58451 13.3335 6.33341"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              Ajouter au panier
-            </nuxt-link>
-          </div>
+          <NuxtLink
+            :to="`/clothes/${item.slug}`"
+            class="button--secondary card_add_to_cart"
+            :aria-label="`Voir le produit ${item.name}`"
+          >
+            Voir le produit
+          </NuxtLink>
         </article>
       </div>
 
       <button
-        class="best_sellers_content_button best_sellers_content_button--next"
         v-if="navIndexMax > 1 && navIndex > 1"
+        type="button"
+        class="best_sellers_content_button best_sellers_content_button--next"
+        aria-label="Voir les produits précédents"
         @click="navigateToCarouselPosition(navIndex - 1)"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
@@ -110,8 +98,11 @@
         v-for="n in navIndexMax"
         :id="`navi-dot-${n}`"
         :key="n"
+        type="button"
         class="best_sellers_navigation_dot"
         :class="n == navIndex ? 'activ' : ''"
+        :aria-label="`Afficher la page ${n} des Best Sellers`"
+        :aria-current="n === navIndex ? 'true' : undefined"
         @click="navigateToCarouselPosition(n)"
       ></button>
     </div>
@@ -148,12 +139,12 @@ export default {
       return (this.section?.products || []).map((product : BestSellerProductDTO) => {
         const images = this.parseImages(product.images)
         const preview_image = images.length ? images[0] : ''
-        const priceNumber = Number(product.price || 0)
+        const priceNumber = Number(product.price || 0) / 100
 
         return {
           ...product,
           preview_image,
-          calcultedPriceTTC: (priceNumber * 1.085).toFixed(2),
+          calcultedPriceTTC: priceNumber.toFixed(2),
         }
       })
     },

@@ -45,13 +45,13 @@
             Connecte-toi
           </button>
           <div class="login_container_forms_inputs_forget_password">
-            <a href="/forgot-password">Mot de passe oublié</a>
+            <NuxtLink to="/forgot-password">Mot de passe oublié</NuxtLink>
           </div>
           <div class="login_container_forms_buttons">
             <p>
               Tu n'est pas encore inscris ?
-              <a href="/signin" class="login_container_forms_buttons_signin"
-                >Inscris toi</a
+              <NuxtLink to="/signup" class="login_container_forms_buttons_signup"
+                >Inscris toi</NuxtLink
               >
             </p>
           </div>
@@ -126,16 +126,17 @@
       </div>
     </div>
 
-    <!-- <PopupComponent :popup_message="popupMessage" /> -->
+    <PopupComponent :popup_message="popupMessage" />
   </div>
 </template>
 
 <script>
-// import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import PopupComponent from '~/components/attachable/PopupComponent.vue'
+import { humanizeErrorMessage } from '~/utils/humanizeErrorMessage'
 
 export default {
   components: {
-    // PopupComponent,
+    PopupComponent,
   },
 
   data() {
@@ -144,7 +145,7 @@ export default {
       password: '',
       awaitingConfirmAccount: false,
       code: ['', '', '', '', '', ''],
-      // popupMessage: null,
+      popupMessage: null,
       userId: null,
       resendCodeTimeout: false,
     }
@@ -157,39 +158,45 @@ export default {
         email: this.email,
         password: this.password,
       }
-      const url = `${this.$store.state.apiUrl}/auth/login`
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user: userData }),
-        credentials: 'include',
-      }
-
       try {
-        const response = await fetch(url, options)
-        const data = await response.json()
+        const data = await $fetch('/api/auth/login', {
+          method: 'POST',
+          body: userData,
+          credentials: 'include',
+        })
 
-        if (response.ok) {
-          this.$router.push('/')
-        } else {
-          if (data.type === 'confirmation_code') {
-            this.userId = data.userId
-            this.awaitingConfirmAccount = true
-          }
-          throw data.error
-        }
+        this.redirectAfterLogin()
 
         return data
       } catch (error) {
         console.error(error)
 
+        const data = error?.data
+        if (data?.type === 'confirmation_code') {
+          this.userId = data.id ?? data.userId
+          this.awaitingConfirmAccount = true
+        }
+
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: this.getErrorMessage(
+            error,
+            'Impossible de vous connecter. Vérifiez vos identifiants.'
+          ),
         }
       }
+    },
+
+    redirectAfterLogin() {
+      const redirect = this.$route.query.redirect
+      const redirectPath = Array.isArray(redirect) ? redirect[0] : redirect
+
+      if (redirectPath && redirectPath.startsWith('/')) {
+        this.$router.push(redirectPath)
+        return
+      }
+
+      this.$router.push('/')
     },
 
     focusNextInput(event, index) {
@@ -206,32 +213,27 @@ export default {
 
       const requestData = {
         code: code.toUpperCase(),
-        userId: this.userId,
-      }
-
-      const url = `${this.$store.state.apiUrl}/auth/verify-confirmation-code`
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
+        id: this.userId,
       }
 
       try {
-        const response = await fetch(url, options)
-        const data = await response.json()
+        const data = await $fetch('/api/auth/verify-confirmation-code', {
+          method: 'POST',
+          body: requestData,
+        })
 
-        if (response.ok) {
-          await this.handleLogin()
-        } else {
-          // Gérer les erreurs
-          console.error('Erreur lors de la confirmation du code :', data.error)
-        }
+        await this.handleLogin()
 
         return data
       } catch (error) {
         console.error('Erreur lors de la confirmation du code :', error)
+        this.popupMessage = {
+          type: 'error',
+          message: this.getErrorMessage(
+            error,
+            'Le code de confirmation est invalide ou a expiré.'
+          ),
+        }
         return error
       }
     },
@@ -241,48 +243,39 @@ export default {
         userEmail: this.email,
       }
 
-      const url = `${this.$store.state.apiUrl}/auth/resend-confirmation-code`
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      }
-
       try {
         if (this.resendCodeTimeout) {
-          throw new Error('Reessayer dans quelques secondes')
+          throw new Error(
+            'Veuillez patienter quelques secondes avant de renvoyer un code.'
+          )
         }
 
-        const response = await fetch(url, options)
-        const data = await response.json()
+        const data = await $fetch('/api/auth/resend-confirmation-code', {
+          method: 'POST',
+          body: requestData,
+        })
 
-        if (response.ok) {
-          this.popupMessage = {
-            type: 'valid',
-            message: data.message,
-          }
-          this.resendCodeTimeout = true
-          setTimeout(() => {
-            this.resendCodeTimeout = false
-          }, 10000)
+        this.popupMessage = {
+          type: 'valid',
+          message: 'Un nouveau code vient de vous être envoyé par e-mail.',
         }
-
-        if (!response.ok) {
-          this.resendCodeTimeout = true
-          setTimeout(() => {
-            this.resendCodeTimeout = false
-          }, 10000)
-          throw data.error
-        }
+        this.resendCodeTimeout = true
+        setTimeout(() => {
+          this.resendCodeTimeout = false
+        }, 10000)
       } catch (error) {
         console.error(error)
         this.popupMessage = {
           type: 'error',
-          message: error,
+          message: this.getErrorMessage(
+            error,
+            'Impossible de renvoyer le code pour le moment.'
+          ),
         }
       }
+    },
+    getErrorMessage(error, fallback) {
+      return humanizeErrorMessage(error, fallback)
     },
   },
 }

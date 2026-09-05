@@ -1,6 +1,6 @@
 <template>
   <div class="manual">
-    <h2>Mode d'emploi</h2>
+    <h2>{{ sectionTitle }}</h2>
 
     <div class="manual_container">
       <div
@@ -18,12 +18,13 @@
           />
         </div>
         <div class="manual_container_item_title">
+          <h3>{{ item.title || `Étape ${index + 1}` }}</h3>
           <p>{{ item.text }}</p>
         </div>
       </div>
     </div>
 
-    <a href="/avatar" class="button--primary">
+    <nuxt-link to="/avatar" class="button--primary">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 19" fill="none">
         <path
           d="M4.1665 9.5H15.8332M15.8332 9.5L10.8332 4.75M15.8332 9.5L10.8332 14.25"
@@ -33,7 +34,7 @@
         />
       </svg>
       Créer ton avatar
-    </a>
+    </nuxt-link>
   </div>
 </template>
 
@@ -73,6 +74,9 @@ export default {
     },
   },
   computed: {
+    sectionTitle() {
+      return this.section?.title?.trim() || "Mode d'emploi"
+    },
     sectionList() {
       return this.section?.list && this.section.list.length
         ? this.section.list

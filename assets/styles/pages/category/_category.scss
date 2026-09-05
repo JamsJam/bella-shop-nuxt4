@@ -106,6 +106,101 @@
       }
     }
 
+    @media screen and (min-width: 1025px) {
+      &_grid {
+        &_item {
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+          background-color: $principal-200;
+
+          &::before,
+          &::after {
+            content: '';
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            pointer-events: none;
+            transition: opacity 350ms ease;
+          }
+
+          &::before {
+            background-color: $nuance-0;
+            opacity: 0;
+          }
+
+          &::after {
+            background: linear-gradient(
+              to bottom,
+              transparent calc(35% - 30px),
+              hsla(0, 0%, 100%, 0.95) 100%
+            );
+            opacity: 1;
+          }
+
+          &:hover,
+          &:focus-visible {
+            background-color: $principal-200;
+
+            &::before {
+              opacity: 0.92;
+            }
+
+            &::after {
+              opacity: 0;
+            }
+
+            img {
+              transform: scale(1.04);
+            }
+
+            .clothes_selection_container_grid_item_title {
+              bottom: 50%;
+              transform: translateY(50%);
+            }
+          }
+
+          &:focus-visible {
+            outline: 3px solid $accent-500;
+            outline-offset: 4px;
+          }
+
+          &_image {
+            display: block;
+            position: absolute;
+            inset: 0;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              object-position: center;
+              transition: transform 350ms ease;
+            }
+          }
+
+          &_title {
+            position: absolute;
+            z-index: 2;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            text-align: center;
+            transform: translateY(0);
+            transition:
+              bottom 350ms ease,
+              transform 350ms ease;
+
+            h2 {
+              color: $neutral-900;
+              line-height: 1.15;
+              text-shadow: none;
+            }
+          }
+        }
+      }
+    }
+
     &_hero {
       align-self: stretch;
 

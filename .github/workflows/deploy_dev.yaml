@@ -1,0 +1,86 @@
+name: Deploy test
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy on test server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v6
+
+      - name: Deployer sur le serveur de test
+        uses: appleboy/ssh-action@v1.2.5
+
+        env:
+          API_URL: ${{ secrets.TEST_API_URL }}
+          PUBLIC_API_URL: ${{ secrets.TEST_PUBLIC_API_URL }}
+          PUBLIC_SITE_URL: ${{ secrets.TEST_PUBLIC_SITE_URL }}
+          SITE_ENV: ${{ secrets.TEST_SITE_ENV }}
+          CRYPT_KEY: ${{ secrets.TEST_CRYPTO_KEY }}
+          STRIPE_MODE: ${{ secrets.TEST_STRIPE_MODE }}
+          SUCCESS_URL: ${{ secrets.TEST_SUCCESS_URL }}
+          CANCEL_URL: ${{ secrets.TEST_CANCEL_URL }}
+
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          envs: API_URL,PUBLIC_API_URL,PUBLIC_SITE_URL,SITE_ENV,CRYPT_KEY,STRIPE_MODE,SUCCESS_URL,CANCEL_URL
+          script: |
+            set -e
+            mkdir -p /var/www/${{ secrets.SERVER_USER }}/test.${{ secrets.DOMAIN }}/
+            cd /var/www/${{ secrets.SERVER_USER }}/test.${{ secrets.DOMAIN }}/
+            git checkout develop
+            git pull --ff-only origin develop
+
+            echo "[4/11] Mise a jour de la configuration de test"
+
+            dotenv_quote() {
+            php -r '
+            echo json_encode(
+              $argv[1],
+              JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            );
+            ' "$1"
+            }
+
+
+            NUXT_PLATFORM_API_BASE_VALUE="$(dotenv_quote "$API_URL")"
+            NUXT_PUBLIC_PLATFORM_API_BASE_VALUE="$(dotenv_quote "$PUBLIC_API_URL")"
+            NUXT_SITE_URL_VALUE="$(dotenv_quote "$PUBLIC_SITE_URL")"
+            NUXT_SITE_ENV_VALUE="$(dotenv_quote "$SITE_ENV")"
+            NUXT_CRYPTO_SECRET_KEY_VALUE="$(dotenv_quote "$CRYPT_KEY")"
+            NUXT_STRIPE_MODE_VALUE="$(dotenv_quote "$STRIPE_MODE")"
+            NUXT_STRIPE_SUCCESS_URL_VALUE="$(dotenv_quote "$SUCCESS_URL")"
+            NUXT_STRIPE_CANCEL_URL_VALUE="$(dotenv_quote "$CANCEL_URL")"
+
+
+            cat > .env.production <<EOF
+            # Configuration de l'application
+            NUXT_PLATFORM_API_BASE=${NUXT_PLATFORM_API_BASE_VALUE}
+            NUXT_PUBLIC_PLATFORM_API_BASE=${NUXT_PUBLIC_PLATFORM_API_BASE_VALUE}
+            NUXT_SITE_URL=${NUXT_SITE_URL_VALUE}
+            NUXT_SITE_ENV=${NUXT_SITE_ENV_VALUE}
+
+            # Configuration de la clé secrète pour le chiffrement
+            NUXT_CRYPTO_SECRET_KEY=${NUXT_CRYPTO_SECRET_KEY_VALUE}
+            
+            # Configuration Stripe
+            NUXT_STRIPE_MODE=${NUXT_STRIPE_MODE_VALUE}
+            NUXT_STRIPE_SUCCESS_URL=${NUXT_STRIPE_SUCCESS_URL_VALUE}
+            NUXT_STRIPE_CANCEL_URL=${NUXT_STRIPE_CANCEL_URL_VALUE}
+            EOF
+
+            chmod 600 .env.production
+
+            npm ci
+            npm run build
+            pm2 reload ecosystem.config.cjs --update-env

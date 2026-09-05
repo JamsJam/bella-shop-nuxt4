@@ -16,18 +16,18 @@
         <h2>Besoin d'aide</h2>
         <ul>
           <li>
-            <a href="/delivery">Livraison / Expédition</a>
+            <NuxtLink to="/delivery">Livraison / Expédition</NuxtLink>
           </li>
           <li>
-            <a href="/returns">Faire un retour</a>
+            <NuxtLink to="/returns">Faire un retour</NuxtLink>
           </li>
           <li>
-            <a v-if="auth" href="/account">Suivre ma commande</a>
-            <a v-else-if="!auth" href="/login">Suivre ma commande</a>
+            <NuxtLink v-if="auth" to="/account">Suivre ma commande</NuxtLink>
+            <NuxtLink v-else to="/login">Suivre ma commande</NuxtLink>
           </li>
 
           <li>
-            <a href="/sav">S.A.V</a>
+            <NuxtLink to="/sav">S.A.V</NuxtLink>
           </li>
         </ul>
       </div>
@@ -116,26 +116,34 @@
 
     <div class="footer_container2">
       <div class="footer_legalblock">
-        <a href="/legals">Mentions légales / CGV / CGU</a>
-        <a href="/confidentiality">Politique de confidentialité</a>
+        <NuxtLink to="/legals">Mentions légales / CGV / CGU</NuxtLink>
+        <NuxtLink to="/confidentiality">Politique de confidentialité</NuxtLink>
       </div>
     </div>
   </footer>
 </template>
 
 <script>
+import { isUserAuthenticated } from '~/middleware/auth'
+
 export default {
   components: {},
-  props: {
-    auth: {
-      type: Boolean,
-      default: false,
+  data() {
+    return {
+      auth: false,
+    }
+  },
+  mounted() {
+    this.verifyLogin()
+  },
+  methods: {
+    async verifyLogin() {
+      try {
+        this.auth = await isUserAuthenticated()
+      } catch (error) {
+        this.auth = false
+      }
     },
   },
-  data() {
-    return {}
-  },
-  mounted() {},
-  methods: {},
 }
 </script>
