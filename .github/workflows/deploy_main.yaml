@@ -1,4 +1,4 @@
-name: Deploy test
+name: Deploy main
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy on test server
+    name: Deploy on main server
     runs-on: ubuntu-latest
 
     steps:

@@ -475,6 +475,7 @@ export default {
   data() {
     return {
       currentCustomizationComponent: '',
+      skinColorSelectionId: 0,
       avatarFallbacks: {
         body: '/images/avatar/template_avatar_morphology.webp',
         face: '/images/avatar/template_avatar_face.webp',
@@ -520,6 +521,15 @@ export default {
   async mounted() {
     await this.retrieveAvatarData()
     await this.avatarCatalogStore.hydrateFromAvatarModel(this.avatarPreview)
+
+    if (!this.avatarPreview.morphotype?.id) {
+      const initialSkinColor =
+        this.avatarPreview.skincolor || this.avatarCatalogStore.skincolors[0]
+
+      if (initialSkinColor) {
+        await this.handleSkinColorSelection(initialSkinColor)
+      }
+    }
   },
   methods: {
     avatarImage(part, property, fallback) {
@@ -603,9 +613,13 @@ export default {
       this.saveAvatarModel()
     },
     async handleSkinColorSelection(skincolor) {
+      const selectionId = ++this.skinColorSelectionId
       const currentMorphology = this.avatarPreview.morphology
       const currentMorphotype = this.avatarPreview.morphotype
       const currentBody = this.avatarPreview.body
+      const hasCurrentMorphology = Boolean(
+        currentMorphology?.id || currentMorphology?.name
+      )
 
       this.avatarPreview.skincolor = skincolor
 
@@ -615,6 +629,8 @@ export default {
           this.avatarCatalogStore.fetchNosesBySkinColorId(skincolor.id),
           this.avatarCatalogStore.fetchFacesBySkinColorId(skincolor.id),
         ])
+
+      if (selectionId !== this.skinColorSelectionId) return
 
       const findEquivalentOrFirst = (items, currentItem) =>
         items.find((item) => item.name === currentItem?.name) || items[0] || null
@@ -628,11 +644,14 @@ export default {
             ) || null
           : null
         const fallbackMorphology =
-          morphologiesResult.value.find((morphology) => morphology.id === 53) ||
+          morphologiesResult.value.find(
+            (morphology) => morphology.name === '8'
+          ) ||
+          morphologiesResult.value[0] ||
           null
 
         this.avatarPreview.morphology =
-          compatibleMorphology || fallbackMorphology
+          hasCurrentMorphology ? compatibleMorphology : fallbackMorphology
 
         if (this.avatarPreview.morphology) {
           try {
@@ -642,11 +661,21 @@ export default {
                 this.avatarPreview.morphology.id
               )
 
+            if (selectionId !== this.skinColorSelectionId) return
+
             this.avatarPreview.morphotype = currentMorphotype
               ? morphotypes.find(
-                  (morphotype) => morphotype.name === currentMorphotype.name
+                  (morphotype) =>
+                    morphotype.name === currentMorphotype.name ||
+                    morphotype.size === currentMorphotype.size
                 ) || null
-              : null
+              : morphotypes.find((morphotype) => morphotype.size === 'S') ||
+                morphotypes[0] ||
+                null
+
+            if (this.avatarPreview.morphotype?.image) {
+              this.avatarPreview.body = { ...this.avatarPreview.morphotype }
+            }
           } catch (error) {
             this.avatarCatalogStore.morphotypes = []
             this.avatarPreview.morphotype = null
@@ -669,6 +698,8 @@ export default {
           this.avatarPreview.morphotype,
           currentBody
         )
+
+        if (selectionId !== this.skinColorSelectionId) return
       } else {
         this.avatarCatalogStore.bodies = []
         this.avatarPreview.body = null
@@ -806,8 +837,11 @@ export default {
 
         this.avatarPreview.morphotype =
           morphotypes.find(
-            (morphotype) => morphotype.name === currentMorphotype.name
+            (morphotype) =>
+              morphotype.name === currentMorphotype.name ||
+              morphotype.size === currentMorphotype.size
           ) ||
+          morphotypes.find((morphotype) => morphotype.size === 'S') ||
           morphotypes[0] ||
           null
       }
