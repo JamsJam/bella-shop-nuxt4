@@ -68,7 +68,7 @@ jobs:
 
             # Configuration de la clé secrète pour le chiffrement
             NUXT_CRYPTO_SECRET_KEY=${NUXT_CRYPTO_SECRET_KEY_VALUE}
-            
+            EOF
 
 
             chmod 600 .env.production
