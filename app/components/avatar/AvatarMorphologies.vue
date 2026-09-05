@@ -82,6 +82,7 @@
             v-if="morphotypeImage(morphotype)"
             :src="morphotypeImage(morphotype)"
             :alt="morphotype.size || 'Morphotype'"
+            @error="useUnclothedMorphotypeImage($event, morphotype)"
           />
           <div
             class="avatar_creation_container_choices_container_item_list_element_name"
@@ -237,6 +238,14 @@ export default {
       )
 
       return body?.image || morphotype.image
+    },
+    useUnclothedMorphotypeImage(event, morphotype) {
+      const image = event.currentTarget
+
+      if (!(image instanceof HTMLImageElement) || !morphotype?.image) return
+      if (image.src === morphotype.image) return
+
+      image.src = morphotype.image
     },
     async fetchMorphologies() {
       this.avatarCatalogStore.morphologies = []
