@@ -3,7 +3,7 @@ name: Deploy test
 on:
   push:
     branches:
-      - develop
+      - main
   workflow_dispatch:
 
 jobs:
@@ -19,14 +19,12 @@ jobs:
         uses: appleboy/ssh-action@v1.2.5
 
         env:
-          API_URL: ${{ secrets.TEST_API_URL }}
-          PUBLIC_API_URL: ${{ secrets.TEST_PUBLIC_API_URL }}
-          PUBLIC_SITE_URL: ${{ secrets.TEST_PUBLIC_SITE_URL }}
-          SITE_ENV: ${{ secrets.TEST_SITE_ENV }}
-          CRYPT_KEY: ${{ secrets.TEST_CRYPTO_KEY }}
-          STRIPE_MODE: ${{ secrets.TEST_STRIPE_MODE }}
-          SUCCESS_URL: ${{ secrets.TEST_SUCCESS_URL }}
-          CANCEL_URL: ${{ secrets.TEST_CANCEL_URL }}
+          API_URL: ${{ secrets.MAIN_API_URL }}
+          PUBLIC_API_URL: ${{ secrets.MAIN_PUBLIC_API_URL }}
+          PUBLIC_SITE_URL: ${{ secrets.MAIN_PUBLIC_SITE_URL }}
+          SITE_ENV: ${{ secrets.MAIN_SITE_ENV }}
+          CRYPT_KEY: ${{ secrets.MAIN_CRYPTO_KEY }}
+
 
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -36,10 +34,10 @@ jobs:
           envs: API_URL,PUBLIC_API_URL,PUBLIC_SITE_URL,SITE_ENV,CRYPT_KEY,STRIPE_MODE,SUCCESS_URL,CANCEL_URL
           script: |
             set -e
-            mkdir -p /var/www/${{ secrets.SERVER_USER }}/test.${{ secrets.DOMAIN }}/
-            cd /var/www/${{ secrets.SERVER_USER }}/test.${{ secrets.DOMAIN }}/
-            git checkout develop
-            git pull --ff-only origin develop
+            mkdir -p /var/www/${{ secrets.SERVER_USER }}/${{ secrets.DOMAIN }}/
+            cd /var/www/${{ secrets.SERVER_USER }}/${{ secrets.DOMAIN }}/
+            git checkout main
+            git pull --ff-only origin main
 
             echo "[4/11] Mise a jour de la configuration de test"
 
@@ -58,9 +56,7 @@ jobs:
             NUXT_SITE_URL_VALUE="$(dotenv_quote "$PUBLIC_SITE_URL")"
             NUXT_SITE_ENV_VALUE="$(dotenv_quote "$SITE_ENV")"
             NUXT_CRYPTO_SECRET_KEY_VALUE="$(dotenv_quote "$CRYPT_KEY")"
-            NUXT_STRIPE_MODE_VALUE="$(dotenv_quote "$STRIPE_MODE")"
-            NUXT_STRIPE_SUCCESS_URL_VALUE="$(dotenv_quote "$SUCCESS_URL")"
-            NUXT_STRIPE_CANCEL_URL_VALUE="$(dotenv_quote "$CANCEL_URL")"
+
 
 
             cat > .env.production <<EOF
@@ -73,11 +69,7 @@ jobs:
             # Configuration de la clé secrète pour le chiffrement
             NUXT_CRYPTO_SECRET_KEY=${NUXT_CRYPTO_SECRET_KEY_VALUE}
             
-            # Configuration Stripe
-            NUXT_STRIPE_MODE=${NUXT_STRIPE_MODE_VALUE}
-            NUXT_STRIPE_SUCCESS_URL=${NUXT_STRIPE_SUCCESS_URL_VALUE}
-            NUXT_STRIPE_CANCEL_URL=${NUXT_STRIPE_CANCEL_URL_VALUE}
-            EOF
+
 
             chmod 600 .env.production
 
