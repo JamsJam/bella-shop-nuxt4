@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'bella_front',
+      name: process.env.PM2_APP_NAME || 'bella_front',
       port: '3000',
       exec_mode: 'cluster',
       instances: 'max',
