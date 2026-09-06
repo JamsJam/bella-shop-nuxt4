@@ -28,13 +28,15 @@ jobs:
           SUCCESS_URL: ${{ secrets.TEST_SUCCESS_URL }}
           CANCEL_URL: ${{ secrets.TEST_CANCEL_URL }}
           PM2_APP_NAME: ${{ secrets.TEST_PM2_APP_NAME }}
+          PORT: ${{ secrets.TEST_PORT }}
+
 
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          envs: API_URL,PUBLIC_API_URL,PUBLIC_SITE_URL,SITE_ENV,CRYPT_KEY,STRIPE_MODE,SUCCESS_URL,CANCEL_URL,PM2_APP_NAME
+          envs: API_URL,PUBLIC_API_URL,PUBLIC_SITE_URL,SITE_ENV,CRYPT_KEY,STRIPE_MODE,SUCCESS_URL,CANCEL_URL,PM2_APP_NAME,PORT
           script: |
             set -e
             mkdir -p /var/www/${{ secrets.SERVER_USER }}/test.${{ secrets.DOMAIN }}/
@@ -62,6 +64,8 @@ jobs:
             NUXT_STRIPE_MODE_VALUE="$(dotenv_quote "$STRIPE_MODE")"
             NUXT_STRIPE_SUCCESS_URL_VALUE="$(dotenv_quote "$SUCCESS_URL")"
             NUXT_STRIPE_CANCEL_URL_VALUE="$(dotenv_quote "$CANCEL_URL")"
+            NUXT_PM2_APP_NAME_VALUE="$(dotenv_quote "$PM2_APP_NAME")"
+            NUXT_PORT_VALUE="$(dotenv_quote "$PORT")"
 
 
             cat > .env.production <<EOF
