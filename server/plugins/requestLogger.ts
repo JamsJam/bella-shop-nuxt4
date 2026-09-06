@@ -12,6 +12,7 @@ export default defineNitroPlugin((nitroApp) => {
 
     console.log(JSON.stringify({
       type: 'http_request',
+      direction: 'incoming',
       timestamp: new Date().toISOString(),
       method: event.method,
       path: getRequestURL(event).pathname,
