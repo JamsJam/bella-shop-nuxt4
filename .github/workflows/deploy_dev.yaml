@@ -87,6 +87,6 @@ jobs:
             chmod 600 .env.production
 
             npm ci
-            npm run build -- --dotenv .env.production
-            pm2 startOrReload ecosystem.config.cjs --update-env
+            npm run build
+            pm2 startOrReload ecosystem.config.cjs  --only $(dotenv_quote "$PM2_APP_NAME") --update-env
             pm2 save
