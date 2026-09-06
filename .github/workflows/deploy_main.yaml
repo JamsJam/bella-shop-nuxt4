@@ -25,13 +25,14 @@ jobs:
           SITE_ENV: ${{ secrets.MAIN_SITE_ENV }}
           CRYPT_KEY: ${{ secrets.MAIN_CRYPTO_KEY }}
           PM2_APP_NAME: ${{ secrets.MAIN_PM2_APP_NAME }}
+          PORT: ${{ secrets.MAIN_PORT }}
 
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          envs: API_URL,PUBLIC_API_URL,PUBLIC_SITE_URL,SITE_ENV,CRYPT_KEY,PM2_APP_NAME
+          envs: API_URL,PUBLIC_API_URL,PUBLIC_SITE_URL,SITE_ENV,CRYPT_KEY,PM2_APP_NAME,PORT
           script: |
             set -e
             mkdir -p /var/www/${{ secrets.SERVER_USER }}/${{ secrets.DOMAIN }}/
@@ -56,7 +57,8 @@ jobs:
             NUXT_SITE_URL_VALUE="$(dotenv_quote "$PUBLIC_SITE_URL")"
             NUXT_SITE_ENV_VALUE="$(dotenv_quote "$SITE_ENV")"
             NUXT_CRYPTO_SECRET_KEY_VALUE="$(dotenv_quote "$CRYPT_KEY")"
-
+            NUXT_PORT_VALUE="$(dotenv_quote "$PORT")"
+            NUXT_PM2_APP_NAME_VALUE="$(dotenv_quote "$PM2_APP_NAME")"
 
 
             cat > .env.production <<EOF
@@ -65,6 +67,8 @@ jobs:
             NUXT_PUBLIC_PLATFORM_API_BASE=${NUXT_PUBLIC_PLATFORM_API_BASE_VALUE}
             NUXT_SITE_URL=${NUXT_SITE_URL_VALUE}
             NUXT_SITE_ENV=${NUXT_SITE_ENV_VALUE}
+            NUXT_PORT=${NUXT_PORT_VALUE}
+            NUXT_PM2_APP_NAME=${NUXT_PM2_APP_NAME_VALUE}
 
             # Configuration de la clé secrète pour le chiffrement
             NUXT_CRYPTO_SECRET_KEY=${NUXT_CRYPTO_SECRET_KEY_VALUE}
