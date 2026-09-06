@@ -8,7 +8,7 @@ module.exports = {
       script: './.output/server/index.mjs',
       node_args: '--env-file=.env.production',
       env: {
-        NODE_ENV: 'production',
+        NODE_ENV: process.env.SITE_ENV ,
       },
     },
   ],
